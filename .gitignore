@@ -1,0 +1,28 @@
+# Dependencies
+/vendor/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# PHP / testing
+.phpunit.result.cache
+/build/
+*.cache
+
+# Uploads (keep directory, ignore contents)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Logs
+*.log
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

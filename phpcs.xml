@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<ruleset name="IOMS">
+    <description>PSR-12 coding standard for the IOMS backend.</description>
+
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg value="p"/>
+
+    <file>app</file>
+    <file>tests</file>
+
+    <rule ref="PSR12"/>
+</ruleset>
