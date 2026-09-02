@@ -1,0 +1,50 @@
+PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.4.8
+Configuration: /Users/Expiro/Project/ioms/phpunit.xml
+
+..........................                                        26 / 26 (100%)
+
+Time: 00:01.469, Memory: 10.00 MB
+
+Goods Issue Integration (Tests\Integration\GoodsIssueIntegration)
+ ✔ Second goods issue is rejected once stock is exhausted
+
+Goods Receipt Integration (Tests\Integration\GoodsReceiptIntegration)
+ ✔ Receiving goods increments stock and writes ledger entry
+ ✔ Partial then full receipt moves status through partially received to received
+
+Low Stock Detection (Tests\Unit\LowStockDetection)
+ ✔ Product below reorder point is flagged low stock
+ ✔ Product at or above reorder point is not flagged
+ ✔ Total is summed across warehouses for reorder comparison
+
+Product Service (Tests\Unit\ProductService)
+ ✔ Create rejects duplicate sku
+ ✔ Create succeeds with valid data
+ ✔ Delete falls back to deactivate when used in orders
+
+Purchase Order Date Validation (Tests\Unit\PurchaseOrderDateValidation)
+ ✔ Empty date is rejected
+ ✔ Invalid format is rejected
+ ✔ Today is accepted
+ ✔ Future date beyond tolerance is rejected
+ ✔ Future date within tolerance is accepted
+
+Sales Order Service (Tests\Unit\SalesOrderService)
+ ✔ Fulfill throws insufficient stock and rolls back when stock too low
+ ✔ Fulfill succeeds and decrements stock when sufficient
+ ✔ Invalid status transition is rejected
+ ✔ Sales role cannot approve even when calling service directly
+ ✔ Creator cannot approve own order
+ ✔ Warehouse staff role cannot approve
+ ✔ Warehouse staff role cannot reject
+ ✔ Full valid lifecycle draft to fulfilled
+ ✔ Fulfilled cannot transition back to draft
+ ✔ Approved cannot skip straight to fulfilled via transition assertion only
+ ✔ Only owner can submit for approval
+
+Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
+ ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
+
+OK (26 tests, 63 assertions)

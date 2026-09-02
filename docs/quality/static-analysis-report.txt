@@ -1,0 +1,49 @@
+=== PHPStan (composer stan) — Wed Sep  2 09:12:33 WIB 2026 ===
+Note: Using configuration file /Users/Expiro/Project/ioms/phpstan.neon.
+  0/73 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%[1G[2K 73/73 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+
+ [OK] No errors                                                                 
+
+
+=== PHPCS (phpcs.xml, PSR-12) — Wed Sep  2 09:12:35 WIB 2026 ===
+
+[1mFILE: /Users/Expiro/Project/ioms/app/Service/SupplierService.php[0m
+----------------------------------------------------------------------
+[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+----------------------------------------------------------------------
+ 34 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+----------------------------------------------------------------------
+
+
+[1mFILE: /Users/Expiro/Project/ioms/app/Service/CustomerService.php[0m
+----------------------------------------------------------------------
+[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+----------------------------------------------------------------------
+ 34 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+----------------------------------------------------------------------
+
+
+[1mFILE: /Users/Expiro/Project/ioms/app/Service/ReportService.php[0m
+----------------------------------------------------------------------
+[1mFOUND 0 ERRORS AND 7 WARNINGS AFFECTING 7 LINES[0m
+----------------------------------------------------------------------
+ 33 | [33mWARNING[0m | Line exceeds 120 characters; contains 156 characters
+ 35 | [33mWARNING[0m | Line exceeds 120 characters; contains 171 characters
+ 47 | [33mWARNING[0m | Line exceeds 120 characters; contains 123 characters
+ 53 | [33mWARNING[0m | Line exceeds 120 characters; contains 121 characters
+ 55 | [33mWARNING[0m | Line exceeds 120 characters; contains 132 characters
+ 58 | [33mWARNING[0m | Line exceeds 120 characters; contains 134 characters
+ 65 | [33mWARNING[0m | Line exceeds 120 characters; contains 148 characters
+----------------------------------------------------------------------
+
+
+[1mFILE: /Users/Expiro/Project/ioms/app/Service/PurchaseOrderService.php[0m
+----------------------------------------------------------------------
+[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+----------------------------------------------------------------------
+ 24 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+----------------------------------------------------------------------
+
+Time: 1.99 secs; Memory: 10MB
+

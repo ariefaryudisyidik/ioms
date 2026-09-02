@@ -1,0 +1,25 @@
+# Technical Debt — Catatan Jujur
+
+Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02. Tujuannya transparansi, bukan menyembunyikan kekurangan.
+
+## Keterbatasan implementasi saat ini
+
+1. **`ApiController` melewati layer Service.** `ApiController::productAvailability()` membuat instance `MySqlProductRepository`, `MySqlProductStockRepository`, `MySqlWarehouseRepository` secara langsung di dalam Controller, alih-alih memanggil sebuah `ProductAvailabilityService`. Ini menyimpang dari pola layering Controller→Service→Repository yang dipakai konsisten di controller lain, dan membuat logic agregasi (menjumlah stok per gudang) tidak reusable/testable secara terpisah dari HTTP layer.
+2. **Validasi input masih sederhana (presence/format dasar).** Validasi di Service (mis. `SalesOrderService::create`, `PurchaseOrderService::create`) memeriksa "wajib diisi", "positif", "tanggal valid Y-m-d", dan keunikan nomor — tapi belum ada validasi lintas-field yang lebih kompleks (mis. memastikan `selling_price` SO tidak di bawah `purchase_price` produk, atau validasi format kontak/telepon di Customer/Supplier).
+3. **Tidak ada rate limiting** pada endpoint login (`AuthController::login`) maupun API (`ApiController::productAvailability`) — berpotensi terhadap brute-force credential guessing atau pemakaian berlebihan pada endpoint API.
+4. **Otentikasi API memakai session cookie yang sama dengan web** (`Auth::requireLoginApi`), bukan token terpisah (API key/JWT) — cocok untuk kebutuhan internal saat ini, tapi berarti API tidak bisa dipakai oleh klien non-browser tanpa turut menangani cookie session PHP.
+5. **Implementasi In-Memory Repository tidak mensimulasikan row-locking MySQL sungguhan.** `InMemoryProductStockRepository::lockForUpdate` (dipakai unit test) tidak benar-benar meniru semantik `SELECT ... FOR UPDATE` InnoDB (blocking antar transaksi konkuren) — sehingga skenario race condition pada `SalesOrderService::fulfill` HANYA benar-benar tervalidasi lewat integration test terhadap MySQL asli (lihat ADR-002), bukan lewat unit test murni.
+6. **Integration test membutuhkan Docker + MySQL nyata untuk dijalankan reviewer** — test yang memakai `MySql*Repository` (lawan dari `InMemory*Repository`) tidak bisa dijalankan tanpa database sungguhan berjalan. Ini sudah dijalankan dan lulus terhadap MySQL nyata di Docker (`docker compose up`, lalu `TEST_DB_HOST=127.0.0.1 TEST_DB_PORT=<port mapped> ... vendor/bin/phpunit --testsuite Integration` → 4 test lulus, 24 assertion) selama tahap verifikasi akhir proyek ini. Reviewer yang hanya menjalankan `composer test:unit`/`composer test` tanpa mengatur env `TEST_DB_*` ke instance MySQL yang berjalan akan melihat 4 test ini **skip** (bukan gagal) — bukan bug, itu sengaja (`markTestSkipped()` di `IntegrationTestCase`) supaya `composer test` tetap hijau di lingkungan tanpa Docker.
+7. **Tidak ada CI/CD pipeline** — sesuai batasan proyek (lihat `docs/planning/scope.md`), tidak ada automated pipeline yang menjalankan test/lint pada setiap push; verifikasi kualitas kode bergantung pada eksekusi manual (`composer test`, `phpstan`, `phpcs`).
+8. **`scripts/check-low-stock.php` adalah skrip CLI murni**, tidak ada scheduler bawaan aplikasi (sesuai larangan cron in-app) — jika reviewer/operator lupa menjadwalkannya via cron OS, notifikasi low stock tidak akan pernah berjalan otomatis.
+9. **Upload gambar produk disimpan di filesystem lokal** (`image_path` di tabel `products`). `ProductService` sudah memvalidasi ukuran maksimum (2MB) dan tipe MIME sungguhan (`mime_content_type`, dibatasi ke JPEG/PNG/WEBP) sebelum menyimpan file dengan nama acak (`bin2hex(random_bytes(16))`) — bukan nama asli. Belum diuji manual dengan berbagai file gambar nyata (hanya diverifikasi lewat pembacaan kode); disarankan diuji ulang oleh pengguna sebelum submission.
+10. **Tidak ada mekanisme audit trail untuk perubahan master data** (Product, Category, Supplier, Customer, Warehouse) — hanya transaksi stok (PO/SO) yang tercatat di `stock_ledger`. Siapa mengubah harga produk kapan, misalnya, tidak terekam.
+
+## Rencana Perbaikan ke Depan
+
+- Refactor `ApiController` agar memanggil `ProductAvailabilityService` (baru) yang menggabungkan tiga Repository tersebut, konsisten dengan Controller lain.
+- Menambah rule validasi lintas-field pada `SalesOrderService`/`ProductService` (mis. margin harga minimum) jika dibutuhkan proses bisnis.
+- Menambah rate limiting sederhana berbasis session/IP (tanpa infrastruktur eksternal, sesuai batasan proyek) pada endpoint login dan API.
+- Menambah kelas `ProductStockLockSimulator` atau helper test khusus agar `InMemoryProductStockRepository` bisa mensimulasikan kontensi (mis. dengan flag "locked" manual) untuk pengujian race condition tanpa MySQL.
+- Menyediakan panduan setup Docker+MySQL yang jelas di README agar reviewer bisa menjalankan integration test bila mereka mau (di luar cakupan wajib).
+- Menambah audit log sederhana (tabel `audit_log` generik) untuk perubahan master data, jika dibutuhkan kepatuhan/tracing lebih lanjut.
