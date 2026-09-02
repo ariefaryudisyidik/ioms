@@ -52,13 +52,7 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
 
     public function lockForUpdate(PDO $pdo, int $productId, int $warehouseId): int
     {
-        // Ensure a row exists so it can be locked deterministically.
-        $insert = $pdo->prepare(
-            'INSERT INTO product_stocks (product_id, warehouse_id, quantity)
-             VALUES (?, ?, 0)
-             ON DUPLICATE KEY UPDATE product_id = product_id'
-        );
-        $insert->execute([$productId, $warehouseId]);
+        $this->ensureRowExists($pdo, $productId, $warehouseId);
 
         $stmt = $pdo->prepare(
             'SELECT quantity FROM product_stocks WHERE product_id = ? AND warehouse_id = ? FOR UPDATE'
@@ -77,6 +71,23 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
              ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)'
         );
         $stmt->execute([$productId, $warehouseId, $qty]);
+    }
+
+    /**
+     * Ensures a product_stocks row exists for the given product/warehouse
+     * pair (inserted at quantity 0 if missing) so it can be locked or
+     * updated deterministically. Extracted from lockForUpdate() so any
+     * future caller needing the same guarantee does not duplicate the
+     * upsert-with-no-op pattern (see docs/quality/refactor-log.md #3).
+     */
+    private function ensureRowExists(PDO $pdo, int $productId, int $warehouseId): void
+    {
+        $insert = $pdo->prepare(
+            'INSERT INTO product_stocks (product_id, warehouse_id, quantity)
+             VALUES (?, ?, 0)
+             ON DUPLICATE KEY UPDATE product_id = product_id'
+        );
+        $insert->execute([$productId, $warehouseId]);
     }
 
     public function decrement(int $productId, int $warehouseId, int $qty): void
