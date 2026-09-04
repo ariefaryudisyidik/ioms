@@ -74,11 +74,14 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
     public function search(array $filters = []): array
     {
         [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT * FROM purchase_orders';
+        $sql = 'SELECT po.*, s.name AS supplier_name
+                FROM purchase_orders po
+                LEFT JOIN suppliers s ON s.id = po.supplier_id';
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
-        $sql .= ' ORDER BY created_at DESC';
+        $direction = ($filters['sort'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
+        $sql .= " ORDER BY po.order_date {$direction}, po.created_at {$direction}";
 
         $limit = (int) ($filters['limit'] ?? 10);
         $offset = (int) ($filters['offset'] ?? 0);

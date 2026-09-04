@@ -37,6 +37,7 @@ final class SalesOrderController extends Controller
             $repo = new MySqlSalesOrderRepository($this->pdo());
             $filters = [
                 'status' => $request->query('status', ''),
+                'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
                 'limit' => 10,
                 'offset' => (max(1, (int) $request->query('page', 1)) - 1) * 10,
             ];

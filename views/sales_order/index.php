@@ -10,7 +10,10 @@ $lastPage = (int) max(1, ceil($total / $perPage));
 include __DIR__ . '/../partials/header.php';
 
 $buildUrl = static function (array $overrides) use ($filters) {
-    $params = array_merge(['status' => $filters['status'] ?? ''], $overrides);
+    $params = array_merge([
+        'status' => $filters['status'] ?? '',
+        'sort' => $filters['sort'] ?? 'desc',
+    ], $overrides);
     $params = array_filter($params, static fn ($v) => $v !== '' && $v !== null);
 
     return '/sales-orders?' . http_build_query($params);
@@ -33,6 +36,13 @@ $statuses = ['Draft', 'PendingApproval', 'Approved', 'Fulfilled', 'Cancelled'];
             <?php foreach ($statuses as $s): ?>
                 <option value="<?= e($s) ?>" <?= ($filters['status'] ?? '') === $s ? 'selected' : '' ?>><?= e($s) ?></option>
             <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="field">
+        <label for="sort">Sort by Date</label>
+        <select id="sort" name="sort">
+            <option value="desc" <?= ($filters['sort'] ?? 'desc') === 'desc' ? 'selected' : '' ?>>Newest first</option>
+            <option value="asc" <?= ($filters['sort'] ?? 'desc') === 'asc' ? 'selected' : '' ?>>Oldest first</option>
         </select>
     </div>
     <div class="field" style="min-width:auto;">

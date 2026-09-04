@@ -82,7 +82,8 @@ final class MySqlSalesOrderRepository implements SalesOrderRepositoryInterface
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
-        $sql .= ' ORDER BY created_at DESC';
+        $direction = ($filters['sort'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
+        $sql .= " ORDER BY order_date {$direction}, created_at {$direction}";
 
         $limit = (int) ($filters['limit'] ?? 10);
         $offset = (int) ($filters['offset'] ?? 0);

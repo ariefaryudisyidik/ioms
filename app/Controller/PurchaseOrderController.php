@@ -37,6 +37,7 @@ final class PurchaseOrderController extends Controller
             $filters = [
                 'status' => $request->query('status', ''),
                 'supplier_id' => (int) $request->query('supplier_id', 0) ?: null,
+                'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
                 'limit' => 10,
                 'offset' => (max(1, (int) $request->query('page', 1)) - 1) * 10,
             ];

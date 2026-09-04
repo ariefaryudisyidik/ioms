@@ -14,6 +14,7 @@ $buildUrl = static function (array $overrides) use ($filters) {
     $params = array_merge([
         'status' => $filters['status'] ?? '',
         'supplier_id' => $filters['supplier_id'] ?? '',
+        'sort' => $filters['sort'] ?? 'desc',
     ], $overrides);
     $params = array_filter($params, static fn ($v) => $v !== '' && $v !== null);
 
@@ -48,6 +49,13 @@ $statuses = ['Draft', 'Ordered', 'PartiallyReceived', 'Received', 'Cancelled'];
             <?php endforeach; ?>
         </select>
     </div>
+    <div class="field">
+        <label for="sort">Sort by Date</label>
+        <select id="sort" name="sort">
+            <option value="desc" <?= ($filters['sort'] ?? 'desc') === 'desc' ? 'selected' : '' ?>>Newest first</option>
+            <option value="asc" <?= ($filters['sort'] ?? 'desc') === 'asc' ? 'selected' : '' ?>>Oldest first</option>
+        </select>
+    </div>
     <div class="field" style="min-width:auto;">
         <button type="submit" class="btn">Apply</button>
     </div>
@@ -58,11 +66,12 @@ $statuses = ['Draft', 'Ordered', 'PartiallyReceived', 'Received', 'Cancelled'];
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
-            <thead><tr><th>PO Number</th><th>Order Date</th><th>Status</th><th></th></tr></thead>
+            <thead><tr><th>PO Number</th><th>Supplier</th><th>Order Date</th><th>Status</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($items as $po): ?>
                 <tr>
                     <td><?= e($po->poNumber) ?></td>
+                    <td><?= e($po->supplierName ?? '-') ?></td>
                     <td><?= e($po->orderDate) ?></td>
                     <td><span class="badge badge-<?= strtolower($po->status) ?>"><?= e($po->status) ?></span></td>
                     <td><a class="btn btn-secondary btn-sm" href="/purchase-orders/<?= (int) $po->id ?>">View</a></td>

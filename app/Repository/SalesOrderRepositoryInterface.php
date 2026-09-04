@@ -17,7 +17,7 @@ interface SalesOrderRepositoryInterface
     public function soNumberExists(string $soNumber): bool;
 
     /**
-     * @param array{status?:string,customer_id?:int,warehouse_id?:int,created_by?:int,date_from?:string,date_to?:string,limit?:int,offset?:int} $filters
+     * @param array{status?:string,customer_id?:int,warehouse_id?:int,created_by?:int,date_from?:string,date_to?:string,sort?:string,limit?:int,offset?:int} $filters
      * @return SalesOrder[]
      */
     public function search(array $filters = []): array;

@@ -17,7 +17,7 @@ interface PurchaseOrderRepositoryInterface
     public function poNumberExists(string $poNumber): bool;
 
     /**
-     * @param array{status?:string,supplier_id?:int,warehouse_id?:int,date_from?:string,date_to?:string,limit?:int,offset?:int} $filters
+     * @param array{status?:string,supplier_id?:int,warehouse_id?:int,date_from?:string,date_to?:string,sort?:string,limit?:int,offset?:int} $filters
      * @return PurchaseOrder[]
      */
     public function search(array $filters = []): array;
