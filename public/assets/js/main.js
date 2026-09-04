@@ -32,11 +32,25 @@
 
     var addBtn = document.querySelector('.js-add-item-row');
     if (addBtn) {
+      // Start past the statically rendered row(s) (items[0]...) and never
+      // reuse an index, even after a row in the middle is removed - reusing
+      // a live index would merge an unrelated new row's fields into an
+      // existing item.
+      var nextIndex = document.querySelectorAll('.js-item-rows .js-item-row').length;
       addBtn.addEventListener('click', function () {
         var template = document.querySelector('.js-item-row-template');
-        if (!template) return;
-        var clone = template.content.firstElementChild.cloneNode(true);
         var container = document.querySelector('.js-item-rows');
+        if (!template || !container) return;
+        var clone = template.content.firstElementChild.cloneNode(true);
+        // Each item field must share the same numeric index (items[N][field])
+        // so PHP groups them into one row instead of one row per field -
+        // a bare "items[][field]" repeated across fields makes PHP append a
+        // new top-level index for every occurrence, splitting one logical
+        // row into several incomplete ones.
+        clone.querySelectorAll('[name*="__INDEX__"]').forEach(function (field) {
+          field.name = field.name.replace('__INDEX__', String(nextIndex));
+        });
+        nextIndex += 1;
         container.appendChild(clone);
         wireRow(clone);
       });

@@ -65,18 +65,18 @@ include __DIR__ . '/../partials/header.php';
                 <div class="item-row js-item-row">
                     <div class="field">
                         <label>Product</label>
-                        <select name="items[][product_id]" class="js-product-select" data-required required>
+                        <select name="items[0][product_id]" class="js-product-select" data-required required>
                             <option value="">Select a product</option>
                             <?php $renderProductOptions(); ?>
                         </select>
                     </div>
                     <div class="field">
                         <label>Qty</label>
-                        <input type="number" name="items[][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
+                        <input type="number" name="items[0][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
                     </div>
                     <div class="field">
                         <label>Selling Price</label>
-                        <input type="number" name="items[][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
+                        <input type="number" name="items[0][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
                     </div>
                     <div class="field">
                         <button type="button" class="btn btn-danger btn-sm js-remove-item-row">Remove</button>
@@ -98,18 +98,18 @@ include __DIR__ . '/../partials/header.php';
     <div class="item-row js-item-row">
         <div class="field">
             <label>Product</label>
-            <select name="items[][product_id]" class="js-product-select" data-required required>
+            <select name="items[__INDEX__][product_id]" class="js-product-select" data-required required>
                 <option value="">Select a product</option>
                 <?php $renderProductOptions(); ?>
             </select>
         </div>
         <div class="field">
             <label>Qty</label>
-            <input type="number" name="items[][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
+            <input type="number" name="items[__INDEX__][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
         </div>
         <div class="field">
             <label>Selling Price</label>
-            <input type="number" name="items[][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
+            <input type="number" name="items[__INDEX__][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
         </div>
         <div class="field">
             <button type="button" class="btn btn-danger btn-sm js-remove-item-row">Remove</button>
