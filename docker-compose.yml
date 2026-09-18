@@ -10,35 +10,16 @@ services:
     env_file:
       - .env
     environment:
-      DB_HOST: mysql
+      # MySQL runs on the host via MAMP, not as a Docker service; from
+      # inside the container, the host is reached via this Docker
+      # Desktop-provided hostname (Mac/Windows only).
+      DB_HOST: host.docker.internal
       DB_PORT: "3306"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/var/www/html
       - uploads_data:/var/www/html/public/uploads
-    depends_on:
-      mysql:
-        condition: service_healthy
-
-  mysql:
-    image: mysql:8.0
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_change_me}
-      MYSQL_DATABASE: ${DB_DATABASE:-ioms}
-      MYSQL_USER: ${DB_USERNAME:-ioms_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-change_me}
-    ports:
-      - "3307:3306"
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
-      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-root_change_me}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
 volumes:
-  db_data:
   uploads_data:
