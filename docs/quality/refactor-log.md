@@ -82,3 +82,37 @@ Sekarang Controller bisa `catch (ValidationException $e)` secara spesifik dan me
 **Tindakan Boy Scout:** Menambahkan/mempertahankan komentar penjelas satu baris tepat di atas query tersebut (`// Ensure a row exists so it can be locked deterministically.`) — komentar ini sudah ada di kode dan dikonfirmasi tetap dipertahankan sebagai dokumentasi inline yang benar, bukan dihapus saat refactor lain menyentuh file ini. Prinsipnya: setiap kali file ini disentuh untuk keperluan apa pun, baris komentar krusial seperti ini dijaga agar tidak hilang, karena tanpanya intent locking-nya tidak terlihat jelas hanya dari baca SQL mentah.
 
 **Tindak lanjut (dieksekusi, commit `refactor:`):** pola "pastikan baris ada sebelum dikunci" di `lockForUpdate()` diekstrak menjadi private helper `ensureRowExists(PDO $pdo, int $productId, int $warehouseId): void` di `MySqlProductStockRepository`. `lockForUpdate()` kini hanya memanggil helper ini lalu melakukan `SELECT ... FOR UPDATE`, memisahkan "memastikan baris ada" dari "mengunci baris" sebagai dua langkah yang masing-masing bisa dibaca sendiri. Divalidasi dengan menjalankan ulang seluruh test suite (unit + integration terhadap MySQL nyata di Docker) — tetap hijau tanpa perubahan perilaku.
+
+## 4. Dashboard melakukan 8 query count terpisah untuk satu halaman (Consolidate Query / GROUP BY)
+
+**Code smell:** `DashboardService::summaryFor()` memanggil `SalesOrder::countByStatus()` lima kali (sekali per status) dan `PurchaseOrder::countSearch(['status' => ...])` tiga kali secara berurutan hanya untuk menampilkan rekap status di satu halaman dashboard — total 8 round-trip database untuk data yang sebenarnya bisa didapat dari 2 query. Pola ini sama dengan gejala N+1 yang dibahas di modul training SQL Bab 12: banyak query kecil yang seharusnya bisa digabung jadi satu query agregasi.
+
+**Teknik:** Consolidate Query — mengganti seluruh pemanggilan per-status dengan satu method `countsByStatus(): array<string,int>` per repository yang menjalankan `SELECT status, COUNT(*) AS cnt FROM ... GROUP BY status` sekali, lalu Service membaca hasilnya dari array dengan fallback `?? 0` untuk status yang tidak muncul di data.
+
+**Sebelum (representatif, `app/Service/DashboardService.php`):**
+```php
+$summary = [
+    'pending_approval_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_PENDING_APPROVAL),
+    'so_draft_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_DRAFT),
+    'so_approved_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_APPROVED),
+    'so_fulfilled_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_FULFILLED),
+    'so_cancelled_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_CANCELLED),
+    'po_draft_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_DRAFT]),
+    'po_ordered_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_ORDERED]),
+    'po_received_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_RECEIVED]),
+];
+```
+
+**Sesudah (kode nyata):**
+```php
+$soCounts = $this->salesOrders->countsByStatus();
+$poCounts = $this->purchaseOrders->countsByStatus();
+
+$summary = [
+    'pending_approval_count' => $soCounts[SalesOrder::STATUS_PENDING_APPROVAL] ?? 0,
+    'so_draft_count' => $soCounts[SalesOrder::STATUS_DRAFT] ?? 0,
+    // ...
+    'po_ordered_count' => $poCounts[PurchaseOrder::STATUS_ORDERED] ?? 0,
+];
+```
+`countByStatus(string $status): int` yang jadi tidak terpakai dihapus dari interface dan kedua implementasinya (MySQL + in-memory) agar tidak ada kode mati. Divalidasi dengan menjalankan ulang unit + integration test (tetap hijau) dan membandingkan angka dashboard terhadap hasil `GROUP BY` manual langsung di MySQL — cocok persis.
