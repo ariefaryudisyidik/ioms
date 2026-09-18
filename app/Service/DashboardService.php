@@ -31,20 +31,21 @@ final class DashboardService
     {
         $totalProducts = count($this->products->all(true));
         $lowStockCount = $this->stocks->countLowStock();
-        $pendingApprovalCount = $this->salesOrders->countByStatus(SalesOrder::STATUS_PENDING_APPROVAL);
+        $soCounts = $this->salesOrders->countsByStatus();
+        $poCounts = $this->purchaseOrders->countsByStatus();
 
         $summary = [
             'total_products' => $totalProducts,
             'low_stock_count' => $lowStockCount,
             'low_stock_items' => $this->stocks->lowStockList(),
-            'pending_approval_count' => $pendingApprovalCount,
-            'so_draft_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_DRAFT),
-            'so_approved_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_APPROVED),
-            'so_fulfilled_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_FULFILLED),
-            'so_cancelled_count' => $this->salesOrders->countByStatus(SalesOrder::STATUS_CANCELLED),
-            'po_draft_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_DRAFT]),
-            'po_ordered_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_ORDERED]),
-            'po_received_count' => $this->purchaseOrders->countSearch(['status' => PurchaseOrder::STATUS_RECEIVED]),
+            'pending_approval_count' => $soCounts[SalesOrder::STATUS_PENDING_APPROVAL] ?? 0,
+            'so_draft_count' => $soCounts[SalesOrder::STATUS_DRAFT] ?? 0,
+            'so_approved_count' => $soCounts[SalesOrder::STATUS_APPROVED] ?? 0,
+            'so_fulfilled_count' => $soCounts[SalesOrder::STATUS_FULFILLED] ?? 0,
+            'so_cancelled_count' => $soCounts[SalesOrder::STATUS_CANCELLED] ?? 0,
+            'po_draft_count' => $poCounts[PurchaseOrder::STATUS_DRAFT] ?? 0,
+            'po_ordered_count' => $poCounts[PurchaseOrder::STATUS_ORDERED] ?? 0,
+            'po_received_count' => $poCounts[PurchaseOrder::STATUS_RECEIVED] ?? 0,
         ];
 
         if ($role === 'Sales') {

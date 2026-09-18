@@ -24,6 +24,9 @@ interface PurchaseOrderRepositoryInterface
 
     public function countSearch(array $filters = []): int;
 
+    /** @return array<string,int> */
+    public function countsByStatus(): array;
+
     public function save(PurchaseOrder $po): PurchaseOrder;
 
     public function saveItem(PurchaseOrderItem $item): PurchaseOrderItem;

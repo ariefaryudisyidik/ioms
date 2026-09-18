@@ -174,11 +174,14 @@ final class MySqlSalesOrderRepository implements SalesOrderRepositoryInterface
         $stmt->execute([$status, $soId]);
     }
 
-    public function countByStatus(string $status): int
+    public function countsByStatus(): array
     {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM sales_orders WHERE status = ?');
-        $stmt->execute([$status]);
+        $stmt = $this->pdo->query('SELECT status, COUNT(*) AS cnt FROM sales_orders GROUP BY status');
+        $counts = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $counts[(string) $row['status']] = (int) $row['cnt'];
+        }
 
-        return (int) $stmt->fetchColumn();
+        return $counts;
     }
 }

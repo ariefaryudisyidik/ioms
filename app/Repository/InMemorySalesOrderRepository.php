@@ -98,8 +98,13 @@ final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterfac
         }
     }
 
-    public function countByStatus(string $status): int
+    public function countsByStatus(): array
     {
-        return count(array_filter($this->orders, fn ($o) => $o->status === $status));
+        $counts = [];
+        foreach ($this->orders as $o) {
+            $counts[$o->status] = ($counts[$o->status] ?? 0) + 1;
+        }
+
+        return $counts;
     }
 }

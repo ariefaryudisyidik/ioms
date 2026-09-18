@@ -106,6 +106,17 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
         return (int) $stmt->fetchColumn();
     }
 
+    public function countsByStatus(): array
+    {
+        $stmt = $this->pdo->query('SELECT status, COUNT(*) AS cnt FROM purchase_orders GROUP BY status');
+        $counts = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $counts[(string) $row['status']] = (int) $row['cnt'];
+        }
+
+        return $counts;
+    }
+
     public function save(PurchaseOrder $po): PurchaseOrder
     {
         if ($po->id === null) {
