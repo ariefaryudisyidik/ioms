@@ -23,6 +23,7 @@ final class PurchaseOrder
         public string $status,
         public string $orderDate,
         public int $createdBy,
+        public ?string $supplierName = null,
     ) {
     }
 
@@ -36,6 +37,7 @@ final class PurchaseOrder
             (string) $row['status'],
             (string) $row['order_date'],
             (int) $row['created_by'],
+            isset($row['supplier_name']) ? (string) $row['supplier_name'] : null,
         );
     }
 }
