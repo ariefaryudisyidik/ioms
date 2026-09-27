@@ -15,7 +15,7 @@ final class MySqlWarehouseRepository implements WarehouseRepositoryInterface
 
     public function findById(int $id): ?Warehouse
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM warehouses WHERE id = ?');
+        $stmt = $this->pdo->prepare('SELECT id, name, location, is_active FROM warehouses WHERE id = ?');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +24,8 @@ final class MySqlWarehouseRepository implements WarehouseRepositoryInterface
 
     public function all(bool $onlyActive = false): array
     {
-        $sql = 'SELECT * FROM warehouses' . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
+        $sql = 'SELECT id, name, location, is_active FROM warehouses'
+            . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
         $stmt = $this->pdo->query($sql);
         $rows = $stmt ? $stmt->fetchAll() : [];
 

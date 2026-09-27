@@ -15,7 +15,9 @@ final class MySqlUserRepository implements UserRepositoryInterface
 
     public function findById(int $id): ?User
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, name, email, password_hash, role, is_active, created_at, updated_at FROM users WHERE id = ?'
+        );
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +26,9 @@ final class MySqlUserRepository implements UserRepositoryInterface
 
     public function findByEmail(string $email): ?User
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, name, email, password_hash, role, is_active, created_at, updated_at FROM users WHERE email = ?'
+        );
         $stmt->execute([$email]);
         $row = $stmt->fetch();
 
@@ -33,7 +37,9 @@ final class MySqlUserRepository implements UserRepositoryInterface
 
     public function all(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM users ORDER BY id DESC');
+        $stmt = $this->pdo->query(
+            'SELECT id, name, email, password_hash, role, is_active, created_at, updated_at FROM users ORDER BY id DESC'
+        );
         $rows = $stmt ? $stmt->fetchAll() : [];
 
         return array_map(fn ($r) => User::fromRow($r), $rows);

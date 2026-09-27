@@ -15,7 +15,10 @@ final class MySqlProductRepository implements ProductRepositoryInterface
 
     public function findById(int $id): ?Product
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM products WHERE id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, sku, name, category_id, unit, purchase_price, selling_price, reorder_point, image_path, is_active
+             FROM products WHERE id = ?'
+        );
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +27,10 @@ final class MySqlProductRepository implements ProductRepositoryInterface
 
     public function findBySku(string $sku): ?Product
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM products WHERE sku = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, sku, name, category_id, unit, purchase_price, selling_price, reorder_point, image_path, is_active
+             FROM products WHERE sku = ?'
+        );
         $stmt->execute([$sku]);
         $row = $stmt->fetch();
 
@@ -77,7 +83,9 @@ final class MySqlProductRepository implements ProductRepositoryInterface
     public function search(array $filters = []): array
     {
         [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT p.* FROM products p';
+        $sql = 'SELECT p.id, p.sku, p.name, p.category_id, p.unit, p.purchase_price, p.selling_price,
+                       p.reorder_point, p.image_path, p.is_active
+                FROM products p';
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
@@ -113,7 +121,8 @@ final class MySqlProductRepository implements ProductRepositoryInterface
 
     public function all(bool $onlyActive = false): array
     {
-        $sql = 'SELECT * FROM products' . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
+        $sql = 'SELECT id, sku, name, category_id, unit, purchase_price, selling_price, reorder_point, image_path, is_active
+                FROM products' . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
         $stmt = $this->pdo->query($sql);
         $rows = $stmt ? $stmt->fetchAll() : [];
 

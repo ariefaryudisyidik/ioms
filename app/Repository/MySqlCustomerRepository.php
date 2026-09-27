@@ -15,7 +15,7 @@ final class MySqlCustomerRepository implements CustomerRepositoryInterface
 
     public function findById(int $id): ?Customer
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM customers WHERE id = ?');
+        $stmt = $this->pdo->prepare('SELECT id, name, contact, address, is_active FROM customers WHERE id = ?');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +24,8 @@ final class MySqlCustomerRepository implements CustomerRepositoryInterface
 
     public function all(bool $onlyActive = false): array
     {
-        $sql = 'SELECT * FROM customers' . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
+        $sql = 'SELECT id, name, contact, address, is_active FROM customers'
+            . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
         $stmt = $this->pdo->query($sql);
         $rows = $stmt ? $stmt->fetchAll() : [];
 

@@ -15,7 +15,7 @@ final class MySqlSupplierRepository implements SupplierRepositoryInterface
 
     public function findById(int $id): ?Supplier
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM suppliers WHERE id = ?');
+        $stmt = $this->pdo->prepare('SELECT id, name, contact, address, is_active FROM suppliers WHERE id = ?');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +24,8 @@ final class MySqlSupplierRepository implements SupplierRepositoryInterface
 
     public function all(bool $onlyActive = false): array
     {
-        $sql = 'SELECT * FROM suppliers' . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
+        $sql = 'SELECT id, name, contact, address, is_active FROM suppliers'
+            . ($onlyActive ? ' WHERE is_active = 1' : '') . ' ORDER BY name ASC';
         $stmt = $this->pdo->query($sql);
         $rows = $stmt ? $stmt->fetchAll() : [];
 

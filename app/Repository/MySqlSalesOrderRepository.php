@@ -16,7 +16,10 @@ final class MySqlSalesOrderRepository implements SalesOrderRepositoryInterface
 
     public function findById(int $id): ?SalesOrder
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM sales_orders WHERE id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, so_number, customer_id, warehouse_id, created_by, approved_by, status, order_date
+             FROM sales_orders WHERE id = ?'
+        );
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -78,7 +81,8 @@ final class MySqlSalesOrderRepository implements SalesOrderRepositoryInterface
     public function search(array $filters = []): array
     {
         [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT * FROM sales_orders';
+        $sql = 'SELECT id, so_number, customer_id, warehouse_id, created_by, approved_by, status, order_date
+                FROM sales_orders';
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
@@ -154,7 +158,9 @@ final class MySqlSalesOrderRepository implements SalesOrderRepositoryInterface
 
     public function itemsFor(int $soId): array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM sales_order_items WHERE sales_order_id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, sales_order_id, product_id, qty, selling_price FROM sales_order_items WHERE sales_order_id = ?'
+        );
         $stmt->execute([$soId]);
 
         return array_map(fn ($r) => SalesOrderItem::fromRow($r), $stmt->fetchAll());

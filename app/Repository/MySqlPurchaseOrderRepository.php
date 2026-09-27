@@ -16,7 +16,10 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
 
     public function findById(int $id): ?PurchaseOrder
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM purchase_orders WHERE id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, po_number, supplier_id, warehouse_id, status, order_date, created_by
+             FROM purchase_orders WHERE id = ?'
+        );
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -74,7 +77,8 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
     public function search(array $filters = []): array
     {
         [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT po.*, s.name AS supplier_name
+        $sql = 'SELECT po.id, po.po_number, po.supplier_id, po.warehouse_id, po.status, po.order_date, po.created_by,
+                       s.name AS supplier_name
                 FROM purchase_orders po
                 LEFT JOIN suppliers s ON s.id = po.supplier_id';
         if ($where) {
@@ -161,7 +165,10 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
 
     public function itemsFor(int $poId): array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM purchase_order_items WHERE purchase_order_id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, purchase_order_id, product_id, qty_ordered, qty_received, purchase_price
+             FROM purchase_order_items WHERE purchase_order_id = ?'
+        );
         $stmt->execute([$poId]);
 
         return array_map(fn ($r) => PurchaseOrderItem::fromRow($r), $stmt->fetchAll());

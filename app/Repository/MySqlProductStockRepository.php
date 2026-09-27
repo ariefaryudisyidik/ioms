@@ -15,7 +15,10 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
 
     public function find(int $productId, int $warehouseId): ?ProductStock
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM product_stocks WHERE product_id = ? AND warehouse_id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, product_id, warehouse_id, quantity
+             FROM product_stocks WHERE product_id = ? AND warehouse_id = ?'
+        );
         $stmt->execute([$productId, $warehouseId]);
         $row = $stmt->fetch();
 
@@ -25,7 +28,7 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
     public function findByProduct(int $productId): array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT ps.*, w.name AS warehouse_name FROM product_stocks ps
+            'SELECT ps.id, ps.product_id, ps.warehouse_id, ps.quantity FROM product_stocks ps
              JOIN warehouses w ON w.id = ps.warehouse_id
              WHERE ps.product_id = ? ORDER BY w.name ASC'
         );
@@ -36,7 +39,9 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
 
     public function findByWarehouse(int $warehouseId): array
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM product_stocks WHERE warehouse_id = ?');
+        $stmt = $this->pdo->prepare(
+            'SELECT id, product_id, warehouse_id, quantity FROM product_stocks WHERE warehouse_id = ?'
+        );
         $stmt->execute([$warehouseId]);
 
         return array_map(fn ($r) => ProductStock::fromRow($r), $stmt->fetchAll());

@@ -15,7 +15,7 @@ final class MySqlCategoryRepository implements CategoryRepositoryInterface
 
     public function findById(int $id): ?Category
     {
-        $stmt = $this->pdo->prepare('SELECT * FROM categories WHERE id = ?');
+        $stmt = $this->pdo->prepare('SELECT id, name, description FROM categories WHERE id = ?');
         $stmt->execute([$id]);
         $row = $stmt->fetch();
 
@@ -24,7 +24,7 @@ final class MySqlCategoryRepository implements CategoryRepositoryInterface
 
     public function all(): array
     {
-        $stmt = $this->pdo->query('SELECT * FROM categories ORDER BY name ASC');
+        $stmt = $this->pdo->query('SELECT id, name, description FROM categories ORDER BY name ASC');
         $rows = $stmt ? $stmt->fetchAll() : [];
 
         return array_map(fn ($r) => Category::fromRow($r), $rows);

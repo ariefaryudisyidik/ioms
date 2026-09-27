@@ -60,7 +60,9 @@ final class MySqlStockLedgerRepository implements StockLedgerRepositoryInterface
             $params[] = $filters['date_to'] . ' 23:59:59';
         }
 
-        $sql = 'SELECT * FROM stock_ledger';
+        $sql = 'SELECT id, product_id, warehouse_id, movement_type, quantity, reference_type, reference_id,
+                       performed_by, created_at
+                FROM stock_ledger';
         if ($where) {
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
