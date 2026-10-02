@@ -43,8 +43,21 @@ COPY . .
 # Re-run to make sure autoload files are generated against the final source.
 RUN composer dump-autoload --optimize --no-dev || true
 
-RUN mkdir -p public/uploads \
-    && chown -R www-data:www-data /var/www/html \
+# Run as an unprivileged user instead of root. Non-root cannot bind port 80,
+# so Apache listens on 8080 and writes its runtime files to dirs we own.
+ARG APP_UID=1000
+ARG APP_GID=1000
+RUN groupadd -g ${APP_GID} appuser \
+    && useradd -u ${APP_UID} -g appuser -m -s /usr/sbin/nologin appuser \
+    && sed -ri -e 's/Listen 80$/Listen 8080/' /etc/apache2/ports.conf \
+    && sed -ri -e 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/*.conf \
+    && mkdir -p public/uploads \
+    && chown -R appuser:appuser /var/www/html /var/run/apache2 /var/lock/apache2 /var/log/apache2 \
     && chmod -R 755 public/uploads
 
-EXPOSE 80
+ENV APACHE_RUN_USER=appuser \
+    APACHE_RUN_GROUP=appuser
+
+USER appuser
+
+EXPOSE 8080

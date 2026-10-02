@@ -6,7 +6,7 @@ services:
     image: ioms-app:local
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8080:8080"
     env_file:
       - .env
     environment:
@@ -18,6 +18,12 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
   mysql:
     image: mysql:8.0
