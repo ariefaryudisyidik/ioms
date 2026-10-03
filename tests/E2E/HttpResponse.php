@@ -11,7 +11,13 @@ final class HttpResponse
         public readonly string $body,
         public readonly string $location,
         public readonly string $contentType,
+        public readonly string $rawHeaders = '',
     ) {
+    }
+
+    public function header(string $name): string
+    {
+        return preg_match('/^' . preg_quote($name, '/') . ':\s*(.+?)\r?$/mi', $this->rawHeaders, $m) === 1 ? trim($m[1]) : '';
     }
 
     public function json(): array

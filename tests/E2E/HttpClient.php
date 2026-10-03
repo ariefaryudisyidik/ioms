@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\E2E;
 
+use App\Core\Csrf;
 use CURLFile;
 
 /**
@@ -12,6 +13,7 @@ use CURLFile;
 final class HttpClient
 {
     private string $cookieJar;
+    private ?string $csrfToken = null;
 
     public function __construct(private readonly string $baseUrl)
     {
@@ -33,7 +35,47 @@ final class HttpClient
      */
     public function post(string $path, array $data = []): HttpResponse
     {
+        $response = $this->request('POST', $path, $data + [Csrf::FIELD => $this->token()]);
+        if ($path === '/logout') {
+            $this->forgetToken();
+        }
+
+        return $response;
+    }
+
+    /**
+     * POST that deliberately sends no CSRF token (to prove the server rejects it).
+     *
+     * @param array<string,mixed> $data
+     */
+    public function postWithoutToken(string $path, array $data = []): HttpResponse
+    {
         return $this->request('POST', $path, $data);
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    public function postWithToken(string $path, array $data, string $token): HttpResponse
+    {
+        return $this->request('POST', $path, $data + [Csrf::FIELD => $token]);
+    }
+
+    /**
+     * The CSRF token of the current session, read from the last page that carried one.
+     */
+    public function token(): string
+    {
+        if ($this->csrfToken === null) {
+            $this->request('GET', '/login');
+        }
+
+        return (string) $this->csrfToken;
+    }
+
+    public function forgetToken(): void
+    {
+        $this->csrfToken = null;
     }
 
     /**
@@ -41,7 +83,13 @@ final class HttpClient
      */
     public function postJson(string $path, array $data): HttpResponse
     {
-        return $this->request('POST', $path, [], json_encode($data, JSON_THROW_ON_ERROR), ['Content-Type: application/json']);
+        return $this->request(
+            'POST',
+            $path,
+            [],
+            json_encode($data, JSON_THROW_ON_ERROR),
+            ['Content-Type: application/json', 'X-CSRF-Token: ' . $this->token()]
+        );
     }
 
     /**
@@ -76,11 +124,16 @@ final class HttpClient
         $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
         curl_close($curl);
 
+        if (preg_match('/name="_csrf" value="([0-9a-f]{64})"|name="csrf-token" content="([0-9a-f]{64})"/', $body, $match) === 1) {
+            $this->csrfToken = $match[1] !== '' ? $match[1] : $match[2];
+        }
+
         return new HttpResponse(
             $status,
             $body,
             $this->header($responseHeaders, 'Location'),
             $this->header($responseHeaders, 'Content-Type'),
+            $responseHeaders,
         );
     }
 

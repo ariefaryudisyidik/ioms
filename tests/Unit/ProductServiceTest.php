@@ -127,6 +127,19 @@ final class ProductServiceTest extends TestCase
         }
     }
 
+    public function testFileWithImageSignatureButNoRealImageIsRejected(): void
+    {
+        [$service, , $tmp] = $this->serviceWithFreshUploadDir();
+        file_put_contents($tmp, "\x89PNG\r\n\x1a\n" . '<?php echo "not an image"; ?>');
+
+        try {
+            $service->create($this->productData(), ['error' => UPLOAD_ERR_OK, 'size' => 100, 'tmp_name' => $tmp]);
+            $this->fail('A fake image must be rejected.');
+        } catch (ValidationException $e) {
+            $this->assertArrayHasKey('image', $e->errors());
+        }
+    }
+
     public function testStorageFailureIsReportedAsAValidationError(): void
     {
         $blocker = (string) tempnam(sys_get_temp_dir(), 'blocker');

@@ -76,6 +76,15 @@ final class CoreSupportTest extends TestCase
         $this->assertStringContainsString('alert-info', $html);
     }
 
+    public function testUserListShowsEmptyStateWhenThereAreNoUsers(): void
+    {
+        View::setViewsPath(dirname(__DIR__, 2) . '/views');
+
+        $html = View::render('user.index', ['users' => [], 'auth_user' => ['id' => 1, 'name' => 'A', 'email' => 'a@x.test', 'role' => 'Admin']]);
+
+        $this->assertStringContainsString('empty-state', $html);
+    }
+
     public function testStockLedgerServiceDelegatesSearchToTheRepository(): void
     {
         $repository = $this->createMock(StockLedgerRepositoryInterface::class);

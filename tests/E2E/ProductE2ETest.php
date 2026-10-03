@@ -131,7 +131,7 @@ final class ProductE2ETest extends E2ETestCase
         $this->assertSame(0, (int) $this->value('SELECT is_active FROM products WHERE id = 1'));
 
         $this->assertSame(302, $client->post('/products/99999/delete')->status);
-        $this->assertSame(302, $client->request('DELETE', '/products/2')->status);
+        $this->assertSame(302, $client->request('DELETE', '/products/2', [], null, ['X-CSRF-Token: ' . $client->token()])->status);
     }
 
     public function testProductWritesAreRestrictedByRole(): void

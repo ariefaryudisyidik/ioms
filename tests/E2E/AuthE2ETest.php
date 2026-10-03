@@ -73,7 +73,8 @@ final class AuthE2ETest extends E2ETestCase
         $this->assertSame(302, $client->get('/dashboard')->status);
 
         $client = $this->loginAs(self::ADMIN);
-        $this->assertStringEndsWith('/login', $client->get('/logout')->location);
+        $this->assertSame(404, $client->get('/logout')->status, 'logging out must not be possible via GET (CSRF)');
+        $this->assertSame(200, $client->get('/dashboard')->status);
     }
 
     public function testGuestIsRedirectedToLoginFromProtectedPages(): void

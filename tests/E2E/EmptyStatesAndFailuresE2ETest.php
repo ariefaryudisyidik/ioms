@@ -16,7 +16,7 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
     public function testListPagesShowEmptyStateWhenThereAreNoRows(): void
     {
         $admin = $this->loginAs(self::ADMIN);
-        foreach (['categories', 'customers', 'suppliers', 'warehouses', 'users'] as $table) {
+        foreach (['categories', 'customers', 'suppliers', 'warehouses'] as $table) {
             $this->clearTable($table);
             $response = $admin->get('/' . $table);
 

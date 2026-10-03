@@ -48,15 +48,33 @@ final class SalesOrderE2ETest extends E2ETestCase
         $this->assertSame(200, $this->loginAs(self::WAREHOUSE)->get('/sales-orders')->status);
     }
 
-    public function testEverySeededSalesOrderRendersItsDetailPage(): void
+    public function testSeededSalesOrdersRenderForStaffAndOnlyOwnOrdersForSales(): void
     {
-        foreach ([self::ADMIN, self::SALES, self::WAREHOUSE] as $email) {
+        foreach ([self::ADMIN, self::WAREHOUSE] as $email) {
             $client = $this->loginAs($email);
             for ($id = 1; $id <= 12; $id++) {
                 $this->assertSame(200, $client->get('/sales-orders/' . $id)->status, "{$email} SO {$id}");
             }
         }
+
+        $sari = $this->loginAs(self::SALES);
+        for ($id = 1; $id <= 12; $id++) {
+            $owned = $id % 2 === 1; // seed: odd ids belong to Sari, even ids to Budi
+            $this->assertSame($owned ? 200 : 403, $sari->get('/sales-orders/' . $id)->status, "Sari SO {$id}");
+        }
         $this->assertSame(404, $this->loginAs(self::ADMIN)->get('/sales-orders/99999')->status);
+    }
+
+    public function testSalesCannotCancelAnotherSalesUsersOrder(): void
+    {
+        $budi = $this->loginAs(self::SALES_2);
+
+        $response = $budi->post('/sales-orders/1/cancel');
+
+        $this->assertSame(403, $response->status);
+        $this->assertSame('PendingApproval', $this->orderStatus(1));
+        $this->assertSame(302, $this->loginAs(self::SALES)->post('/sales-orders/1/cancel')->status);
+        $this->assertSame('Cancelled', $this->orderStatus(1));
     }
 
     public function testCreateFormIsAvailableToSalesAndAdminOnly(): void

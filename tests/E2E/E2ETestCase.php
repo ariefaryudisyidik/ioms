@@ -104,12 +104,14 @@ abstract class E2ETestCase extends TestCase
 
     protected function jpeg(): string
     {
-        return "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" . str_repeat("\x00", 32);
+        return (string) base64_decode(
+            '/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='
+        );
     }
 
     protected function webp(): string
     {
-        return 'RIFF' . pack('V', 26) . 'WEBPVP8 ' . pack('V', 10) . str_repeat("\x00", 10);
+        return (string) base64_decode('UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA');
     }
 
     private function resetDatabase(): void
