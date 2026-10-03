@@ -76,9 +76,9 @@ docker compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ioms -e "
 # API
 curl -i http://localhost:8080/api/products/SKU-0001/availability   # 401 tanpa session
 
-# Bukti 403 dari server (ganti 14 dengan id SO yang berstatus PendingApproval)
+# Bukti 403 dari server (ganti 13 dengan id SO yang berstatus PendingApproval)
 curl -s -c /tmp/sales.jar -o /dev/null -d 'email=sari.sales@ioms.test&password=Password123!' http://localhost:8080/login
-curl -i -b /tmp/sales.jar -X POST http://localhost:8080/sales-orders/14/approve | head -1   # HTTP/1.1 403
+curl -i -b /tmp/sales.jar -X POST http://localhost:8080/sales-orders/13/approve | head -1   # HTTP/1.1 403
 ```
 
 ## 3. Antisipasi pertanyaan asesor
