@@ -28,7 +28,7 @@ Cabang yang tidak bisa dicapai lewat HTTP (mis. respons JSON untuk 403/409 di `C
 
 ## Konsekuensi
 
-- Coverage kini mencerminkan eksekusi nyata dan mencapai 100% line coverage (3.512 baris), dengan perilaku HTTP (status, redirect, pembatasan role) terkunci oleh test.
+- Coverage kini mencerminkan eksekusi nyata dan mencapai 100% line coverage, dengan perilaku HTTP (status, redirect, pembatasan role) terkunci oleh test.
 - Menjalankan `composer coverage` butuh Docker dan PHP dengan Xdebug. `composer test` biasa tetap jalan tanpa keduanya karena suite E2E dilewati bila `E2E_BASE_URL` tidak di-set.
 - Itu *line coverage*: tidak menjamin semua kombinasi input teruji. Kualitas asersi tetap perlu direview.
 - Suite E2E lebih lambat (≈2 menit) daripada unit test; sebagian waktu itu overhead Xdebug.

@@ -43,3 +43,9 @@ Sesi Claude Code berikutnya (atas instruksi pengguna yang sama) menambahkan dan 
 - Dokumentasi terkait: ADR-003, class diagram as-built, refactor log (entri 5 dan 6), laporan SonarQube, dan tech debt.
 
 Pengguna tetap bertanggung jawab memahami dan menjelaskan seluruh kode di atas, serta me-review hasil perubahan sebelum presentasi.
+
+## Pembaruan 2026-10-03 — tinjauan dan perbaikan keamanan
+
+- Audit keamanan baca-kode dijalankan oleh subagent read-only (XSS, SQL injection, otorisasi per route, sesi, upload, konfigurasi), lalu temuannya diperbaiki dan diuji di sesi utama: CSRF, validasi ulang sesi, cookie sesi, throttling login, IDOR sales order, pembatasan laporan, validasi order, formula injection CSV, verifikasi upload, dan hardening Dockerfile/Apache/compose.
+- Verifikasi: 237 test (termasuk `SecurityE2ETest`), scan SonarQube 0 isu/0 hotspot, dan pengujian terhadap container Apache sungguhan (header, cookie, PHP di folder upload ditolak, tanpa tool dev).
+- Dokumentasi: `docs/quality/security-review.md`, ADR-004. Risiko yang tersisa dicatat jujur di sana; tinjauan ini bukan pengganti uji penetrasi independen.

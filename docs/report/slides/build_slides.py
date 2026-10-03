@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds docs/report/IOMS-Presentation-2026-10-07.pdf (16:9, 11 slides).
+"""Builds docs/report/IOMS-Presentation-2026-10-07.pdf (16:9, 12 slides).
 
     python3 docs/report/slides/build_slides.py
 
@@ -281,22 +281,19 @@ def main():
         f'Keputusan dan alternatif: {code("ADR-002")}'],
         680, top - 8, 525, size=19, gap=13)
 
-    # 6 ── security / frontend / docker ───────────────────────────────
-    d.new('03 · Implementasi teknis', 'Keamanan, frontend, dan Docker')
+    # 6 ── frontend / json / docker ───────────────────────────────────
+    d.new('03 · Implementasi teknis', 'Frontend, JSON, dan Docker')
     cols = [
-        ('Keamanan', [f'{code("password_hash")} / {code("password_verify")}',
-                      f'{code("session_regenerate_id")} saat login',
-                      f'Role dicek di <b>server</b> ({code("Auth::requireRole")})',
-                      'Output di-escape; prepared statement',
-                      'Upload: tipe MIME asli, maks 2MB, nama acak']),
-        ('Frontend dan JSON', ['HTML semantik, CSS sendiri, responsif',
-                               'Vanilla JS: validasi form, baris item dinamis',
-                               f'<b>Fetch API</b>: {code("GET /api/products/{sku}/availability")}',
-                               '401 tanpa login, 404 SKU tidak ada']),
+        ('Frontend', ['HTML semantik, CSS sendiri, responsif',
+                      'Vanilla JS: validasi form, baris item dinamis',
+                      'Semua form dilindungi token CSRF (otomatis)']),
+        ('JSON API', [f'<b>Fetch API</b>: {code("GET /api/products/{sku}/availability")}',
+                      '401 tanpa login, 404 SKU tidak ada',
+                      'Error domain jadi JSON 422 / 403 / 409 / 500']),
         ('Docker', [f'{code("docker compose up --build")}: app + MySQL',
                     'Schema dan seed diimpor otomatis',
-                    'App berjalan sebagai <b>non-root</b>, ada healthcheck',
-                    'Diverifikasi dari <b>clone bersih</b>']),
+                    'Multi-stage, <b>non-root</b>, tanpa tool dev, healthcheck',
+                    'MySQL hanya di <b>127.0.0.1</b>; diverifikasi dari clone bersih']),
     ]
     cw = 360
     for i, (t, items) in enumerate(cols):
@@ -305,10 +302,25 @@ def main():
         d.para(f'<b>{t}</b>', x + 20, top - 20, cw - 40, style(22))
         d.bullets(items, x + 20, top - 70, cw - 44, size=17.5, gap=13)
 
-    # 7 ── quality evidence ───────────────────────────────────────────
+    # 7 ── security ────────────────────────────────────────────────────
+    d.new('03 · Implementasi teknis', 'Keamanan: ancaman, kontrol, bukti')
+    rows = [['Ancaman', 'Kontrol', 'Bukti'],
+            ['CSRF', 'Token per-sesi di semua form POST, divalidasi di front controller', 'SecurityE2ETest'],
+            ['Sesi dibajak / basi', f'HttpOnly, SameSite, timeout; user divalidasi ulang tiap request', 'Sesi, nonaktif, role'],
+            ['Brute force login', 'Throttling DB (5 per akun, 20 per IP); respons waktu-konstan', 'Lockout E2E'],
+            ['Akses objek (IDOR)', 'Sales hanya SO miliknya; tidak bisa setujui SO sendiri', 'Temuan diperbaiki'],
+            ['Injeksi', 'Prepared statement; output di-escape + CSP; CSV dinetralkan', 'Audit + test'],
+            ['Upload berbahaya', f'mime + {code("getimagesize")}, 2MB, nama acak, PHP mati di uploads', 'Diuji di Apache'],
+            ['Container', 'Non-root, tanpa tool dev, header keamanan, MySQL localhost', 'Dicek di container']]
+    h = d.table(rows, MX, top, [235, 640, 253], size=15.5)
+    d.para('Sisa risiko (jujur): TLS dari reverse proxy, rate limiting API, MFA. Rincian: '
+           + code('docs/quality/security-review.md') + ', ADR-004. SonarQube: 0 isu, 0 hotspot, security A.',
+           MX, top - h - 22, 1128, style(14.5, MUTED))
+
+    # 8 ── quality evidence ───────────────────────────────────────────
     d.new('04 · Bukti kualitas', 'Test dan SonarQube')
-    stats = [('166', 'test lulus, 903 assertion\nUnit 73 · Integration 9 · E2E 84'),
-             ('100%', 'line coverage\n(3.512 baris)'),
+    stats = [('237', 'test lulus, 1.108 assertion\nUnit 124 · Integration 9 · E2E 104'),
+             ('100%', 'line coverage\n(semua baris ter-cover)'),
              ('0', 'isu terbuka: bug, vulnerability,\nsmell, hotspot'),
              ('0%', 'duplikasi kode\nquality gate: Passed')]
     sw = 270
@@ -328,10 +340,10 @@ def main():
     d.bullets([
         'E2E menembak aplikasi lewat HTTP dan merekam coverage dari server (ADR-003), digabung dengan Unit + Integration.',
         'PHPStan level 5 dan PHPCS PSR-12: 0 error.',
-        f'Satu aturan dikecualikan dengan alasan tertulis: {code("php:S2003")} (view dan config).'],
+        f'Dua pengecualian beralasan: {code("php:S2003")} (view/config) dan {code("php:S2092")} (flag Secure cookie aktif otomatis di HTTPS).'],
         MX + 630, top - 180, 500, size=18, gap=12)
 
-    # 8 ── refactor table ─────────────────────────────────────────────
+    # 9 ── refactor table ─────────────────────────────────────────────
     d.new('04 · Bukti kualitas', 'Perbaikan utama yang dilakukan')
     rows = [['Temuan', 'Teknik', 'Hasil'],
             ['5 controller CRUD hampir identik', f'Template Method ({code("CrudController")})', '≈200 baris duplikat hilang'],
@@ -344,7 +356,7 @@ def main():
     d.para('Dokumentasi: class diagram initial vs as-built, ADR-001/002/003, ' + code('refactor-log.md') + ', ' +
            code('sonarqube-report.md') + '.', MX, top - h - 26, 1100, style(16, MUTED))
 
-    # 9 ── reflection ────────────────────────────────────────────────
+    # 10 ── reflection ────────────────────────────────────────────────
     d.new('05 · Refleksi', 'Kendala, keterbatasan, dan langkah berikutnya')
     d.card(MX, top, 560, 290, SOFT)
     d.para('<b>Kendala dan solusi</b>', MX + 22, top - 20, 520, style(22))
@@ -354,18 +366,18 @@ def main():
               MX + 22, top - 68, 520, size=18, gap=11)
     d.card(MX + 580, top, 548, 290, WARN)
     d.para('<b>Keterbatasan (jujur)</b>', MX + 602, top - 20, 500, style(22))
-    d.bullets(['Tanpa rate limiting dan CSRF token.',
+    d.bullets(['TLS perlu reverse proxy; rate limiting baru untuk login.',
                f'API memakai session cookie; {code("ApiController")} melewati Service.',
                '100% adalah <i>line</i> coverage, bukan semua kombinasi input.',
                'Tanpa CI/CD.'],
               MX + 602, top - 68, 505, size=18, gap=11)
     d.card(MX, top - 315, 1128, 110)
     d.para('<b>Prioritas berikutnya</b>', MX + 22, top - 333, 500, style(22))
-    d.para('<b>1</b> ProductAvailabilityService &nbsp;&nbsp;·&nbsp;&nbsp; <b>2</b> Rate limiting login/API '
-           '&nbsp;&nbsp;·&nbsp;&nbsp; <b>3</b> Audit log master data &nbsp;&nbsp;·&nbsp;&nbsp; <b>4</b> Token API &amp; CSRF',
+    d.para('<b>1</b> Rate limiting API &nbsp;&nbsp;·&nbsp;&nbsp; <b>2</b> TLS + reverse proxy '
+           '&nbsp;&nbsp;·&nbsp;&nbsp; <b>3</b> Audit log master data &nbsp;&nbsp;·&nbsp;&nbsp; <b>4</b> MFA &amp; token API',
            MX + 22, top - 372, 1090, style(19))
 
-    # 10 ── AI disclosure ────────────────────────────────────────────
+    # 11 ── AI disclosure ────────────────────────────────────────────
     d.new('Transparansi', 'Penggunaan AI')
     d.bullets([
         'Sebagian besar kode, test, dan dokumentasi dibuat dengan <b>Claude Code</b> (Anthropic).',
@@ -379,7 +391,7 @@ def main():
            f'{code("Router")}, dan {code("CrudController")}.', MX + 674, top - 68, 430, style(18.5, leading=27))
     d.para(f'Rincian: {code("ai-usage-log.md")}', MX + 674, top - 212, 430, style(15.5, MUTED))
 
-    # 11 ── Q&A ──────────────────────────────────────────────────────
+    # 12 ── Q&A ──────────────────────────────────────────────────────
     d.new('', '', plain=True)
     c.setFillColor(ACCENT)
     c.setFont('Sans-Bold', 14)

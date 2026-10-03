@@ -6,7 +6,7 @@ Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02 
 
 1. **`ApiController` melewati layer Service.** `ApiController::productAvailability()` membuat instance `MySqlProductRepository`, `MySqlProductStockRepository`, `MySqlWarehouseRepository` secara langsung di dalam Controller, alih-alih memanggil sebuah `ProductAvailabilityService`. Ini menyimpang dari pola layering Controller→Service→Repository yang dipakai konsisten di controller lain, dan membuat logic agregasi (menjumlah stok per gudang) tidak reusable/testable secara terpisah dari HTTP layer.
 2. **Validasi input masih sederhana (presence/format dasar).** Validasi di Service (mis. `SalesOrderService::create`, `PurchaseOrderService::create`) memeriksa "wajib diisi", "positif", "tanggal valid Y-m-d", dan keunikan nomor — tapi belum ada validasi lintas-field yang lebih kompleks (mis. memastikan `selling_price` SO tidak di bawah `purchase_price` produk, atau validasi format kontak/telepon di Customer/Supplier).
-3. **Tidak ada rate limiting** pada endpoint login (`AuthController::login`) maupun API (`ApiController::productAvailability`) — berpotensi terhadap brute-force credential guessing atau pemakaian berlebihan pada endpoint API.
+3. **Rate limiting hanya untuk login.** `AuthController::login` dibatasi lewat `LoginThrottle` (tabel `login_attempts`); endpoint API (`ApiController::productAvailability`) belum dibatasi lajunya, dan pembatasan memakai `REMOTE_ADDR` (di belakang reverse proxy perlu konfigurasi agar IP klien yang benar terbaca).
 4. **Otentikasi API memakai session cookie yang sama dengan web** (`Auth::requireLoginApi`), bukan token terpisah (API key/JWT) — cocok untuk kebutuhan internal saat ini, tapi berarti API tidak bisa dipakai oleh klien non-browser tanpa turut menangani cookie session PHP.
 5. **Implementasi In-Memory Repository tidak mensimulasikan row-locking MySQL sungguhan.** `InMemoryProductStockRepository::lockForUpdate` (dipakai unit test) tidak benar-benar meniru semantik `SELECT ... FOR UPDATE` InnoDB (blocking antar transaksi konkuren) — sehingga skenario race condition pada `SalesOrderService::fulfill` HANYA benar-benar tervalidasi lewat integration test terhadap MySQL asli (lihat ADR-002), bukan lewat unit test murni.
 6. **Integration dan E2E test membutuhkan Docker + MySQL nyata untuk dijalankan reviewer.** Test yang memakai `MySql*Repository` dan seluruh suite E2E tidak bisa jalan tanpa database sungguhan. `composer coverage` (`scripts/coverage.sh`) menyiapkan semuanya otomatis (MySQL sementara + server PHP) dan menjalankan 166 test/903 assertion. Reviewer yang hanya menjalankan `composer test` tanpa env `TEST_DB_*`/`E2E_BASE_URL` akan melihat test tersebut **skip** (bukan gagal), karena sengaja memakai `markTestSkipped()` supaya `composer test` tetap hijau tanpa Docker.
@@ -18,11 +18,13 @@ Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02 
 11. **Coverage 100% adalah line coverage.** Setiap baris kode aplikasi dieksekusi oleh Unit/Integration/E2E test (lihat ADR-003), tetapi itu tidak menjamin semua kombinasi input atau cabang logika teruji; asersi belum mencakup uji beban/konkurensi paralel sungguhan.
 12. **Test E2E mengandalkan data seed demo** (`database/seed.sql`): perubahan ID atau isi seed dapat mematahkan beberapa asersi (mis. `SKU-0001` total stok 56, `SO-2026-0001` milik Sari).
 
+13. **Risiko keamanan yang tersisa** (rinci di `docs/quality/security-review.md`): TLS tidak disediakan compose; akun demo di seed; token CSRF per-sesi; tanpa MFA; harga jual SO diisi Sales tanpa batas kewenangan diskon; gambar lama tidak dihapus saat diganti.
+
 ## Rencana Perbaikan ke Depan
 
 - Refactor `ApiController` agar memanggil `ProductAvailabilityService` (baru) yang menggabungkan tiga Repository tersebut, konsisten dengan Controller lain.
 - Menambah rule validasi lintas-field pada `SalesOrderService`/`ProductService` (mis. margin harga minimum) jika dibutuhkan proses bisnis.
-- Menambah rate limiting sederhana berbasis session/IP (tanpa infrastruktur eksternal, sesuai batasan proyek) pada endpoint login dan API.
+- Memperluas rate limiting ke endpoint API dan menambah batas kewenangan diskon harga jual pada SO.
 - Menambah kelas `ProductStockLockSimulator` atau helper test khusus agar `InMemoryProductStockRepository` bisa mensimulasikan kontensi (mis. dengan flag "locked" manual) untuk pengujian race condition tanpa MySQL.
 - Menyediakan panduan setup Docker+MySQL yang jelas di README agar reviewer bisa menjalankan integration test bila mereka mau (di luar cakupan wajib).
 - Menambah audit log sederhana (tabel `audit_log` generik) untuk perubahan master data, jika dibutuhkan kepatuhan/tracing lebih lanjut.

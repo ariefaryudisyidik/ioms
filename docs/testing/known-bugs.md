@@ -7,7 +7,7 @@ Diperbarui 2026-09-02 setelah tahap verifikasi akhir menyeluruh (Docker `up --bu
 1. **`Auth::requireRole()` mengembalikan redirect 302 ke `/dashboard`, bukan halaman 403**, saat user yang sudah login mencoba mengakses route yang bukan haknya (mis. Sales membuka `/users`). Ini melanggar ERR-01 ("tanpa kewenangan menampilkan 403"). Diperbaiki di `app/Core/Auth.php`: sekarang merender `views/errors/403.php` dengan status HTTP 403 sungguhan. Diverifikasi ulang via `curl` (Sales → `/users` → `403`, Sales → approve order sendiri → `403`).
 2. **False-positive PHPStan** pada `PurchaseOrderService.php`/`SalesOrderService.php` akibat docblock `@param` yang men-declare shape array terlalu ketat (menganggap semua key pasti ada), padahal data berasal dari request mentah yang belum tervalidasi — menyebabkan penggunaan `??` defensif dianggap "always true/redundant" oleh PHPStan. Diperbaiki dengan melonggarkan tipe docblock ke `array<string,mixed>`. Bukan bug fungsional, tapi memperbaiki keakuratan laporan static analysis.
 3. **`Core/Env.php:74`** perbandingan `=== null` yang tidak pernah true — dihapus (dead condition, tidak mengubah perilaku).
-4. **`Service/ProductService.php:166`** match-arm `default` yang unreachable menurut PHPStan — dipertahankan sebagai fallback defensif dan ditandai eksplisit dengan `@phpstan-ignore` (bukan dihapus, karena tetap berguna bila `ALLOWED_MIME` berubah di masa depan).
+4. **`Service/ProductService.php`** match-arm `default` yang unreachable menurut PHPStan — saat itu dipertahankan dengan `@phpstan-ignore`; sejak 2026-10-03 diganti peta `EXTENSIONS` sehingga cabang mustahil itu tidak ada lagi (catatan asli: dipertahankan karena berguna bila `ALLOWED_MIME` berubah di masa depan).
 5. **4 error PSR-12** di `app/Core/Router.php` dan `app/Controller/Controller.php` — diperbaiki otomatis via `phpcbf`.
 
 Setelah perbaikan di atas: `composer stan` → **0 error**, `phpcs` → **0 error** (sisa 32 warning kosmetik panjang baris, lihat `docs/quality/static-analysis-report.txt`).
@@ -35,6 +35,10 @@ Jika ditemukan bug fungsional baru pada tahap review berikutnya, perbarui dokume
 
 ## Pembaruan 2026-10-03
 
-- Full test suite sekarang **166 test / 903 assertion** (Unit 73, Integration 9, E2E 84 lewat HTTP), semuanya lulus lewat `composer coverage`. Line coverage 100%.
+- Full test suite sekarang **237 test / 1108 assertion** (Unit 124, Integration 9, E2E 104 lewat HTTP), semuanya lulus lewat `composer coverage`. Line coverage 100%.
 - PHPStan 0 error; PHPCS 0 error dengan 27 warning panjang baris (kosmetik).
 - Tidak ada bug fungsional baru ditemukan oleh suite E2E. Satu bug *environment* ditemukan dan diperbaiki lebih awal: `docker-compose.yml` memasang source di atas `vendor/` image sehingga clone bersih langsung fatal error (sudah diperbaiki, bind mount dihapus).
+
+## Pembaruan keamanan 2026-10-03
+
+Tinjauan keamanan menemukan dan memperbaiki celah berikut (rinci di `docs/quality/security-review.md`): tanpa CSRF, sesi tidak divalidasi ulang, cookie sesi tanpa flag, IDOR sales order, kebocoran laporan CSV lintas role, tanpa throttling login, validasi referensi/harga order, formula injection CSV, dan beberapa hardening Docker/Apache. Suite E2E (`SecurityE2ETest`) mengunci perilaku tersebut.

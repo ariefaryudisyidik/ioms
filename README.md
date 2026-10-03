@@ -27,7 +27,7 @@ Aplikasi PHP native (tanpa framework) untuk mengelola inventori, Purchase Order 
 ```bash
 git clone <repo-url> ioms
 cd ioms
-cp .env.example .env    # sesuaikan kredensial DB bila perlu
+cp .env.example .env    # wajib; ganti DB_PASSWORD sebelum dipakai di luar demo lokal
 docker compose up --build
 ```
 
@@ -102,18 +102,31 @@ docker compose -f docker-compose.sonar.yml -p ioms-sonar run --rm scanner sonar-
 
 Konfigurasi analisis ada di `sonar-project.properties`. Hasil dan penjelasan temuan: `docs/quality/sonarqube-report.md`.
 
+## Keamanan
+
+Kontrol yang aktif (detail, bukti test, dan risiko tersisa: `docs/quality/security-review.md`, ADR-004):
+
+- **CSRF:** token per-sesi pada semua request state-changing (disisipkan otomatis ke form).
+- **Sesi:** cookie `HttpOnly` + `SameSite=Lax` (+ `Secure` di HTTPS), idle timeout 30 menit, umur maksimum 8 jam (`SESSION_IDLE_TIMEOUT`, `SESSION_ABSOLUTE_TIMEOUT` di `.env`), dan user divalidasi ulang ke database di setiap request.
+- **Login:** bcrypt, throttling (5 gagal per akun+IP atau 20 per IP dalam 15 menit), respons waktu-konstan untuk akun yang tidak ada.
+- **Otorisasi:** role dicek di server, plus kepemilikan objek (Sales hanya melihat/membatalkan SO miliknya; tidak bisa menyetujui SO sendiri; admin tidak bisa menonaktifkan akunnya sendiri).
+- **Input/output:** prepared statement, validasi referensi/harga/qty/tanggal, upload diverifikasi (`mime` + `getimagesize`, maks 2MB, nama acak), output di-escape, CSP `script-src 'self'`, CSV dinetralkan dari formula.
+- **Container:** non-root, multi-stage tanpa tool dev, PHP dimatikan di folder upload, versi server disembunyikan, MySQL hanya di `127.0.0.1`.
+
+Produksi: pasang TLS di depan aplikasi (reverse proxy), ganti semua kredensial di `.env`, dan hapus/ganti akun demo.
+
 ## Dokumentasi
 
 - Perencanaan: `docs/planning/` (user story, scope, ERD, class diagram awal, backlog)
-- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock, ADR strategi test E2E/coverage)
-- Kualitas kode: `docs/quality/` (refactor log, audit SRP, tech debt, critique, laporan static analysis)
+- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock, ADR strategi test E2E/coverage, ADR kontrol keamanan)
+- Kualitas kode: `docs/quality/` (refactor log, audit SRP, tech debt, critique, laporan static analysis, laporan SonarQube, tinjauan keamanan)
 - Testing: `docs/testing/` (skenario test, known bugs)
 - Disclosure penggunaan AI: `ai-usage-log.md`
 
 ## Known Limitations (Jujur)
 
 - `ApiController` mengakses tiga `MySql*Repository` secara langsung tanpa lewat Service — penyimpangan kecil dari pola layering di controller lain.
-- Tidak ada rate limiting pada login maupun endpoint API.
+- Rate limiting hanya untuk login; endpoint API belum dibatasi lajunya.
 - Otentikasi API memakai session cookie yang sama dengan web, bukan token terpisah.
 - Implementasi `InMemory*Repository` (test double) tidak mensimulasikan row-locking MySQL sungguhan — skenario race condition goods-issue divalidasi lewat integration test terhadap MySQL asli di Docker (`tests/Integration/GoodsIssueIntegrationTest.php`), bukan lewat thread/proses paralel sungguhan (sesuai batasan brief — tidak wajib).
 - Tidak ada CI/CD pipeline (di luar scope sesuai brief — lihat `docs/planning/scope.md`).
@@ -143,7 +156,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 166 test lulus (903 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 237 test lulus (1108 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 
