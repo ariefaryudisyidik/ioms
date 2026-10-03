@@ -1,4 +1,5 @@
 <?php
+$hasError = ' has-error';
 $pageTitle = 'New User';
 $errors = $errors ?? [];
 $old = [
@@ -13,23 +14,23 @@ include __DIR__ . '/../partials/header.php';
 <div class="panel">
     <form method="post" action="/users" data-validate novalidate>
         <div class="form-grid">
-            <div class="field<?= isset($errors['name']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['name']) ? $hasError : '' ?>">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" data-required value="<?= e($old['name']) ?>" required>
                 <?php if (isset($errors['name'])): ?><div class="field-error"><?= e($errors['name']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['email']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['email']) ? $hasError : '' ?>">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" data-required data-type="email" value="<?= e($old['email']) ?>" required>
                 <?php if (isset($errors['email'])): ?><div class="field-error"><?= e($errors['email']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['password']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['password']) ? $hasError : '' ?>">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" data-required minlength="8" required>
                 <div class="hint">At least 8 characters.</div>
                 <?php if (isset($errors['password'])): ?><div class="field-error"><?= e($errors['password']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['role']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['role']) ? $hasError : '' ?>">
                 <label for="role">Role</label>
                 <select id="role" name="role" data-required required>
                     <?php foreach (['Admin', 'Sales', 'WarehouseStaff'] as $r): ?>

@@ -55,12 +55,13 @@ $router->get('/dashboard', [DashboardController::class, 'index']);
 $router->get('/products', [ProductController::class, 'index']);
 $router->get('/products/create', [ProductController::class, 'create']);
 $router->post('/products', [ProductController::class, 'store']);
-$router->get('/products/{id}', [ProductController::class, 'show']);
+$productItemPath = '/products/{id}';
+$router->get($productItemPath, [ProductController::class, 'show']);
 $router->get('/products/{id}/edit', [ProductController::class, 'edit']);
-$router->post('/products/{id}', [ProductController::class, 'update']);
-$router->put('/products/{id}', [ProductController::class, 'update']);
+$router->post($productItemPath, [ProductController::class, 'update']);
+$router->put($productItemPath, [ProductController::class, 'update']);
 $router->post('/products/{id}/delete', [ProductController::class, 'destroy']);
-$router->delete('/products/{id}', [ProductController::class, 'destroy']);
+$router->delete($productItemPath, [ProductController::class, 'destroy']);
 
 // ---------------------------------------------------------------------
 // Categories
@@ -69,10 +70,11 @@ $router->get('/categories', [CategoryController::class, 'index']);
 $router->get('/categories/create', [CategoryController::class, 'create']);
 $router->post('/categories', [CategoryController::class, 'store']);
 $router->get('/categories/{id}/edit', [CategoryController::class, 'edit']);
-$router->post('/categories/{id}', [CategoryController::class, 'update']);
-$router->put('/categories/{id}', [CategoryController::class, 'update']);
+$categoryItemPath = '/categories/{id}';
+$router->post($categoryItemPath, [CategoryController::class, 'update']);
+$router->put($categoryItemPath, [CategoryController::class, 'update']);
 $router->post('/categories/{id}/delete', [CategoryController::class, 'destroy']);
-$router->delete('/categories/{id}', [CategoryController::class, 'destroy']);
+$router->delete($categoryItemPath, [CategoryController::class, 'destroy']);
 
 // ---------------------------------------------------------------------
 // Warehouses

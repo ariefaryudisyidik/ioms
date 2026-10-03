@@ -12,6 +12,8 @@ use App\Service\ProductService;
 
 final class ProductController extends Controller
 {
+    private const BASE_URL = '/products';
+
     private function service(): ProductService
     {
         return new ProductService(
@@ -50,10 +52,10 @@ final class ProductController extends Controller
                 'filters' => $filters,
                 'categories' => (new MySqlCategoryRepository($this->pdo()))->all(),
             ]);
-        }, false, '/products');
+        }, false, self::BASE_URL);
     }
 
-    public function show(Request $request, array $params): void
+    public function show(array $params): void
     {
         if (Auth::requireLogin()) {
             return;
@@ -67,9 +69,9 @@ final class ProductController extends Controller
         $this->render('product.show', ['product' => $product]);
     }
 
-    public function create(Request $request): void
+    public function create(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $this->render('product.create', ['categories' => (new MySqlCategoryRepository($this->pdo()))->all()]);
@@ -77,18 +79,18 @@ final class ProductController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $this->handle(function () use ($request) {
             $this->service()->create($request->all(), $request->file('image'));
-            $this->redirect('/products');
+            $this->redirect(self::BASE_URL);
         }, false, '/products/create');
     }
 
-    public function edit(Request $request, array $params): void
+    public function edit(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $product = $this->service()->find((int) $params['id']);
@@ -105,25 +107,25 @@ final class ProductController extends Controller
 
     public function update(Request $request, array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($request, $id) {
             $this->service()->update($id, $request->all(), $request->file('image'));
-            $this->redirect('/products');
+            $this->redirect(self::BASE_URL);
         }, false, "/products/{$id}/edit");
     }
 
-    public function destroy(Request $request, array $params): void
+    public function destroy(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->delete($id);
-            $this->redirect('/products');
-        }, false, '/products');
+            $this->redirect(self::BASE_URL);
+        }, false, self::BASE_URL);
     }
 }

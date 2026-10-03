@@ -42,10 +42,7 @@ final class Auth
      */
     public static function user(): ?array
     {
-        /** @var array{id:int,name:string,email:string,role:string}|null $user */
-        $user = Session::get(self::SESSION_KEY);
-
-        return $user;
+        return Session::get(self::SESSION_KEY);
     }
 
     public static function id(): ?int
@@ -87,11 +84,9 @@ final class Auth
     /**
      * Enforces role membership for HTML flows: not logged in -> redirect to
      * login; logged in but wrong role -> render a real 403 page (ERR-01).
-     * The $forbiddenUrl parameter is kept for backward compatibility but is
-     * no longer used for redirecting on authorization failure.
      * Returns true when the request was halted.
      */
-    public static function requireRole(string $forbiddenUrl, string ...$roles): bool
+    public static function requireRole(string ...$roles): bool
     {
         if (self::requireLogin()) {
             return true;

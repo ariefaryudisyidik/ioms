@@ -14,6 +14,8 @@ use App\Repository\StockLedgerRepositoryInterface;
  */
 final class ReportService
 {
+    private const WAREHOUSE_ID_HEADER = 'Warehouse ID';
+
     public function __construct(
         private StockLedgerRepositoryInterface $ledger,
         private SalesOrderRepositoryInterface $salesOrders,
@@ -30,7 +32,7 @@ final class ReportService
         ]);
 
         $handle = fopen('php://temp', 'r+');
-        fputcsv($handle, ['ID', 'Product ID', 'Warehouse ID', 'Movement Type', 'Quantity', 'Reference Type', 'Reference ID', 'Performed By', 'Created At']);
+        fputcsv($handle, ['ID', 'Product ID', self::WAREHOUSE_ID_HEADER, 'Movement Type', 'Quantity', 'Reference Type', 'Reference ID', 'Performed By', 'Created At']);
         foreach ($entries as $e) {
             fputcsv($handle, [$e->id, $e->productId, $e->warehouseId, $e->movementType, $e->quantity, $e->referenceType, $e->referenceId, $e->performedBy, $e->createdAt]);
         }
@@ -49,13 +51,13 @@ final class ReportService
         $handle = fopen('php://temp', 'r+');
 
         if ($type === 'purchase') {
-            fputcsv($handle, ['ID', 'PO Number', 'Supplier ID', 'Warehouse ID', 'Status', 'Order Date', 'Created By']);
+            fputcsv($handle, ['ID', 'PO Number', 'Supplier ID', self::WAREHOUSE_ID_HEADER, 'Status', 'Order Date', 'Created By']);
             $orders = $this->purchaseOrders->search(['date_from' => $dateFrom, 'date_to' => $dateTo, 'limit' => 100000]);
             foreach ($orders as $o) {
                 fputcsv($handle, [$o->id, $o->poNumber, $o->supplierId, $o->warehouseId, $o->status, $o->orderDate, $o->createdBy]);
             }
         } else {
-            fputcsv($handle, ['ID', 'SO Number', 'Customer ID', 'Warehouse ID', 'Status', 'Order Date', 'Created By', 'Approved By']);
+            fputcsv($handle, ['ID', 'SO Number', 'Customer ID', self::WAREHOUSE_ID_HEADER, 'Status', 'Order Date', 'Created By', 'Approved By']);
             $filters = ['date_from' => $dateFrom, 'date_to' => $dateTo, 'limit' => 100000];
             if ($restrictToUserId !== null) {
                 $filters['created_by'] = $restrictToUserId;

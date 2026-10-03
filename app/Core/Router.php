@@ -63,7 +63,7 @@ final class Router
     {
         $method = strtoupper($method);
         $names = [];
-        $pattern = preg_replace_callback('#\{([a-zA-Z_][a-zA-Z0-9_]*)\}#', static function (array $m) use (&$names): string {
+        $pattern = preg_replace_callback('#\{([a-zA-Z_]\w*)\}#', static function (array $m) use (&$names): string {
             $names[] = $m[1];
 
             return '([^/]+)';
@@ -126,17 +126,42 @@ final class Router
     }
 
     /**
+     * Handlers declare only the arguments they need; they are matched by
+     * parameter name ($request, $params).
+     *
      * @param array<string,mixed> $params
      */
     private function invoke(callable|array $handler, Request $request, array $params): mixed
     {
+        $available = ['request' => $request, 'params' => $params];
+
         if (is_array($handler) && isset($handler[0], $handler[1]) && is_string($handler[0])) {
             $controller = new $handler[0]();
             $method = $handler[1];
 
-            return $controller->{$method}($request, $params);
+            $reflection = new \ReflectionMethod($controller, $method);
+
+            return $controller->{$method}(...$this->resolveArguments($reflection, $available));
         }
 
-        return $handler($request, $params);
+        $reflection = new \ReflectionFunction(\Closure::fromCallable($handler));
+
+        return $handler(...$this->resolveArguments($reflection, $available));
+    }
+
+    /**
+     * @param array<string,mixed> $available
+     * @return array<string,mixed>
+     */
+    private function resolveArguments(\ReflectionFunctionAbstract $reflection, array $available): array
+    {
+        $arguments = [];
+        foreach ($reflection->getParameters() as $parameter) {
+            if (array_key_exists($parameter->getName(), $available)) {
+                $arguments[$parameter->getName()] = $available[$parameter->getName()];
+            }
+        }
+
+        return $arguments;
     }
 }

@@ -23,7 +23,7 @@ include __DIR__ . '/../partials/header.php';
                         <td><?= (int) $item->qtyReceived ?></td>
                         <td><?= (int) $item->remaining() ?></td>
                         <td>
-                            <input type="number" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
+                            <input type="number" aria-label="Quantity to receive" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
                                    step="1" value="0" data-type="number" data-min="0" <?= $item->remaining() <= 0 ? 'disabled' : '' ?>>
                         </td>
                     </tr>

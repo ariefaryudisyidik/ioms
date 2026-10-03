@@ -1,4 +1,5 @@
 <?php
+$hasError = ' has-error';
 /** @var \App\Entity\Customer[] $customers */
 /** @var \App\Entity\Warehouse[] $warehouses */
 /** @var \App\Entity\Product[] $products */
@@ -25,12 +26,12 @@ include __DIR__ . '/../partials/header.php';
 <div class="panel">
     <form method="post" action="/sales-orders" data-validate novalidate>
         <div class="form-grid">
-            <div class="field<?= isset($errors['so_number']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['so_number']) ? $hasError : '' ?>">
                 <label for="so_number">SO Number</label>
                 <input type="text" id="so_number" name="so_number" data-required value="<?= e($old['so_number']) ?>" required>
                 <?php if (isset($errors['so_number'])): ?><div class="field-error"><?= e($errors['so_number']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['customer_id']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['customer_id']) ? $hasError : '' ?>">
                 <label for="customer_id">Customer</label>
                 <select id="customer_id" name="customer_id" data-required required>
                     <option value="">Select a customer</option>
@@ -40,7 +41,7 @@ include __DIR__ . '/../partials/header.php';
                 </select>
                 <?php if (isset($errors['customer_id'])): ?><div class="field-error"><?= e($errors['customer_id']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['warehouse_id']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['warehouse_id']) ? $hasError : '' ?>">
                 <label for="warehouse_id">Warehouse</label>
                 <select id="warehouse_id" name="warehouse_id" class="js-order-warehouse" data-required required>
                     <option value="">Select a warehouse</option>
@@ -50,7 +51,7 @@ include __DIR__ . '/../partials/header.php';
                 </select>
                 <?php if (isset($errors['warehouse_id'])): ?><div class="field-error"><?= e($errors['warehouse_id']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['order_date']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['order_date']) ? $hasError : '' ?>">
                 <label for="order_date">Order Date</label>
                 <input type="date" id="order_date" name="order_date" data-required data-type="date" value="<?= e($old['order_date']) ?>" required>
                 <?php if (isset($errors['order_date'])): ?><div class="field-error"><?= e($errors['order_date']) ?></div><?php endif; ?>
@@ -64,19 +65,22 @@ include __DIR__ . '/../partials/header.php';
             <div class="js-item-rows">
                 <div class="item-row js-item-row">
                     <div class="field">
-                        <label>Product</label>
+                        <label>Product
                         <select name="items[0][product_id]" class="js-product-select" data-required required>
                             <option value="">Select a product</option>
                             <?php $renderProductOptions(); ?>
                         </select>
+                    </label>
                     </div>
                     <div class="field">
-                        <label>Qty</label>
+                        <label>Qty
                         <input type="number" name="items[0][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
+                    </label>
                     </div>
                     <div class="field">
-                        <label>Selling Price</label>
+                        <label>Selling Price
                         <input type="number" name="items[0][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
+                    </label>
                     </div>
                     <div class="field">
                         <button type="button" class="btn btn-danger btn-sm js-remove-item-row">Remove</button>
@@ -97,19 +101,22 @@ include __DIR__ . '/../partials/header.php';
 <template class="js-item-row-template">
     <div class="item-row js-item-row">
         <div class="field">
-            <label>Product</label>
+            <label>Product
             <select name="items[__INDEX__][product_id]" class="js-product-select" data-required required>
                 <option value="">Select a product</option>
                 <?php $renderProductOptions(); ?>
             </select>
+        </label>
         </div>
         <div class="field">
-            <label>Qty</label>
+            <label>Qty
             <input type="number" name="items[__INDEX__][qty]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
+        </label>
         </div>
         <div class="field">
-            <label>Selling Price</label>
+            <label>Selling Price
             <input type="number" name="items[__INDEX__][selling_price]" min="0" step="0.01" data-type="number" data-min="0">
+        </label>
         </div>
         <div class="field">
             <button type="button" class="btn btn-danger btn-sm js-remove-item-row">Remove</button>

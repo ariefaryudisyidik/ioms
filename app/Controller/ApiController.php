@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\Auth;
-use App\Core\Request;
 use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\MySqlWarehouseRepository;
@@ -15,7 +14,7 @@ final class ApiController extends Controller
     /**
      * GET /api/products/{sku}/availability
      */
-    public function productAvailability(Request $request, array $params): void
+    public function productAvailability(array $params): void
     {
         if (Auth::requireLoginApi()) {
             return;

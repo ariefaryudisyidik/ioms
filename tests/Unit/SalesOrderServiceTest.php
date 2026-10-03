@@ -128,7 +128,7 @@ final class SalesOrderServiceTest extends TestCase
         $service = $this->makeService($orders, $stocks);
 
         $this->expectException(AuthorizationException::class);
-        $service->reject($so->id, 3, 'WarehouseStaff');
+        $service->reject($so->id, 'WarehouseStaff');
     }
 
     public function testFullValidLifecycleDraftToFulfilled(): void
@@ -162,7 +162,7 @@ final class SalesOrderServiceTest extends TestCase
         $service = $this->makeService($orders, $stocks);
 
         $this->expectException(InvalidStatusTransitionException::class);
-        $service->reject($so->id, 1, 'Admin'); // reject moves to Draft; must be rejected from Fulfilled
+        $service->reject($so->id, 'Admin'); // reject moves to Draft; must be rejected from Fulfilled
     }
 
     public function testApprovedCannotSkipStraightToFulfilledViaTransitionAssertionOnly(): void

@@ -17,6 +17,8 @@ use App\Service\SalesOrderService;
 
 final class SalesOrderController extends Controller
 {
+    private const DETAIL_URL_PREFIX = '/sales-orders/';
+
     private function service(): SalesOrderService
     {
         return new SalesOrderService(
@@ -58,7 +60,7 @@ final class SalesOrderController extends Controller
         }, false, '/sales-orders');
     }
 
-    public function show(Request $request, array $params): void
+    public function show(array $params): void
     {
         if (Auth::requireLogin()) {
             return;
@@ -73,9 +75,9 @@ final class SalesOrderController extends Controller
         $this->render('sales_order.show', ['so' => $so]);
     }
 
-    public function create(Request $request): void
+    public function create(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'Sales')) {
+        if (Auth::requireRole('Admin', 'Sales')) {
             return;
         }
         $this->render('sales_order.create', [
@@ -87,74 +89,74 @@ final class SalesOrderController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'Sales')) {
+        if (Auth::requireRole('Admin', 'Sales')) {
             return;
         }
         $this->handle(function () use ($request) {
             $so = $this->service()->create($request->all(), Auth::id());
-            $this->redirect('/sales-orders/' . $so->id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $so->id);
         }, false, '/sales-orders/create');
     }
 
-    public function submit(Request $request, array $params): void
+    public function submit(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'Sales')) {
+        if (Auth::requireRole('Admin', 'Sales')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->submitForApproval($id, Auth::id());
-            $this->redirect('/sales-orders/' . $id);
-        }, false, '/sales-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function approve(Request $request, array $params): void
+    public function approve(array $params): void
     {
         // Defense in depth: controller-level role check, but the service
         // remains the authoritative gatekeeper.
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->approve($id, Auth::id(), Auth::role() ?? '');
-            $this->redirect('/sales-orders/' . $id);
-        }, false, '/sales-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function reject(Request $request, array $params): void
+    public function reject(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
-            $this->service()->reject($id, Auth::id(), Auth::role() ?? '');
-            $this->redirect('/sales-orders/' . $id);
-        }, false, '/sales-orders/' . $id);
+            $this->service()->reject($id, Auth::role() ?? '');
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function cancel(Request $request, array $params): void
+    public function cancel(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'Sales')) {
+        if (Auth::requireRole('Admin', 'Sales')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->cancel($id);
-            $this->redirect('/sales-orders/' . $id);
-        }, false, '/sales-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function fulfill(Request $request, array $params): void
+    public function fulfill(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->fulfill($id, Auth::id());
-            $this->redirect('/sales-orders/' . $id);
-        }, false, '/sales-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 }

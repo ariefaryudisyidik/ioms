@@ -16,6 +16,8 @@ use App\Service\PurchaseOrderService;
 
 final class PurchaseOrderController extends Controller
 {
+    private const DETAIL_URL_PREFIX = '/purchase-orders/';
+
     private function service(): PurchaseOrderService
     {
         return new PurchaseOrderService(
@@ -54,7 +56,7 @@ final class PurchaseOrderController extends Controller
         }, false, '/purchase-orders');
     }
 
-    public function show(Request $request, array $params): void
+    public function show(array $params): void
     {
         if (Auth::requireLogin()) {
             return;
@@ -72,9 +74,9 @@ final class PurchaseOrderController extends Controller
         ]);
     }
 
-    public function create(Request $request): void
+    public function create(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $this->render('purchase_order.create', [
@@ -86,42 +88,42 @@ final class PurchaseOrderController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $this->handle(function () use ($request) {
             $po = $this->service()->create($request->all(), Auth::id());
-            $this->redirect('/purchase-orders/' . $po->id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $po->id);
         }, false, '/purchase-orders/create');
     }
 
-    public function order(Request $request, array $params): void
+    public function order(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->transitionTo($id, 'Ordered');
-            $this->redirect('/purchase-orders/' . $id);
-        }, false, '/purchase-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function cancel(Request $request, array $params): void
+    public function cancel(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->transitionTo($id, 'Cancelled');
-            $this->redirect('/purchase-orders/' . $id);
-        }, false, '/purchase-orders/' . $id);
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id);
     }
 
-    public function receiveForm(Request $request, array $params): void
+    public function receiveForm(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
@@ -137,7 +139,7 @@ final class PurchaseOrderController extends Controller
 
     public function receive(Request $request, array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $id = (int) $params['id'];
@@ -148,7 +150,7 @@ final class PurchaseOrderController extends Controller
                 $normalized[] = ['item_id' => (int) $itemId, 'qty' => (int) $qty];
             }
             $this->service()->receiveGoods($id, $normalized, Auth::id());
-            $this->redirect('/purchase-orders/' . $id);
-        }, false, '/purchase-orders/' . $id . '/receive');
+            $this->redirect(self::DETAIL_URL_PREFIX . $id);
+        }, false, self::DETAIL_URL_PREFIX . $id . '/receive');
     }
 }

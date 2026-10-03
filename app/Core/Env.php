@@ -31,33 +31,12 @@ final class Env
         }
 
         foreach ($lines as $line) {
-            $line = trim($line);
-
-            if ($line === '' || str_starts_with($line, '#')) {
+            $pair = self::parseLine($line);
+            if ($pair === null) {
                 continue;
             }
 
-            if (!str_contains($line, '=')) {
-                continue;
-            }
-
-            [$name, $value] = explode('=', $line, 2);
-            $name = trim($name);
-            $value = trim($value);
-
-            // Strip surrounding quotes if present.
-            if (strlen($value) >= 2) {
-                $first = $value[0];
-                $last = $value[strlen($value) - 1];
-                if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
-                    $value = substr($value, 1, -1);
-                }
-            }
-
-            if ($name === '') {
-                continue;
-            }
-
+            [$name, $value] = $pair;
             if (getenv($name) === false) {
                 putenv($name . '=' . $value);
             }
@@ -66,6 +45,34 @@ final class Env
         }
 
         self::$loaded = true;
+    }
+
+    /**
+     * @return array{0:string,1:string}|null null for blank, comment, or malformed lines
+     */
+    private static function parseLine(string $line): ?array
+    {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            return null;
+        }
+
+        [$name, $value] = explode('=', $line, 2);
+        $name = trim($name);
+
+        return $name === '' ? null : [$name, self::stripQuotes(trim($value))];
+    }
+
+    private static function stripQuotes(string $value): string
+    {
+        if (strlen($value) < 2) {
+            return $value;
+        }
+
+        $first = $value[0];
+        $isQuoted = ($first === '"' || $first === "'") && $value[strlen($value) - 1] === $first;
+
+        return $isQuoted ? substr($value, 1, -1) : $value;
     }
 
     public static function get(string $key, mixed $default = null): mixed

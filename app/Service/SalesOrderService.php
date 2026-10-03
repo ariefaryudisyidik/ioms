@@ -19,6 +19,8 @@ use Throwable;
 
 final class SalesOrderService
 {
+    private const ORDER_NOT_FOUND = 'Sales order not found.';
+
     private const TRANSITIONS = [
         SalesOrder::STATUS_DRAFT => [SalesOrder::STATUS_PENDING_APPROVAL, SalesOrder::STATUS_CANCELLED],
         SalesOrder::STATUS_PENDING_APPROVAL => [SalesOrder::STATUS_APPROVED, SalesOrder::STATUS_DRAFT, SalesOrder::STATUS_CANCELLED],
@@ -33,6 +35,25 @@ final class SalesOrderService
         private StockLedgerRepositoryInterface $ledger,
         private PDO $pdo,
     ) {
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private function validateItems(mixed $items): array
+    {
+        if (!is_array($items) || count($items) === 0) {
+            return ['items' => 'At least one item is required.'];
+        }
+
+        $errors = [];
+        foreach ($items as $i => $item) {
+            if (empty($item['product_id']) || (int) ($item['qty'] ?? 0) <= 0) {
+                $errors["items.$i"] = 'Each item requires a product and a positive quantity.';
+            }
+        }
+
+        return $errors;
     }
 
     /**
@@ -60,15 +81,7 @@ final class SalesOrderService
         }
 
         $items = $data['items'] ?? [];
-        if (!is_array($items) || count($items) === 0) {
-            $errors['items'] = 'At least one item is required.';
-        } else {
-            foreach ($items as $i => $item) {
-                if (empty($item['product_id']) || (int) ($item['qty'] ?? 0) <= 0) {
-                    $errors["items.$i"] = 'Each item requires a product and a positive quantity.';
-                }
-            }
-        }
+        $errors += $this->validateItems($items);
 
         if ($errors) {
             throw new ValidationException($errors);
@@ -106,7 +119,7 @@ final class SalesOrderService
     {
         $so = $this->salesOrders->findById($soId);
         if ($so === null) {
-            throw new ValidationException(['id' => 'Sales order not found.']);
+            throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
         }
 
         if ($so->createdBy !== $userId) {
@@ -132,7 +145,7 @@ final class SalesOrderService
 
         $so = $this->salesOrders->findById($soId);
         if ($so === null) {
-            throw new ValidationException(['id' => 'Sales order not found.']);
+            throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
         }
 
         if ($so->createdBy === $approverId) {
@@ -151,7 +164,7 @@ final class SalesOrderService
      * PendingApproval -> Draft (rejected back to the drafting stage).
      * Admin role only.
      */
-    public function reject(int $soId, int $approverId, string $approverRole): SalesOrder
+    public function reject(int $soId, string $approverRole): SalesOrder
     {
         if ($approverRole !== 'Admin') {
             throw AuthorizationException::forbidden('Only an Admin can reject sales orders.');
@@ -159,7 +172,7 @@ final class SalesOrderService
 
         $so = $this->salesOrders->findById($soId);
         if ($so === null) {
-            throw new ValidationException(['id' => 'Sales order not found.']);
+            throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
         }
 
         $this->assertTransition($so->status, SalesOrder::STATUS_DRAFT);
@@ -173,7 +186,7 @@ final class SalesOrderService
     {
         $so = $this->salesOrders->findById($soId);
         if ($so === null) {
-            throw new ValidationException(['id' => 'Sales order not found.']);
+            throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
         }
 
         $this->assertTransition($so->status, SalesOrder::STATUS_CANCELLED);
@@ -194,7 +207,7 @@ final class SalesOrderService
     {
         $so = $this->salesOrders->findWithItems($soId);
         if ($so === null) {
-            throw new ValidationException(['id' => 'Sales order not found.']);
+            throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
         }
 
         $this->assertTransition($so->status, SalesOrder::STATUS_FULFILLED);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Core\Auth;
-use App\Core\Request;
 use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\MySqlPurchaseOrderRepository;
@@ -14,7 +13,7 @@ use App\Service\DashboardService;
 
 final class DashboardController extends Controller
 {
-    public function index(Request $request): void
+    public function index(): void
     {
         if (Auth::requireLogin()) {
             return;

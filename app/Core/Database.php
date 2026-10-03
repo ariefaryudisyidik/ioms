@@ -58,5 +58,6 @@ final class Database
 
     private function __construct()
     {
+        // Intentionally empty: instances are created only through connection().
     }
 }

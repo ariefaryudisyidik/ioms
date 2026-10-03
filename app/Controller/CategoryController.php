@@ -11,12 +11,14 @@ use App\Service\CategoryService;
 
 final class CategoryController extends Controller
 {
+    private const BASE_URL = '/categories';
+
     private function service(): CategoryService
     {
         return new CategoryService(new MySqlCategoryRepository($this->pdo()));
     }
 
-    public function index(Request $request): void
+    public function index(): void
     {
         if (Auth::requireLogin()) {
             return;
@@ -24,9 +26,9 @@ final class CategoryController extends Controller
         $this->render('category.index', ['categories' => $this->service()->all()]);
     }
 
-    public function create(Request $request): void
+    public function create(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $this->render('category.create', []);
@@ -34,18 +36,18 @@ final class CategoryController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $this->handle(function () use ($request) {
             $this->service()->create($request->all());
-            $this->redirect('/categories');
+            $this->redirect(self::BASE_URL);
         }, false, '/categories/create');
     }
 
-    public function edit(Request $request, array $params): void
+    public function edit(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $category = $this->service()->find((int) $params['id']);
@@ -59,25 +61,25 @@ final class CategoryController extends Controller
 
     public function update(Request $request, array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($request, $id) {
             $this->service()->update($id, $request->all());
-            $this->redirect('/categories');
+            $this->redirect(self::BASE_URL);
         }, false, "/categories/{$id}/edit");
     }
 
-    public function destroy(Request $request, array $params): void
+    public function destroy(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->delete($id);
-            $this->redirect('/categories');
-        }, false, '/categories');
+            $this->redirect(self::BASE_URL);
+        }, false, self::BASE_URL);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+$hasError = ' has-error';
 /** @var \App\Entity\Product $product */
 /** @var \App\Entity\Category[] $categories */
 $pageTitle = 'Edit Product';
@@ -23,17 +24,17 @@ include __DIR__ . '/../partials/header.php';
     <form method="post" action="/products/<?= (int) $product->id ?>" enctype="multipart/form-data" data-validate novalidate>
         <input type="hidden" name="_method" value="PUT">
         <div class="form-grid">
-            <div class="field<?= isset($errors['sku']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['sku']) ? $hasError : '' ?>">
                 <label for="sku">SKU</label>
                 <input type="text" id="sku" name="sku" data-required value="<?= e($old['sku']) ?>" required>
                 <?php if (isset($errors['sku'])): ?><div class="field-error"><?= e($errors['sku']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['name']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['name']) ? $hasError : '' ?>">
                 <label for="name">Name</label>
                 <input type="text" id="name" name="name" data-required value="<?= e($old['name']) ?>" required>
                 <?php if (isset($errors['name'])): ?><div class="field-error"><?= e($errors['name']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['category_id']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['category_id']) ? $hasError : '' ?>">
                 <label for="category_id">Category</label>
                 <select id="category_id" name="category_id" data-required required>
                     <option value="">Select a category</option>
@@ -47,22 +48,22 @@ include __DIR__ . '/../partials/header.php';
                 <label for="unit">Unit</label>
                 <input type="text" id="unit" name="unit" value="<?= e($old['unit']) ?>">
             </div>
-            <div class="field<?= isset($errors['purchase_price']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['purchase_price']) ? $hasError : '' ?>">
                 <label for="purchase_price">Purchase Price</label>
                 <input type="number" id="purchase_price" name="purchase_price" step="0.01" min="0" data-required data-type="number" data-min="0" value="<?= e($old['purchase_price']) ?>" required>
                 <?php if (isset($errors['purchase_price'])): ?><div class="field-error"><?= e($errors['purchase_price']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['selling_price']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['selling_price']) ? $hasError : '' ?>">
                 <label for="selling_price">Selling Price</label>
                 <input type="number" id="selling_price" name="selling_price" step="0.01" min="0" data-required data-type="number" data-min="0" value="<?= e($old['selling_price']) ?>" required>
                 <?php if (isset($errors['selling_price'])): ?><div class="field-error"><?= e($errors['selling_price']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['reorder_point']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['reorder_point']) ? $hasError : '' ?>">
                 <label for="reorder_point">Reorder Point</label>
                 <input type="number" id="reorder_point" name="reorder_point" step="1" min="0" data-required data-type="number" data-min="0" value="<?= e($old['reorder_point']) ?>" required>
                 <?php if (isset($errors['reorder_point'])): ?><div class="field-error"><?= e($errors['reorder_point']) ?></div><?php endif; ?>
             </div>
-            <div class="field<?= isset($errors['image']) ? ' has-error' : '' ?>">
+            <div class="field<?= isset($errors['image']) ? $hasError : '' ?>">
                 <label for="image">Replace Image (JPEG/PNG/WEBP, max 2MB)</label>
                 <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp">
                 <?php if (isset($errors['image'])): ?><div class="field-error"><?= e($errors['image']) ?></div><?php endif; ?>

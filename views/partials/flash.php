@@ -7,11 +7,11 @@ $flashError = Session::getFlash('error');
 $flashInfo = Session::getFlash('info');
 ?>
 <?php if ($flashSuccess): ?>
-    <div class="alert alert-success" role="status"><?= e($flashSuccess) ?></div>
+    <output class="alert alert-success"><?= e($flashSuccess) ?></output>
 <?php endif; ?>
 <?php if ($flashError): ?>
     <div class="alert alert-error" role="alert"><?= e($flashError) ?></div>
 <?php endif; ?>
 <?php if ($flashInfo): ?>
-    <div class="alert alert-info" role="status"><?= e($flashInfo) ?></div>
+    <output class="alert alert-info"><?= e($flashInfo) ?></output>
 <?php endif; ?>

@@ -83,7 +83,7 @@ include __DIR__ . '/../partials/header.php';
                 <?php endforeach; ?>
                 </tbody>
                 <tfoot>
-                    <tr><th colspan="3" class="text-right">Total</th><th><?= number_format($grandTotal, 2) ?></th></tr>
+                    <tr><th colspan="3" scope="row" class="text-right">Total</th><td><strong><?= number_format($grandTotal, 2) ?></strong></td></tr>
                 </tfoot>
             </table>
         </div>

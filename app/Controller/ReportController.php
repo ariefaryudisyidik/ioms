@@ -23,7 +23,7 @@ final class ReportController extends Controller
         );
     }
 
-    public function index(Request $request): void
+    public function index(): void
     {
         if (Auth::requireLogin()) {
             return;

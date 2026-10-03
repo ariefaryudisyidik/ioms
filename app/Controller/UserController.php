@@ -11,25 +11,27 @@ use App\Service\UserService;
 
 final class UserController extends Controller
 {
+    private const BASE_URL = '/users';
+
     private function service(): UserService
     {
         return new UserService(new MySqlUserRepository($this->pdo()));
     }
 
-    public function index(Request $request): void
+    public function index(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
 
         $this->handle(function () {
             $this->render('user.index', ['users' => $this->service()->all()]);
-        }, false, '/users');
+        }, false, self::BASE_URL);
     }
 
-    public function create(Request $request): void
+    public function create(): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $this->render('user.create', ['old' => []]);
@@ -37,19 +39,19 @@ final class UserController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
 
         $this->handle(function () use ($request) {
             $this->service()->create($request->all());
-            $this->redirect('/users');
+            $this->redirect(self::BASE_URL);
         }, false, '/users/create');
     }
 
-    public function edit(Request $request, array $params): void
+    public function edit(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
 
@@ -64,27 +66,27 @@ final class UserController extends Controller
 
     public function update(Request $request, array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
 
         $id = (int) $params['id'];
         $this->handle(function () use ($request, $id) {
             $this->service()->update($id, $request->all());
-            $this->redirect('/users');
+            $this->redirect(self::BASE_URL);
         }, false, "/users/{$id}/edit");
     }
 
-    public function deactivate(Request $request, array $params): void
+    public function deactivate(array $params): void
     {
-        if (Auth::requireRole('/dashboard', 'Admin')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
 
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
             $this->service()->deactivate($id);
-            $this->redirect('/users');
-        }, false, '/users');
+            $this->redirect(self::BASE_URL);
+        }, false, self::BASE_URL);
     }
 }

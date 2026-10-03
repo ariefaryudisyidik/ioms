@@ -12,7 +12,9 @@ use App\Service\AuthService;
 
 final class AuthController extends Controller
 {
-    public function showLogin(Request $request): void
+    private const LOGIN_URL = '/login';
+
+    public function showLogin(): void
     {
         if (Auth::check()) {
             $this->redirect('/dashboard');
@@ -37,7 +39,7 @@ final class AuthController extends Controller
             if ($user === null) {
                 Session::setOldInput(['email' => $email]);
                 Session::setErrors(['email' => 'Invalid credentials or inactive account.']);
-                $this->redirect('/login');
+                $this->redirect(self::LOGIN_URL);
 
                 return;
             }
@@ -50,12 +52,12 @@ final class AuthController extends Controller
             ]);
             Session::clearOldInput();
             $this->redirect('/dashboard');
-        }, false, '/login');
+        }, false, self::LOGIN_URL);
     }
 
-    public function logout(Request $request): void
+    public function logout(): void
     {
         Auth::logout();
-        $this->redirect('/login');
+        $this->redirect(self::LOGIN_URL);
     }
 }
