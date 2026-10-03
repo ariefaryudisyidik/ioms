@@ -1,0 +1,30 @@
+# SonarQube lokal untuk analisis kualitas kode (terpisah dari stack aplikasi).
+#   docker compose -f docker-compose.sonar.yml up -d sonarqube
+#   docker compose -f docker-compose.sonar.yml run --rm scanner
+services:
+  sonarqube:
+    image: sonarqube:community
+    ports:
+      - "9001:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+
+  scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    profiles: ["scan"]
+    depends_on:
+      - sonarqube
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+    volumes:
+      - ./:/usr/src
+
+volumes:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:

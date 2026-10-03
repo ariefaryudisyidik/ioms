@@ -82,6 +82,24 @@ vendor/bin/phpcs --standard=phpcs.xml app/
 
 Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 32 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
 
+## SonarQube
+
+SonarQube Community lokal dijalankan lewat `docker-compose.sonar.yml` (dashboard di http://localhost:9001, login awal `admin`/`admin`).
+
+```bash
+docker compose -f docker-compose.sonar.yml -p ioms-sonar up -d sonarqube   # tunggu status UP
+# buat token: My Account > Security, lalu export SONAR_TOKEN=<token>
+
+# 1. Coverage (unit + integration; butuh MySQL untuk TEST_DB_*), path dipetakan ke /usr/src untuk scanner
+XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover build/coverage/clover.xml --log-junit build/coverage/junit.xml
+sed -i.bak "s#$PWD/#/usr/src/#g" build/coverage/clover.xml build/coverage/junit.xml
+
+# 2. Scan
+docker compose -f docker-compose.sonar.yml -p ioms-sonar run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
+```
+
+Konfigurasi analisis ada di `sonar-project.properties`.
+
 ## Dokumentasi
 
 - Perencanaan: `docs/planning/` (user story, scope, ERD, class diagram awal, backlog)
