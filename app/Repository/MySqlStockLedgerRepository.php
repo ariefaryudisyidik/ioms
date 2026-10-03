@@ -7,74 +7,49 @@ namespace App\Repository;
 use App\Entity\StockLedger;
 use PDO;
 
-final class MySqlStockLedgerRepository implements StockLedgerRepositoryInterface
+final class MySqlStockLedgerRepository extends AbstractMySqlRepository implements StockLedgerRepositoryInterface
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    private const RULES = [
+        ['product_id', 'product_id = ?', 'int'],
+        [self::COL_WAREHOUSE_ID, 'warehouse_id = ?', 'int'],
+        ['movement_type', 'movement_type = ?', 'string'],
+        [self::COL_DATE_FROM, 'created_at >= ?', 'string', ' 00:00:00'],
+        [self::COL_DATE_TO, 'created_at <= ?', 'string', ' 23:59:59'],
+    ];
 
     public function record(StockLedger $entry, ?PDO $pdo = null): StockLedger
     {
-        $conn = $pdo ?? $this->pdo;
-        $stmt = $conn->prepare(
-            'INSERT INTO stock_ledger (product_id, warehouse_id, movement_type, quantity, reference_type, reference_id, performed_by)
-             VALUES (?,?,?,?,?,?,?)'
+        $entry->id = $this->insert(
+            'INSERT INTO stock_ledger (product_id, warehouse_id, movement_type, quantity, reference_type, reference_id,
+                performed_by)
+             VALUES (?,?,?,?,?,?,?)',
+            [
+                $entry->productId,
+                $entry->warehouseId,
+                $entry->movementType,
+                $entry->quantity,
+                $entry->referenceType,
+                $entry->referenceId,
+                $entry->performedBy,
+            ],
+            $pdo
         );
-        $stmt->execute([
-            $entry->productId,
-            $entry->warehouseId,
-            $entry->movementType,
-            $entry->quantity,
-            $entry->referenceType,
-            $entry->referenceId,
-            $entry->performedBy,
-        ]);
-        $entry->id = (int) $conn->lastInsertId();
 
         return $entry;
     }
 
     public function search(array $filters = []): array
     {
-        $where = [];
-        $params = [];
+        $rows = $this->searchRows(
+            'SELECT id, product_id, warehouse_id, movement_type, quantity, reference_type, reference_id,
+                    performed_by, created_at
+             FROM stock_ledger',
+            $filters,
+            self::RULES,
+            'created_at DESC',
+            100
+        );
 
-        if (!empty($filters['product_id'])) {
-            $where[] = 'product_id = ?';
-            $params[] = (int) $filters['product_id'];
-        }
-        if (!empty($filters['warehouse_id'])) {
-            $where[] = 'warehouse_id = ?';
-            $params[] = (int) $filters['warehouse_id'];
-        }
-        if (!empty($filters['movement_type'])) {
-            $where[] = 'movement_type = ?';
-            $params[] = (string) $filters['movement_type'];
-        }
-        if (!empty($filters['date_from'])) {
-            $where[] = 'created_at >= ?';
-            $params[] = $filters['date_from'] . ' 00:00:00';
-        }
-        if (!empty($filters['date_to'])) {
-            $where[] = 'created_at <= ?';
-            $params[] = $filters['date_to'] . ' 23:59:59';
-        }
-
-        $sql = 'SELECT id, product_id, warehouse_id, movement_type, quantity, reference_type, reference_id,
-                       performed_by, created_at
-                FROM stock_ledger';
-        if ($where) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
-        }
-        $sql .= ' ORDER BY created_at DESC';
-
-        $limit = (int) ($filters['limit'] ?? 100);
-        $offset = (int) ($filters['offset'] ?? 0);
-        $sql .= " LIMIT {$limit} OFFSET {$offset}";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-
-        return array_map(fn ($r) => StockLedger::fromRow($r), $stmt->fetchAll());
+        return array_map(fn ($r) => StockLedger::fromRow($r), $rows);
     }
 }

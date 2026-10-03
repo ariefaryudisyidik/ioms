@@ -8,20 +8,23 @@ use App\Entity\PurchaseOrder;
 use App\Entity\PurchaseOrderItem;
 use PDO;
 
-final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInterface
+final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository implements PurchaseOrderRepositoryInterface
 {
-    public function __construct(private PDO $pdo)
-    {
-    }
+    private const RULES = [
+        [self::COL_STATUS, 'status = ?', 'string'],
+        ['supplier_id', 'supplier_id = ?', 'int'],
+        [self::COL_WAREHOUSE_ID, 'warehouse_id = ?', 'int'],
+        [self::COL_DATE_FROM, 'order_date >= ?', 'string'],
+        [self::COL_DATE_TO, 'order_date <= ?', 'string'],
+    ];
 
     public function findById(int $id): ?PurchaseOrder
     {
-        $stmt = $this->pdo->prepare(
+        $row = $this->fetchRow(
             'SELECT id, po_number, supplier_id, warehouse_id, status, order_date, created_by
-             FROM purchase_orders WHERE id = ?'
+             FROM purchase_orders WHERE id = ?',
+            [$id]
         );
-        $stmt->execute([$id]);
-        $row = $stmt->fetch();
 
         return $row ? PurchaseOrder::fromRow($row) : null;
     }
@@ -29,115 +32,60 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
     public function findWithItems(int $id): ?PurchaseOrder
     {
         $po = $this->findById($id);
-        if ($po === null) {
-            return null;
+        if ($po !== null) {
+            $po->items = $this->itemsFor($id);
         }
-        $po->items = $this->itemsFor($id);
 
         return $po;
     }
 
     public function poNumberExists(string $poNumber): bool
     {
-        $stmt = $this->pdo->prepare('SELECT id FROM purchase_orders WHERE po_number = ?');
-        $stmt->execute([$poNumber]);
-
-        return $stmt->fetch() !== false;
-    }
-
-    private function buildWhere(array $filters): array
-    {
-        $where = [];
-        $params = [];
-
-        if (!empty($filters['status'])) {
-            $where[] = 'status = ?';
-            $params[] = (string) $filters['status'];
-        }
-        if (!empty($filters['supplier_id'])) {
-            $where[] = 'supplier_id = ?';
-            $params[] = (int) $filters['supplier_id'];
-        }
-        if (!empty($filters['warehouse_id'])) {
-            $where[] = 'warehouse_id = ?';
-            $params[] = (int) $filters['warehouse_id'];
-        }
-        if (!empty($filters['date_from'])) {
-            $where[] = 'order_date >= ?';
-            $params[] = (string) $filters['date_from'];
-        }
-        if (!empty($filters['date_to'])) {
-            $where[] = 'order_date <= ?';
-            $params[] = (string) $filters['date_to'];
-        }
-
-        return [$where, $params];
+        return $this->valueExists('purchase_orders', 'po_number', $poNumber);
     }
 
     public function search(array $filters = []): array
     {
-        [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT po.id, po.po_number, po.supplier_id, po.warehouse_id, po.status, po.order_date, po.created_by,
-                       s.name AS supplier_name
-                FROM purchase_orders po
-                LEFT JOIN suppliers s ON s.id = po.supplier_id';
-        if ($where) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
-        }
-        $direction = ($filters['sort'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
-        $sql .= " ORDER BY po.order_date {$direction}, po.created_at {$direction}";
+        $rows = $this->searchRows(
+            'SELECT po.id, po.po_number, po.supplier_id, po.warehouse_id, po.status, po.order_date, po.created_by,
+                    s.name AS supplier_name
+             FROM purchase_orders po
+             LEFT JOIN suppliers s ON s.id = po.supplier_id',
+            $filters,
+            self::RULES,
+            $this->dateOrder($filters, 'po.'),
+            10
+        );
 
-        $limit = (int) ($filters['limit'] ?? 10);
-        $offset = (int) ($filters['offset'] ?? 0);
-        $sql .= " LIMIT {$limit} OFFSET {$offset}";
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-
-        return array_map(fn ($r) => PurchaseOrder::fromRow($r), $stmt->fetchAll());
+        return array_map(fn ($r) => PurchaseOrder::fromRow($r), $rows);
     }
 
     public function countSearch(array $filters = []): int
     {
-        [$where, $params] = $this->buildWhere($filters);
-        $sql = 'SELECT COUNT(*) FROM purchase_orders';
-        if ($where) {
-            $sql .= ' WHERE ' . implode(' AND ', $where);
-        }
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-
-        return (int) $stmt->fetchColumn();
+        return $this->countRows('purchase_orders', $filters, self::RULES);
     }
 
     public function countsByStatus(): array
     {
-        $stmt = $this->pdo->query('SELECT status, COUNT(*) AS cnt FROM purchase_orders GROUP BY status');
-        $counts = [];
-        foreach ($stmt->fetchAll() as $row) {
-            $counts[(string) $row['status']] = (int) $row['cnt'];
-        }
-
-        return $counts;
+        return $this->countsByStatusFor('purchase_orders');
     }
 
     public function save(PurchaseOrder $po): PurchaseOrder
     {
         if ($po->id === null) {
-            $stmt = $this->pdo->prepare(
+            $po->id = $this->insert(
                 'INSERT INTO purchase_orders (po_number, supplier_id, warehouse_id, status, order_date, created_by)
-                 VALUES (?,?,?,?,?,?)'
+                 VALUES (?,?,?,?,?,?)',
+                [$po->poNumber, $po->supplierId, $po->warehouseId, $po->status, $po->orderDate, $po->createdBy]
             );
-            $stmt->execute([$po->poNumber, $po->supplierId, $po->warehouseId, $po->status, $po->orderDate, $po->createdBy]);
-            $po->id = (int) $this->pdo->lastInsertId();
 
             return $po;
         }
 
-        $stmt = $this->pdo->prepare(
-            'UPDATE purchase_orders SET po_number=?, supplier_id=?, warehouse_id=?, status=?, order_date=? WHERE id=?'
+        $this->execute(
+            'UPDATE purchase_orders SET po_number=?, supplier_id=?, warehouse_id=?, status=?, order_date=? WHERE id=?',
+            [$po->poNumber, $po->supplierId, $po->warehouseId, $po->status, $po->orderDate, $po->id]
         );
-        $stmt->execute([$po->poNumber, $po->supplierId, $po->warehouseId, $po->status, $po->orderDate, $po->id]);
 
         return $po;
     }
@@ -145,46 +93,42 @@ final class MySqlPurchaseOrderRepository implements PurchaseOrderRepositoryInter
     public function saveItem(PurchaseOrderItem $item): PurchaseOrderItem
     {
         if ($item->id === null) {
-            $stmt = $this->pdo->prepare(
-                'INSERT INTO purchase_order_items (purchase_order_id, product_id, qty_ordered, qty_received, purchase_price)
-                 VALUES (?,?,?,?,?)'
+            $item->id = $this->insert(
+                'INSERT INTO purchase_order_items (purchase_order_id, product_id, qty_ordered, qty_received,
+                    purchase_price)
+                 VALUES (?,?,?,?,?)',
+                [$item->purchaseOrderId, $item->productId, $item->qtyOrdered, $item->qtyReceived, $item->purchasePrice]
             );
-            $stmt->execute([$item->purchaseOrderId, $item->productId, $item->qtyOrdered, $item->qtyReceived, $item->purchasePrice]);
-            $item->id = (int) $this->pdo->lastInsertId();
 
             return $item;
         }
 
-        $stmt = $this->pdo->prepare(
-            'UPDATE purchase_order_items SET product_id=?, qty_ordered=?, qty_received=?, purchase_price=? WHERE id=?'
+        $this->execute(
+            'UPDATE purchase_order_items SET product_id=?, qty_ordered=?, qty_received=?, purchase_price=? WHERE id=?',
+            [$item->productId, $item->qtyOrdered, $item->qtyReceived, $item->purchasePrice, $item->id]
         );
-        $stmt->execute([$item->productId, $item->qtyOrdered, $item->qtyReceived, $item->purchasePrice, $item->id]);
 
         return $item;
     }
 
     public function itemsFor(int $poId): array
     {
-        $stmt = $this->pdo->prepare(
+        $rows = $this->fetchRows(
             'SELECT id, purchase_order_id, product_id, qty_ordered, qty_received, purchase_price
-             FROM purchase_order_items WHERE purchase_order_id = ?'
+             FROM purchase_order_items WHERE purchase_order_id = ?',
+            [$poId]
         );
-        $stmt->execute([$poId]);
 
-        return array_map(fn ($r) => PurchaseOrderItem::fromRow($r), $stmt->fetchAll());
+        return array_map(fn ($r) => PurchaseOrderItem::fromRow($r), $rows);
     }
 
     public function updateItemReceived(int $itemId, int $qtyReceived, ?PDO $pdo = null): void
     {
-        $conn = $pdo ?? $this->pdo;
-        $stmt = $conn->prepare('UPDATE purchase_order_items SET qty_received = ? WHERE id = ?');
-        $stmt->execute([$qtyReceived, $itemId]);
+        $this->execute('UPDATE purchase_order_items SET qty_received = ? WHERE id = ?', [$qtyReceived, $itemId], $pdo);
     }
 
     public function updateStatus(int $poId, string $status, ?PDO $pdo = null): void
     {
-        $conn = $pdo ?? $this->pdo;
-        $stmt = $conn->prepare('UPDATE purchase_orders SET status = ? WHERE id = ?');
-        $stmt->execute([$status, $poId]);
+        $this->execute('UPDATE purchase_orders SET status = ? WHERE id = ?', [$status, $poId], $pdo);
     }
 }
