@@ -52,11 +52,6 @@ namespace App\Core {
             Response::html(self::render($template, $data), $status);
         }
 
-        public static function e(mixed $value): string
-        {
-            return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-        }
-
         private static function resolve(string $template): string
         {
             $relative = str_replace('.', '/', $template);

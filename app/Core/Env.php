@@ -19,12 +19,9 @@ final class Env
             return;
         }
 
-        if (!is_file($path) || !is_readable($path)) {
-            self::$loaded = true;
-            return;
-        }
-
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $lines = is_file($path) && is_readable($path)
+            ? file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES)
+            : false;
         if ($lines === false) {
             self::$loaded = true;
             return;

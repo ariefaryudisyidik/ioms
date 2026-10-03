@@ -11,7 +11,7 @@ use App\Service\Exception\ValidationException;
 
 final class ProductService
 {
-    private const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/webp'];
+    private const EXTENSIONS = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     private const MAX_BYTES = 2 * 1024 * 1024; // 2MB
 
     public function __construct(
@@ -155,18 +155,11 @@ final class ProductService
 
         $tmpName = (string) ($file['tmp_name'] ?? '');
         $mime = @mime_content_type($tmpName) ?: '';
-        if (!in_array($mime, self::ALLOWED_MIME, true)) {
+        if (!isset(self::EXTENSIONS[$mime])) {
             throw new ValidationException(['image' => 'Image must be JPEG, PNG, or WEBP.']);
         }
 
-        $ext = match ($mime) {
-            'image/jpeg' => 'jpg',
-            'image/png' => 'png',
-            'image/webp' => 'webp',
-            default => 'bin', // @phpstan-ignore match.unreachable (defensive fallback if ALLOWED_MIME changes)
-        };
-
-        $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+        $filename = bin2hex(random_bytes(16)) . '.' . self::EXTENSIONS[$mime];
         $destDir = rtrim($this->uploadDir, '/');
         if (!is_dir($destDir)) {
             mkdir($destDir, 0775, true);

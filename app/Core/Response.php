@@ -51,4 +51,19 @@ final class Response
     {
         self::json(['error' => $message], 403);
     }
+
+    /**
+     * Generic 500 for failures outside controller actions: JSON for /api/*,
+     * the error template otherwise. Never exposes exception details (ERR-01).
+     */
+    public static function serverError(string $path): void
+    {
+        if (str_starts_with($path, '/api/')) {
+            self::json(['error' => 'An unexpected error occurred.'], 500);
+
+            return;
+        }
+
+        View::display('errors.500', [], 500);
+    }
 }

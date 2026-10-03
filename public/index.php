@@ -181,10 +181,5 @@ try {
 } catch (\Throwable $e) {
     error_log('[Unhandled/bootstrap] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 
-    $path = Request::capture()->path();
-    if (str_starts_with($path, '/api/')) {
-        Response::json(['error' => 'An unexpected error occurred.'], 500);
-    } else {
-        View::display('errors.500', [], 500);
-    }
+    Response::serverError(Request::capture()->path());
 }

@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\Core\Auth;
 use App\Core\Database;
-use App\Core\Request;
 use App\Core\Response;
 use App\Core\Session;
 use App\Core\View;
@@ -44,13 +43,6 @@ abstract class Controller
     protected function json(array $data, int $status = 200): void
     {
         Response::json($data, $status);
-    }
-
-    protected function withOldInputOnError(Request $request, string $backUrl, ValidationException $e): void
-    {
-        Session::setOldInput($request->all());
-        Session::setErrors($e->errors());
-        $this->redirect($backUrl);
     }
 
     /**
