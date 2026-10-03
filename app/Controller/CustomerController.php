@@ -4,82 +4,24 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Request;
 use App\Repository\MySqlCustomerRepository;
 use App\Service\CustomerService;
 
-final class CustomerController extends Controller
+final class CustomerController extends CrudController
 {
-    private const BASE_URL = '/customers';
+    protected const VIEW = 'customer';
+    protected const BASE_URL = '/customers';
+    protected const ENTITY_KEY = 'customer';
+    protected const LIST_KEY = 'customers';
+    protected const WRITE_ROLES = ['Admin', 'Sales'];
 
-    private function service(): CustomerService
+    protected function service(): CustomerService
     {
         return new CustomerService(new MySqlCustomerRepository($this->pdo()));
     }
 
-    public function index(): void
-    {
-        if (Auth::requireLogin()) {
-            return;
-        }
-        $this->render('customer.index', ['customers' => $this->service()->all()]);
-    }
-
-    public function create(): void
-    {
-        if (Auth::requireRole('Admin', 'Sales')) {
-            return;
-        }
-        $this->render('customer.create', []);
-    }
-
-    public function store(Request $request): void
-    {
-        if (Auth::requireRole('Admin', 'Sales')) {
-            return;
-        }
-        $this->handle(function () use ($request) {
-            $this->service()->create($request->all());
-            $this->redirect(self::BASE_URL);
-        }, false, '/customers/create');
-    }
-
-    public function edit(array $params): void
-    {
-        if (Auth::requireRole('Admin', 'Sales')) {
-            return;
-        }
-        $customer = $this->service()->find((int) $params['id']);
-        if ($customer === null) {
-            $this->render('errors.404', [], 404);
-
-            return;
-        }
-        $this->render('customer.edit', ['customer' => $customer]);
-    }
-
-    public function update(Request $request, array $params): void
-    {
-        if (Auth::requireRole('Admin', 'Sales')) {
-            return;
-        }
-        $id = (int) $params['id'];
-        $this->handle(function () use ($request, $id) {
-            $this->service()->update($id, $request->all());
-            $this->redirect(self::BASE_URL);
-        }, false, "/customers/{$id}/edit");
-    }
-
     public function deactivate(array $params): void
     {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $id = (int) $params['id'];
-        $this->handle(function () use ($id) {
-            $this->service()->deactivate($id);
-            $this->redirect(self::BASE_URL);
-        }, false, self::BASE_URL);
+        $this->remove($params);
     }
 }

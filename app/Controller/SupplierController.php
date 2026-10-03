@@ -4,82 +4,23 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Core\Auth;
-use App\Core\Request;
 use App\Repository\MySqlSupplierRepository;
 use App\Service\SupplierService;
 
-final class SupplierController extends Controller
+final class SupplierController extends CrudController
 {
-    private const BASE_URL = '/suppliers';
+    protected const VIEW = 'supplier';
+    protected const BASE_URL = '/suppliers';
+    protected const ENTITY_KEY = 'supplier';
+    protected const LIST_KEY = 'suppliers';
 
-    private function service(): SupplierService
+    protected function service(): SupplierService
     {
         return new SupplierService(new MySqlSupplierRepository($this->pdo()));
     }
 
-    public function index(): void
-    {
-        if (Auth::requireLogin()) {
-            return;
-        }
-        $this->render('supplier.index', ['suppliers' => $this->service()->all()]);
-    }
-
-    public function create(): void
-    {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $this->render('supplier.create', []);
-    }
-
-    public function store(Request $request): void
-    {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $this->handle(function () use ($request) {
-            $this->service()->create($request->all());
-            $this->redirect(self::BASE_URL);
-        }, false, '/suppliers/create');
-    }
-
-    public function edit(array $params): void
-    {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $supplier = $this->service()->find((int) $params['id']);
-        if ($supplier === null) {
-            $this->render('errors.404', [], 404);
-
-            return;
-        }
-        $this->render('supplier.edit', ['supplier' => $supplier]);
-    }
-
-    public function update(Request $request, array $params): void
-    {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $id = (int) $params['id'];
-        $this->handle(function () use ($request, $id) {
-            $this->service()->update($id, $request->all());
-            $this->redirect(self::BASE_URL);
-        }, false, "/suppliers/{$id}/edit");
-    }
-
     public function deactivate(array $params): void
     {
-        if (Auth::requireRole('Admin')) {
-            return;
-        }
-        $id = (int) $params['id'];
-        $this->handle(function () use ($id) {
-            $this->service()->deactivate($id);
-            $this->redirect(self::BASE_URL);
-        }, false, self::BASE_URL);
+        $this->remove($params);
     }
 }
