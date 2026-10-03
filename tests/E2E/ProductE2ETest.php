@@ -37,12 +37,12 @@ final class ProductE2ETest extends E2ETestCase
 
         $this->assertStringContainsString('SKU-0001', $client->get('/products/1')->body);
         $this->assertSame(404, $client->get('/products/99999')->status);
-        $this->assertSame(404, $client->get('/products/99999/edit')->status);
+        $this->assertSame(404, $this->loginAs(self::ADMIN)->get('/products/99999/edit')->status);
     }
 
     public function testCreateWithoutImageThenWithEachAllowedImageType(): void
     {
-        $client = $this->loginAs(self::WAREHOUSE);
+        $client = $this->loginAs(self::ADMIN);
         $this->assertSame(200, $client->get('/products/create')->status);
 
         $plain = $client->post('/products', $this->validProduct());
@@ -142,7 +142,14 @@ final class ProductE2ETest extends E2ETestCase
         $this->assertSame(403, $sales->get('/products/1/edit')->status);
         $this->assertSame(403, $sales->post('/products/1', $this->validProduct(['_method' => 'PUT']))->status);
 
+        // Warehouse Staff may only view products and stock (brief section 1.2).
         $warehouse = $this->loginAs(self::WAREHOUSE);
+        $this->assertSame(200, $warehouse->get('/products')->status);
+        $this->assertSame(403, $warehouse->get('/products/create')->status);
+        $this->assertSame(403, $warehouse->post('/products', $this->validProduct())->status);
+        $this->assertSame(403, $warehouse->get('/products/1/edit')->status);
+        $this->assertSame(403, $warehouse->post('/products/1', $this->validProduct(['_method' => 'PUT']))->status);
         $this->assertSame(403, $warehouse->post('/products/1/delete')->status);
+        $this->assertStringNotContainsString('/products/create', $warehouse->get('/products')->body);
     }
 }

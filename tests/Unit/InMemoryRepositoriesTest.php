@@ -81,6 +81,8 @@ final class InMemoryRepositoriesTest extends TestCase
         $this->assertSame(5, $stocks->lockForUpdate(new PDO('sqlite::memory:'), $p->id, 1));
         $this->assertSame(0, $stocks->lockForUpdate(new PDO('sqlite::memory:'), $p->id, 77));
         $this->assertSame(1, $stocks->countLowStock());
+        $this->assertSame(5 * 1.0, $stocks->totalInventoryValue(), 'purchase price 1 x total quantity 5');
+        $this->assertSame(0.0, (new InMemoryProductStockRepository())->totalInventoryValue());
         $this->assertSame([], (new InMemoryProductStockRepository())->lowStockList());
     }
 
@@ -109,5 +111,6 @@ final class InMemoryRepositoriesTest extends TestCase
         $repo->updateStatus(99, SalesOrder::STATUS_FULFILLED);
         $this->assertSame(3, $a->approvedBy);
         $this->assertSame([SalesOrder::STATUS_APPROVED => 1, SalesOrder::STATUS_FULFILLED => 1], $repo->countsByStatus());
+        $this->assertSame([SalesOrder::STATUS_APPROVED => 1], $repo->countsByStatus(7), 'filtered to one creator');
     }
 }

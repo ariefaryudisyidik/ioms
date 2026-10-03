@@ -34,7 +34,7 @@ final class CrudResourcesE2ETest extends E2ETestCase
             ],
             'customers' => [
                 '/customers', 'customers', ['name' => 'E2E Customer', 'contact' => '0822', 'address' => 'Jl. Uji', 'is_active' => '1'],
-                ['name' => ''], 'name', true, [self::ADMIN, self::SALES], [self::WAREHOUSE], $deactivate,
+                ['name' => ''], 'name', true, [self::ADMIN], [self::SALES, self::WAREHOUSE], $deactivate,
             ],
             'users' => [
                 '/users', 'users',
@@ -151,8 +151,9 @@ final class CrudResourcesE2ETest extends E2ETestCase
         }
     }
 
-    public function testCustomersAreDeactivatedByAdminOnly(): void
+    public function testSalesCanStillReadCustomersForOrderEntry(): void
     {
+        $this->assertSame(200, $this->loginAs(self::SALES)->get('/customers')->status);
         $this->assertSame(403, $this->loginAs(self::SALES)->post('/customers/1/deactivate')->status);
         $this->assertSame(302, $this->loginAs(self::ADMIN)->post('/customers/1/deactivate')->status);
     }

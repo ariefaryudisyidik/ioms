@@ -160,7 +160,7 @@ final class SecurityE2ETest extends E2ETestCase
         $this->db()->exec("UPDATE users SET role = 'WarehouseStaff' WHERE email = '" . self::SALES . "'");
 
         $this->assertSame(403, $sari->get('/sales-orders/create')->status);
-        $this->assertSame(200, $sari->get('/products/create')->status);
+        $this->assertSame(200, $sari->get('/purchase-orders/create')->status);
     }
 
     public function testAdminCannotLockThemselvesOut(): void
@@ -196,7 +196,8 @@ final class SecurityE2ETest extends E2ETestCase
 
         $warehouse = $this->loginAs(self::WAREHOUSE);
         $this->assertSame(200, $warehouse->get('/reports/stock-ledger.csv')->status);
-        $this->assertSame(200, $warehouse->get('/reports/orders.csv?type=purchase')->status);
+        $this->assertSame(403, $warehouse->get('/reports/orders.csv?type=purchase')->status);
+        $this->assertSame(403, $warehouse->get('/reports/orders.csv?type=sales')->status);
 
         $unknownType = $sales->get('/reports/orders.csv?type=../../etc/passwd');
         $this->assertSame(200, $unknownType->status);
