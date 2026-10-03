@@ -35,7 +35,7 @@ Jika ditemukan bug fungsional baru pada tahap review berikutnya, perbarui dokume
 
 ## Pembaruan 2026-10-03
 
-- Full test suite sekarang **237 test / 1108 assertion** (Unit 124, Integration 9, E2E 104 lewat HTTP), semuanya lulus lewat `composer coverage`. Line coverage 100%.
+- Full test suite sekarang **246 test / 1197 assertion** (Unit 124, Integration 9, E2E 113 lewat HTTP), semuanya lulus lewat `composer coverage`. Line coverage 100%.
 - PHPStan 0 error; PHPCS 0 error dengan 27 warning panjang baris (kosmetik).
 - Tidak ada bug fungsional baru ditemukan oleh suite E2E. Satu bug *environment* ditemukan dan diperbaiki lebih awal: `docker-compose.yml` memasang source di atas `vendor/` image sehingga clone bersih langsung fatal error (sudah diperbaiki, bind mount dihapus).
 

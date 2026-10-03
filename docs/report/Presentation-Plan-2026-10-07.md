@@ -11,7 +11,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 - [ ] Clone ke folder baru, `cp .env.example .env`, `docker compose up --build`, login: pastikan README benar-benar jalan.
 - [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml -p ioms-sonar up -d`, buka `http://localhost:9001` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
 - [ ] `composer coverage` sekali lagi; buka `build/coverage/html/index.html` (laporan coverage per file).
-- [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (237 tests, 903 assertions), `docker compose ps`, demo PO→SO.
+- [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (246 tests, 903 assertions), `docker compose ps`, demo PO→SO.
 - [ ] Latihan dengan timer. Target selesai di 9:30.
 
 **30 menit sebelum:**
@@ -27,7 +27,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 | 0:00–1:00 | Pembukaan | Nama, masalah, role, status, kontribusi, pengungkapan AI |
 | 1:00–5:00 | Demo | Alur A: PO → goods receipt → ledger. Alur B: SO → approval → goods issue + oversell ditolak |
 | 5:00–8:00 | Teknis | Layered architecture, transaksi + `FOR UPDATE`, Router/Controller, JSON endpoint, Docker, keamanan |
-| 8:00–9:00 | Bukti kualitas | 237 test, SonarQube, coverage, keamanan |
+| 8:00–9:00 | Bukti kualitas | 246 test, SonarQube, coverage, keamanan |
 | 9:00–10:00 | Refleksi | Kendala, solusi, keterbatasan, prioritas berikutnya |
 
 ### Pembukaan (1 menit): ucapkan kira-kira
@@ -57,7 +57,7 @@ Data seed: password semua akun `Password123!`. Admin `admin@ioms.test`, Sales `s
 6. **Docker:** `docker compose up --build` → app (Apache, **non-root**, healthcheck) + MySQL (schema dan seed otomatis).
 
 ### Bukti kualitas (1 menit)
-- Terminal/slide: **237 test, 1.108 assertion** (Unit 124 · Integration 9 · E2E 104 lewat HTTP). Buka laporan coverage HTML.
+- Terminal/slide: **246 test, 1.197 assertion** (Unit 124 · Integration 9 · E2E 113 lewat HTTP). Buka laporan coverage HTML.
 - SonarQube: **Quality gate Passed · 0 bug/vulnerability/smell/hotspot · coverage 100% · duplikasi 0%**.
 - Cerita perbaikan: awal 192 isu dan duplikasi 8,1% → diperbaiki lewat refactor (`CrudController`, `AbstractMySqlRepository`, partial view). Lihat `docs/quality/sonarqube-report.md` dan `refactor-log.md`.
 
@@ -89,7 +89,7 @@ curl -i -b /tmp/sales.jar -X POST http://localhost:8080/sales-orders/13/approve 
 | Bagaimana mencegah stok negatif / oversell? | Transaksi + `SELECT … FOR UPDATE` per baris stok, cek `available < qty` sebelum decrement, rollback bila gagal. `SalesOrderService::fulfill:206`, ADR-002, `TransactionRollbackIntegrationTest`. |
 | Kenapa pessimistic lock, bukan optimistic? | Konflik pada stok panas sering; optimistic butuh retry. Tidak butuh infrastruktur tambahan (mutex). ADR-002. |
 | Apa itu stock ledger? | Catatan append-only tiap pergerakan stok (Receipt/Issue) dengan referensi order dan pelaku; dashboard dan laporan dihitung dari situ. |
-| Siapa boleh apa? | Admin semua; Sales buat/submit SO miliknya; Warehouse goods receipt/issue dan master produk; approve hanya Admin dan bukan pembuatnya. Dicek di server (`Auth::requireRole`, `SalesOrderService`). |
+| Siapa boleh apa? | Admin semua; Sales buat/submit SO miliknya; Warehouse hanya melihat produk/stok dan memproses goods receipt/issue (master data hanya Admin); approve hanya Admin dan bukan pembuatnya. Dicek di server (`Auth::requireRole`, `SalesOrderService`). |
 | Kenapa Service tidak langsung pakai PDO? | Dependency Inversion: bisa diuji tanpa DB, dan SQL terisolasi (ADR-001). |
 | Jelaskan alur dari URL sampai halaman. | `index.php` → `Router` (regex + `{param}`) → `Controller` → `Service` → `Repository` → `View::display`. |
 | Apa yang berubah di Router hari-hari terakhir? | Argumen handler dipetakan **berdasarkan nama parameter** lewat reflection (`Router::resolveArguments`), jadi handler hanya mendeklarasikan `$request`/`$params` yang dipakai. Ada `RouterTest`. |

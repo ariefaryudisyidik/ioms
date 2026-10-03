@@ -36,3 +36,17 @@ Mencakup alur inti dan edge case. Kolom "Area" mengacu ke Controller/Service asl
 | TS-30 | API | `GET /api/products/{sku}/availability` dengan login valid tapi SKU tidak ditemukan | HTTP 404, body `{"error":"Not Found"}` |
 | TS-31 | API | `GET /api/products/{sku}/availability` dengan login valid dan SKU ada di beberapa gudang | HTTP 200, body berisi `sku`, `name`, `total`, dan array `warehouses` dengan quantity per gudang |
 | TS-32 | Concurrency (integration, butuh MySQL nyata) | Dua request fulfill SO berbeda menyentuh produk & gudang yang sama secara bersamaan, stok hanya cukup untuk satu | Salah satu transaksi berhasil (stok berkurang benar), yang lain menerima `InsufficientStockException` setelah menunggu lock dilepas — stok akhir tidak pernah negatif |
+| TS-33 | Matriks peran (§1.2) | Sales dan Warehouse Staff mencoba membuka form buat produk/kategori/gudang/supplier/customer dan halaman `/users` | 403; produk dan stok tetap bisa dilihat (`BriefRequirementsE2ETest::testMasterDataIsReadOnly…`) |
+| TS-34 | Matriks peran | Sales mencoba membuat PO | 403; Admin dan Warehouse Staff bisa |
+| TS-35 | Laporan | Sales/Warehouse/Admin mengunduh CSV | Admin semua; Sales hanya order miliknya; Warehouse hanya laporan stok; role lain mendapat 403 (`SecurityE2ETest::testReportsAreRestrictedByRole`) |
+| TS-36 | FIND-01 | Cari PO/SO berdasarkan nomor atau nama supplier/customer, filter customer, kombinasi status+sort, pindah ke halaman 2 | Hasil sesuai; filter tetap aktif di link pagination; wildcard `%`/`_` diperlakukan sebagai teks |
+| TS-37 | WH-01 | Buka detail produk dengan stok di dua gudang | Rincian per gudang dan total ditampilkan |
+| TS-38 | DASH-01 | Buka dashboard sebagai Admin/Sales/Warehouse Staff dan ubah data stok/order | Admin: nilai inventori, low stock, order pending; Sales: order miliknya per status; Warehouse: antrean receipt/issue dan low stock; angka berubah mengikuti data |
+| TS-39 | Keamanan | POST tanpa token CSRF, dengan token sesi lain, atau DELETE mentah | 403; data tidak berubah |
+| TS-40 | Keamanan | 5 kali login gagal untuk akun yang sama | Akun terkunci sementara walau password benar; akun lain tetap bisa login; sukses login menghapus hitungan |
+| TS-41 | Keamanan | User dinonaktifkan/dihapus/diubah role-nya saat sedang login | Request berikutnya logout atau memakai role baru |
+| TS-42 | Keamanan | Sales membuka/membatalkan SO milik Sales lain; Admin menyetujui SO sendiri; Admin menonaktifkan akun sendiri | 403 atau ditolak dengan pesan; data tidak berubah |
+| TS-43 | Validasi | PO/SO dengan supplier/customer/gudang/produk tidak ada atau nonaktif, harga negatif, qty ekstrem, tanggal tidak valid | Ditolak di backend dengan pesan per field; tidak ada data tersimpan |
+| TS-44 | Upload | Gambar dengan tanda tangan PNG tetapi isi bukan gambar, tipe salah, terlalu besar | Ditolak; tidak ada produk tersimpan |
+| TS-45 | ERR-01 | Database gagal saat halaman dibuka (tabel tidak ada) | Halaman 500 generik tanpa detail; JSON 500 untuk API |
+| TS-46 | JOB-01 | `docker compose exec app php scripts/check-low-stock.php` | Ringkasan produk di bawah reorder point; kode keluar 1 bila database tidak terjangkau |

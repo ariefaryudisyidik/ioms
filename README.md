@@ -83,7 +83,7 @@ vendor/bin/phpstan analyse --no-progress
 vendor/bin/phpcs --standard=phpcs.xml app/
 ```
 
-Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 33 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
+Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 28 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
 
 ## SonarQube
 
@@ -156,7 +156,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 237 test lulus (1108 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 246 test lulus (1197 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 

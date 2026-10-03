@@ -319,7 +319,7 @@ def main():
 
     # 8 ── quality evidence ───────────────────────────────────────────
     d.new('04 · Bukti kualitas', 'Test dan SonarQube')
-    stats = [('237', 'test lulus, 1.108 assertion\nUnit 124 · Integration 9 · E2E 104'),
+    stats = [('246', 'test lulus, 1.197 assertion\nUnit 124 · Integration 9 · E2E 113'),
              ('100%', 'line coverage\n(semua baris ter-cover)'),
              ('0', 'isu terbuka: bug, vulnerability,\nsmell, hotspot'),
              ('0%', 'duplikasi kode\nquality gate: Passed')]

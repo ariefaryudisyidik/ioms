@@ -1,11 +1,132 @@
+# Hasil test (Unit + Integration + E2E) — 2026-10-03 09:39 WIB
+# Perintah: composer coverage   (scripts/coverage.sh --testdox)
+
 PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
 
-Runtime:       PHP 8.4.8
+Runtime:       PHP 8.4.8 with Xdebug 3.4.2
 Configuration: /Users/Expiro/Project/ioms/phpunit.xml
 
-..........................                                        26 / 26 (100%)
+...............................................................  63 / 246 ( 25%)
+............................................................... 126 / 246 ( 51%)
+............................................................... 189 / 246 ( 76%)
+.........................................................       246 / 246 (100%)
 
-Time: 00:01.469, Memory: 10.00 MB
+Time: 04:04.905, Memory: 25.00 MB
+
+Auth E2E (Tests\E2E\AuthE2E)
+ ✔ Login page is shown to guests and root redirects to itself
+ ✔ Valid login redirects to dashboard and logged in user skips login page
+ ✔ Login accepts a json body
+ ✔ Wrong password returns to login with error and keeps old email
+ ✔ Unknown email is rejected
+ ✔ Deactivated account cannot log in
+ ✔ Logout via post and get ends the session
+ ✔ Guest is redirected to login from protected pages
+ ✔ Guest gets json unauthorized from api
+ ✔ Unknown routes return html or json 404
+ ✔ Forbidden page is rendered for wrong role
+
+Auth Role Api (Tests\Unit\AuthRoleApi)
+ ✔ Guest gets 401
+ ✔ Wrong role gets 403 and matching role passes
+
+Brief Requirements E2E (Tests\E2E\BriefRequirementsE2E)
+ ✔ Purchase orders can be searched by number or supplier name
+ ✔ Sales orders can be searched and filtered by customer
+ ✔ Order search treats wildcards as text and keeps filters when paging
+ ✔ Product detail shows total stock and per warehouse breakdown
+ ✔ Admin dashboard shows inventory value computed from stock
+ ✔ Sales dashboard shows only their own orders per status
+ ✔ Warehouse dashboard shows receipt and issue queues and low stock
+ ✔ Master data is read only for sales and warehouse staff
+ ✔ Purchase orders are created by admin or warehouse staff only
+
+Controller Error Handling (Tests\Unit\ControllerErrorHandling)
+ ✔ Api failures return json with the mapped status with data set "validation"
+ ✔ Api failures return json with the mapped status with data set "forbidden"
+ ✔ Api failures return json with the mapped status with data set "invalid transition"
+ ✔ Api failures return json with the mapped status with data set "insufficient stock"
+ ✔ Api failures return json with the mapped status with data set "unexpected"
+ ✔ Html validation failure stores errors for the redirect target
+ ✔ Html forbidden and unexpected render generic pages
+ ✔ Html domain conflict flashes the message
+ ✔ Successful action returns its result
+
+Core Support (Tests\Unit\CoreSupport)
+ ✔ Database accepts an injected connection and can be reset
+ ✔ View returns empty string for missing template
+ ✔ Session flash helpers track presence and consume on read
+ ✔ Flash partial renders success error and info messages
+ ✔ User list shows empty state when there are no users
+ ✔ Stock ledger service delegates search to the repository
+
+Crud Resources E2E (Tests\E2E\CrudResourcesE2E)
+ ✔ List and forms render for allowed roles with data set "categories"
+ ✔ List and forms render for allowed roles with data set "warehouses"
+ ✔ List and forms render for allowed roles with data set "suppliers"
+ ✔ List and forms render for allowed roles with data set "customers"
+ ✔ List and forms render for allowed roles with data set "users"
+ ✔ Create stores row and shows it in the list with data set "categories"
+ ✔ Create stores row and shows it in the list with data set "warehouses"
+ ✔ Create stores row and shows it in the list with data set "suppliers"
+ ✔ Create stores row and shows it in the list with data set "customers"
+ ✔ Create stores row and shows it in the list with data set "users"
+ ✔ Invalid create returns to form and keeps errors and old input with data set "categories"
+ ✔ Invalid create returns to form and keeps errors and old input with data set "warehouses"
+ ✔ Invalid create returns to form and keeps errors and old input with data set "suppliers"
+ ✔ Invalid create returns to form and keeps errors and old input with data set "customers"
+ ✔ Invalid create returns to form and keeps errors and old input with data set "users"
+ ✔ Update changes row and invalid update is rejected with data set "categories"
+ ✔ Update changes row and invalid update is rejected with data set "warehouses"
+ ✔ Update changes row and invalid update is rejected with data set "suppliers"
+ ✔ Update changes row and invalid update is rejected with data set "customers"
+ ✔ Update changes row and invalid update is rejected with data set "users"
+ ✔ Remove or deactivate works and missing id is handled with data set "categories"
+ ✔ Remove or deactivate works and missing id is handled with data set "warehouses"
+ ✔ Remove or deactivate works and missing id is handled with data set "suppliers"
+ ✔ Remove or deactivate works and missing id is handled with data set "customers"
+ ✔ Remove or deactivate works and missing id is handled with data set "users"
+ ✔ Writes are blocked for unauthorized roles with data set "categories"
+ ✔ Writes are blocked for unauthorized roles with data set "warehouses"
+ ✔ Writes are blocked for unauthorized roles with data set "suppliers"
+ ✔ Writes are blocked for unauthorized roles with data set "customers"
+ ✔ Writes are blocked for unauthorized roles with data set "users"
+ ✔ Sales can still read customers for order entry
+
+Csrf (Tests\Unit\Csrf)
+ ✔ Token is random hex and stable within a session
+ ✔ Only state changing methods require the token with data set "GET"
+ ✔ Only state changing methods require the token with data set "head"
+ ✔ Only state changing methods require the token with data set "OPTIONS"
+ ✔ Only state changing methods require the token with data set "POST"
+ ✔ Only state changing methods require the token with data set "put"
+ ✔ Only state changing methods require the token with data set "DELETE"
+ ✔ Only state changing methods require the token with data set "PATCH"
+ ✔ Token is accepted from the form field or the header only
+ ✔ Inject adds the hidden field to post forms only
+ ✔ Inject leaves pages without forms untouched
+
+Empty States And Failures E2E (Tests\E2E\EmptyStatesAndFailuresE2E)
+ ✔ List pages show empty state when there are no rows
+ ✔ Product list shows manage actions and pager edges
+ ✔ Detail pages handle missing items stock and product image
+ ✔ Dashboard shows empty low stock state when everything is above reorder point
+ ✔ Database failures never leak details and return generic errors
+ ✔ Storing an uploaded image fails gracefully when the upload directory is read only
+ ✔ User password rules and password change are enforced
+ ✔ Category in use cannot be deleted
+ ✔ Receiving more of an already complete line adds nothing
+
+Env (Tests\Unit\Env)
+ ✔ Parses plain quoted and spaced values and skips noise
+ ✔ Existing environment variable is not overwritten
+ ✔ Missing file is ignored and load only runs once
+ ✔ Get casts keyword values with data set "true"
+ ✔ Get casts keyword values with data set "false"
+ ✔ Get casts keyword values with data set "null"
+ ✔ Get casts keyword values with data set "empty"
+ ✔ Get casts keyword values with data set "plain"
+ ✔ Get returns default when key is missing
 
 Goods Issue Integration (Tests\Integration\GoodsIssueIntegration)
  ✔ Second goods issue is rejected once stock is exhausted
@@ -14,15 +135,72 @@ Goods Receipt Integration (Tests\Integration\GoodsReceiptIntegration)
  ✔ Receiving goods increments stock and writes ledger entry
  ✔ Partial then full receipt moves status through partially received to received
 
+In Memory Repositories (Tests\Unit\InMemoryRepositories)
+ ✔ User repository looks up saves and checks email uniqueness
+ ✔ Product repository lookups and filters
+ ✔ Stock repository tracks quantities per product and warehouse
+ ✔ Sales order repository stores searches and updates orders
+
+Login Throttle (Tests\Unit\LoginThrottle)
+ ✔ Account is locked after too many failures from one address
+ ✔ Address is locked after many failures across accounts
+ ✔ Successful login resets the counter
+ ✔ Old failures age out of the window and are purged
+ ✔ Auth service rejects unknown inactive and wrong passwords but accepts the right one
+
+Low Stock Cli E2E (Tests\E2E\LowStockCliE2E)
+ ✔ Lists products below reorder point
+ ✔ Reports when nothing is low
+ ✔ Exits with error when database is unreachable
+
 Low Stock Detection (Tests\Unit\LowStockDetection)
  ✔ Product below reorder point is flagged low stock
  ✔ Product at or above reorder point is not flagged
  ✔ Total is summed across warehouses for reorder comparison
 
+Order Rules (Tests\Unit\OrderRules)
+ ✔ Date rules accept only real ymd dates with data set "valid"
+ ✔ Date rules accept only real ymd dates with data set "leap day"
+ ✔ Date rules accept only real ymd dates with data set "impossible day"
+ ✔ Date rules accept only real ymd dates with data set "wrong order"
+ ✔ Date rules accept only real ymd dates with data set "text"
+ ✔ Date rules accept only real ymd dates with data set "empty"
+ ✔ Date rules accept only real ymd dates with data set "trailing junk"
+ ✔ Item validator rules with data set "valid"
+ ✔ Item validator rules with data set "valid without price"
+ ✔ Item validator rules with data set "no items"
+ ✔ Item validator rules with data set "not an array"
+ ✔ Item validator rules with data set "item is not an array"
+ ✔ Item validator rules with data set "missing product"
+ ✔ Item validator rules with data set "zero quantity"
+ ✔ Item validator rules with data set "fractional quantity"
+ ✔ Item validator rules with data set "huge quantity"
+ ✔ Item validator rules with data set "negative price"
+ ✔ Item validator rules with data set "text price"
+ ✔ Item validator rules with data set "huge price"
+ ✔ Item validator rules with data set "second item bad"
+ ✔ Product ids are cast to integers keeping keys
+ ✔ Only the owner or staff can cancel an order
+
+Product E2E (Tests\E2E\ProductE2E)
+ ✔ List supports search category status sort and paging
+ ✔ Show renders product and missing product is 404
+ ✔ Create without image then with each allowed image type
+ ✔ Invalid images are rejected
+ ✔ Invalid fields and duplicate sku are rejected
+ ✔ Update changes fields accepts new image and rejects bad input
+ ✔ Delete deactivates product whether or not it is used in orders
+ ✔ Product writes are restricted by role
+
 Product Service (Tests\Unit\ProductService)
  ✔ Create rejects duplicate sku
  ✔ Create succeeds with valid data
  ✔ Delete falls back to deactivate when used in orders
+ ✔ Find by sku returns the matching product
+ ✔ Create stores an allowed image and creates the upload directory
+ ✔ Image validation rejects failed oversized and wrong type uploads
+ ✔ File with image signature but no real image is rejected
+ ✔ Storage failure is reported as a validation error
 
 Purchase Order Date Validation (Tests\Unit\PurchaseOrderDateValidation)
  ✔ Empty date is rejected
@@ -30,6 +208,66 @@ Purchase Order Date Validation (Tests\Unit\PurchaseOrderDateValidation)
  ✔ Today is accepted
  ✔ Future date beyond tolerance is rejected
  ✔ Future date within tolerance is accepted
+
+Purchase Order E2E (Tests\E2E\PurchaseOrderE2E)
+ ✔ List supports status supplier sort and paging for every role
+ ✔ Every seeded purchase order renders its detail page
+ ✔ Create form and successful create as warehouse staff
+ ✔ Create validation rejects bad input
+ ✔ Order then partial then full receipt updates stock ledger and status
+ ✔ Receiving on draft order is rejected
+ ✔ Cancel and invalid transitions are handled
+ ✔ Sales role cannot write purchase orders
+
+Reports Api Dashboard E2E (Tests\E2E\ReportsApiDashboardE2E)
+ ✔ Dashboard renders for every role
+ ✔ Reports page and csv exports are available to logged in users
+ ✔ Sales export is restricted to the requesters own orders
+ ✔ Availability api returns stock per warehouse
+ ✔ Availability api shows unknown warehouse and zero stock products
+
+Repository Integration (Tests\Integration\RepositoryIntegration)
+ ✔ Sales order and item are inserted then updated in place
+ ✔ Purchase order and item are inserted then updated in place
+ ✔ Stock lookups by warehouse and total
+ ✔ Product search supports active flag and stock status filters
+ ✔ Failure while receiving goods rolls back item quantities and status
+
+Request (Tests\Unit\Request)
+ ✔ Query returns all values or a single key with default
+ ✔ Form body is used for input and merged over query in all
+ ✔ Json content type switches input source and empty body decodes to empty array
+ ✔ Server header path and file accessors
+
+Response (Tests\Unit\Response)
+ ✔ Forbidden emits json with 403
+ ✔ Unauthorized and not found emit json
+ ✔ Server error is json for api paths and html otherwise
+ ✔ Redirect html and csv set status codes
+
+Router (Tests\Unit\Router)
+ ✔ Handler without arguments is invoked
+ ✔ Handler receives only params when it declares only params
+ ✔ Handler receives only request when it declares only request
+ ✔ Handler receives request and params regardless of declaration order
+ ✔ Closure handler arguments are resolved by name
+ ✔ Post with method override dispatches to delete route
+ ✔ Unknown route uses not found handler
+ ✔ Patch and any register routes for their methods
+ ✔ Missing route without custom handler responds with json 404
+ ✔ Root route matches empty and slash paths
+
+Sales Order E2E (Tests\E2E\SalesOrderE2E)
+ ✔ Sales users only see their own orders while admin sees all
+ ✔ Seeded sales orders render for staff and only own orders for sales
+ ✔ Sales cannot cancel another sales users order
+ ✔ Create form is available to sales and admin only
+ ✔ Create validation rejects bad input
+ ✔ Full lifecycle draft submit approve fulfill moves stock and writes ledger
+ ✔ Reject returns order to draft and cancel works until fulfilled
+ ✔ Business rules block self approval foreign submit and bad transitions
+ ✔ Fulfillment with insufficient stock rolls back and keeps order approved
+ ✔ Actions are restricted by role
 
 Sales Order Service (Tests\Unit\SalesOrderService)
  ✔ Fulfill throws insufficient stock and rolls back when stock too low
@@ -44,7 +282,46 @@ Sales Order Service (Tests\Unit\SalesOrderService)
  ✔ Approved cannot skip straight to fulfilled via transition assertion only
  ✔ Only owner can submit for approval
 
+Security (Tests\Unit\Security)
+ ✔ Sending headers works over plain http and https
+ ✔ Https detection honours the server flag and proxy header
+ ✔ Safe requests and valid tokens pass the csrf gate
+ ✔ Forged html request is rejected with 403 page
+ ✔ Forged api request is rejected with json
+
+Security E2E (Tests\E2E\SecurityE2E)
+ ✔ State changing requests without a valid token are rejected
+ ✔ A token from another session is rejected
+ ✔ Forged api writes get json forbidden
+ ✔ Every post form carries the token and pages expose it in a meta tag
+ ✔ Responses carry security headers and no php version
+ ✔ Session cookie is http only and same site
+ ✔ Repeated failed logins lock the account even for the right password
+ ✔ Failed attempts are forgotten after a successful login
+ ✔ Sql injection payloads do not bypass login or search
+ ✔ Deactivated user is signed out on the next request
+ ✔ Deleted user loses access immediately
+ ✔ Role changes take effect without logging in again
+ ✔ Admin cannot lock themselves out
+ ✔ Reports are restricted by role
+ ✔ Csv export neutralises spreadsheet formulas
+ ✔ User supplied text is escaped in html output
+ ✔ Search treats like wildcards as plain text
+ ✔ Orders cannot reference missing or inactive records or use bad values
+ ✔ Image with an image signature but no real image is rejected
+
+Session Hardening (Tests\Unit\SessionHardening)
+ ✔ Idle session is cleared and receives a new id
+ ✔ Session past its absolute lifetime is cleared
+ ✔ Active session keeps its data and id
+ ✔ Refresh is a no op for guests
+ ✔ Refresh signs out deactivated and deleted users
+ ✔ Refresh applies role changes immediately
+
 Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
  ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
 
-OK (26 tests, 63 assertions)
+OK (246 tests, 1197 assertions)
+
+
+Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)

@@ -6,13 +6,15 @@ Diagram ini disusun langsung dari nama class/interface/method nyata di `app/` (b
 classDiagram
     %% ===== Core =====
     class Router { +get() +post() +put() +delete() +patch() +any() +dispatch(Request) -resolveArguments() }
-    class Auth { +login() +check() +user() +hasRole() +requireLogin() +requireRole(roles...) +requireLoginApi() +requireRoleApi(roles...) }
-    class Session { +start() +flash() +old() +setErrors() +getErrors() }
+    class Auth { +login() +check() +user() +hasRole() +refresh(UserRepositoryInterface) +requireLogin() +requireRole(roles...) +requireLoginApi() +requireRoleApi(roles...) }
+    class Session { +start() +isHttps() +flash() +old() +setErrors() +getErrors() }
     class Database { +connection() PDO }
     class Request { +method() +path() +input() +jsonBody() +file() }
     class Response { +html() +json() +redirect() +csv() +notFound() +unauthorized() +forbidden() +serverError(path) }
     class View { +render() +display() }
     class Env { +load() +get() }
+    class Csrf { +token() +isValid(Request) +inject(html) +requiresCheck(method) }
+    class Security { +sendHeaders() +rejectForgedRequest(Request) }
 
     %% ===== Entity =====
     class User
@@ -39,6 +41,7 @@ classDiagram
     class PurchaseOrderRepositoryInterface { <<interface>> }
     class SalesOrderRepositoryInterface { <<interface>> }
     class StockLedgerRepositoryInterface { <<interface>> }
+    class LoginAttemptRepositoryInterface { <<interface>> +recordFailure() +countRecent() +countRecentForIp() +clear() +purgeOlderThan() }
 
     %% ===== Repository Implementations (MySQL) =====
     class MySqlUserRepository
@@ -51,6 +54,8 @@ classDiagram
     class MySqlPurchaseOrderRepository
     class MySqlSalesOrderRepository
     class MySqlStockLedgerRepository
+    class MySqlLoginAttemptRepository
+    class InMemoryLoginAttemptRepository
     class AbstractMySqlRepository { <<abstract>> #fetchRows() #fetchRow() #execute() #insert() #buildWhere() #searchRows() #countRows() #dateOrder() }
 
     %% ===== Repository Implementations (In-Memory, untuk unit test) =====
@@ -73,6 +78,9 @@ classDiagram
     MySqlSalesOrderRepository ..|> SalesOrderRepositoryInterface
     InMemorySalesOrderRepository ..|> SalesOrderRepositoryInterface
     MySqlStockLedgerRepository ..|> StockLedgerRepositoryInterface
+    MySqlLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
+    InMemoryLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
+    MySqlLoginAttemptRepository --|> AbstractMySqlRepository
     MySqlPurchaseOrderRepository --|> AbstractMySqlRepository
     MySqlSalesOrderRepository --|> AbstractMySqlRepository
     MySqlStockLedgerRepository --|> AbstractMySqlRepository
@@ -88,6 +96,9 @@ classDiagram
     class PurchaseOrderService { +validateOrderDate() +create() +transitionTo() +receiveGoods() }
     class SalesOrderService { +create() +submitForApproval() +approve() +reject() +cancel() +fulfill() }
     class StockLedgerService { +search() }
+    class LoginThrottle { +isLocked(email,ip) +recordFailure() +reset() }
+    class OrderItemValidator { +validate(items,qtyKey,priceKey) +productIds() }
+    class DateRules { +isValidYmd(value) }
     class DashboardService { +summaryFor(role,userId) }
     class ReportService { +stockLedgerCsv() +orderStatusCsv() }
 
@@ -123,6 +134,14 @@ classDiagram
     ReportService --> StockLedgerRepositoryInterface
     ReportService --> PurchaseOrderRepositoryInterface
     ReportService --> SalesOrderRepositoryInterface
+    LoginThrottle --> LoginAttemptRepositoryInterface
+    PurchaseOrderService ..> OrderItemValidator
+    PurchaseOrderService ..> DateRules
+    SalesOrderService ..> OrderItemValidator
+    SalesOrderService ..> DateRules
+    Auth ..> UserRepositoryInterface : refresh()
+    Security --> Csrf
+    View ..> Csrf : inject()
 
     %% ===== Controller =====
     class Controller { <<abstract>> #handle(action,isApi,fallbackUrl) #render() #redirect() #json() }
@@ -155,6 +174,7 @@ classDiagram
     ApiController --|> Controller
 
     AuthController --> AuthService
+    AuthController --> LoginThrottle
     UserController --> UserService
     CategoryController --> CategoryService
     SupplierController --> SupplierService
@@ -184,3 +204,10 @@ classDiagram
 7. **`Auth::requireRole()` tidak lagi menerima URL**: parameter `$forbiddenUrl` sudah tidak dipakai sejak halaman 403 dirender langsung. Pemanggilnya menjadi `Auth::requireRole('Admin', 'Sales')`.
 8. **`Response::serverError(path)` ditambahkan** agar handler error bootstrap (`public/index.php`) bisa diuji; JSON untuk `/api/*`, template `errors.500` untuk sisanya.
 9. **Lapisan view memakai partial**: `views/partials/` (`order-form`, `order-item-row`, `order-list`, `product-form`, `contact-form`, `text-field`, `select-field`, `form-footer`) beserta helper `partial($name, $vars)` menggantikan HTML yang disalin-tempel antar halaman.
+10. **Kontrol keamanan ditambahkan (ADR-004):** `Csrf` dan `Security` (token CSRF + header keamanan, dipanggil dari `public/index.php` sebelum routing), `Auth::refresh()` (validasi ulang user ke database di setiap request, bergantung pada `UserRepositoryInterface`, bukan kelas konkret), serta `LoginThrottle` dengan `LoginAttemptRepositoryInterface` (implementasi MySQL dan in-memory, pola yang sama seperti repository lain).
+11. **`OrderItemValidator` dan `DateRules` ditambahkan** sebagai aturan validasi bersama untuk PO dan SO (item, harga, qty, tanggal), menggantikan `validateItems()` yang sebelumnya diduplikasi di dua Service. Repository PO/SO juga mendapat `invalidReferences()` agar pengecekan ID customer/supplier/gudang/produk tetap lewat interface (Service tidak menyentuh SQL).
+12. **Penyesuaian dengan matriks peran brief (§1.2):** `ProductController` kini hanya Admin untuk menulis (Warehouse Staff hanya melihat produk dan stok), `CustomerController` hanya Admin untuk menulis, dan pencarian order (`search`, filter customer) menambah rule `like` di `AbstractMySqlRepository::buildWhere`. `ProductStockRepositoryInterface::totalInventoryValue()` dan `SalesOrderRepositoryInterface::countsByStatus(?createdBy)` dipakai `DashboardService` untuk nilai inventori Admin dan ringkasan order milik Sales.
+
+## Catatan: Service dan `PDO`
+
+`SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor (bukan `new PDO()` tersembunyi) hanya untuk `beginTransaction/commit/rollBack`; semua SQL tetap di Repository. Ini kompromi sadar: transaksi lintas beberapa repository perlu satu koneksi bersama. Alternatif yang lebih murni (antarmuka `TransactionManager`) dicatat di `docs/quality/tech-debt.md` sebagai perbaikan ideal.

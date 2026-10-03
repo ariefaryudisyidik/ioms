@@ -49,3 +49,18 @@ Pengguna tetap bertanggung jawab memahami dan menjelaskan seluruh kode di atas, 
 - Audit keamanan baca-kode dijalankan oleh subagent read-only (XSS, SQL injection, otorisasi per route, sesi, upload, konfigurasi), lalu temuannya diperbaiki dan diuji di sesi utama: CSRF, validasi ulang sesi, cookie sesi, throttling login, IDOR sales order, pembatasan laporan, validasi order, formula injection CSV, verifikasi upload, dan hardening Dockerfile/Apache/compose.
 - Verifikasi: 237 test (termasuk `SecurityE2ETest`), scan SonarQube 0 isu/0 hotspot, dan pengujian terhadap container Apache sungguhan (header, cookie, PHP di folder upload ditolak, tanpa tool dev).
 - Dokumentasi: `docs/quality/security-review.md`, ADR-004. Risiko yang tersisa dicatat jujur di sana; tinjauan ini bukan pengganti uji penetrasi independen.
+
+## Rincian per penggunaan (format brief §6.2)
+
+Prompt sudah disanitasi: tidak ada kredensial, data klien, atau PII yang dikirim ke layanan AI; seluruh data adalah data demo.
+
+| Tool | Tujuan | Ringkasan prompt | Output dipakai / ditolak | Bukti verifikasi |
+|---|---|---|---|---|
+| Claude Code (Anthropic) | Membangun backend, view, skema, dan test awal | "Bangun IOMS dengan PHP native berlapis, 3 role, PO/SO/ledger, stok aman konkurensi" | Dipakai: struktur layer, `FOR UPDATE` untuk stok. Ditolak/diubah: docblock array yang terlalu ketat (false positive PHPStan), redirect 302 yang seharusnya 403 pada `Auth::requireRole` | `composer test`, PHPStan/PHPCS, verifikasi Docker dari volume bersih |
+| Claude Code | Menjalankan SonarQube dan memperbaiki temuan | "Pasang SonarQube lokal, perbaiki semua isu sampai 0" | Dipakai: ekstrak method, konstanta, partial view, `CrudController`. Dikecualikan dengan alasan tertulis: `php:S2003` dan `php:S2092`. Dicatat jujur: baseline *new code* dipindahkan setelah refactor besar | Scan ulang: 0 isu, 0 hotspot; perilaku sebelum/sesudah dibandingkan |
+| Claude Code (subagent paralel) | Refactor duplikasi di worktree terpisah | "Hilangkan duplikasi di controller/view/repository tanpa mengubah perilaku" | Dipakai setelah di-rebase ke master dan diuji ulang. Ditolak sementara: hasil awal yang dibuat di atas commit lama (tidak kompatibel dengan Router baru) | Perbandingan HTML sebelum/sesudah, test E2E, scan Sonar |
+| Claude Code | Menyusun suite E2E dan coverage gabungan | "Capai coverage penuh tanpa mengecualikan Controller/view" | Dipakai: server PHP + phpcov. Ditolak: memanggil Controller langsung di PHPUnit (rapuh) | 246 test, coverage 100% (`composer coverage`) |
+| Claude Code (subagent read-only) | Audit keamanan | "Audit XSS, SQL injection, otorisasi per route, sesi, upload, konfigurasi" | Dipakai: temuan CSRF, sesi, IDOR, laporan, CSV, Docker. Ditolak: mengambil harga jual order dari master produk (diskon adalah keputusan bisnis; diganti validasi non-negatif) | `SecurityE2ETest`, uji terhadap container Apache |
+| Claude Code | Menyelaraskan aplikasi dengan brief | "Cek final project brief dan perbaiki yang belum sesuai" | Dipakai: matriks peran, pencarian order, dashboard sesuai DASH-01, total stok, dokumen DB. Dicatat jujur sebagai tech debt: Service masih menerima `PDO` untuk transaksi | `BriefRequirementsE2ETest`, ulang `composer coverage` |
+
+Seluruh keputusan arsitektur dapat saya jelaskan sendiri (lihat ADR-001 sampai ADR-004); AI dipakai sebagai asisten yang hasilnya saya review, verifikasi dengan test, dan ubah bila perlu.
