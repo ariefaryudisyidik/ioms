@@ -17,7 +17,9 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
         ['created_by', 'created_by = ?', 'int'],
         [self::COL_DATE_FROM, 'order_date >= ?', 'string'],
         [self::COL_DATE_TO, 'order_date <= ?', 'string'],
+        ['search', '(so.so_number LIKE ? OR c.name LIKE ?)', 'like'],
     ];
+    private const SEARCH_FROM = 'sales_orders so LEFT JOIN customers c ON c.id = so.customer_id';
 
     public function findById(int $id): ?SalesOrder
     {
@@ -61,11 +63,12 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
     public function search(array $filters = []): array
     {
         $rows = $this->searchRows(
-            'SELECT id, so_number, customer_id, warehouse_id, created_by, approved_by, status, order_date
-             FROM sales_orders',
+            'SELECT so.id, so.so_number, so.customer_id, so.warehouse_id, so.created_by, so.approved_by, so.status,
+                    so.order_date, c.name AS customer_name
+             FROM ' . self::SEARCH_FROM,
             $filters,
             self::RULES,
-            $this->dateOrder($filters),
+            $this->dateOrder($filters, 'so.'),
             10
         );
 
@@ -74,7 +77,7 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
 
     public function countSearch(array $filters = []): int
     {
-        return $this->countRows('sales_orders', $filters, self::RULES);
+        return $this->countRows(self::SEARCH_FROM, $filters, self::RULES);
     }
 
     public function save(SalesOrder $so): SalesOrder
@@ -146,8 +149,8 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
         $this->execute('UPDATE sales_orders SET status = ? WHERE id = ?', [$status, $soId], $pdo);
     }
 
-    public function countsByStatus(): array
+    public function countsByStatus(?int $createdBy = null): array
     {
-        return $this->countsByStatusFor('sales_orders');
+        return $this->countsByStatusFor('sales_orders', $createdBy);
     }
 }

@@ -9,7 +9,7 @@ include __DIR__ . '/../partials/header.php';
 <div class="page-head">
     <h1><?= e($product->name) ?></h1>
     <div class="btn-row">
-        <?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
+        <?php if ($role === 'Admin'): ?>
             <a class="btn btn-secondary" href="/products/<?= (int) $product->id ?>/edit">Edit</a>
         <?php endif; ?>
         <a class="btn btn-secondary" href="/products">Back to list</a>
@@ -39,14 +39,22 @@ include __DIR__ . '/../partials/header.php';
             <table class="data-table">
                 <thead><tr><th>Warehouse</th><th>Quantity</th></tr></thead>
                 <tbody>
+                <?php $totalQuantity = 0; ?>
                 <?php foreach ($stocks as $stock): ?>
                     <?php $wh = $warehouses->findById($stock->warehouseId); ?>
+                    <?php $totalQuantity += (int) $stock->quantity; ?>
                     <tr>
                         <td><?= e($wh?->name ?? ('#' . $stock->warehouseId)) ?></td>
-                        <td><?= (int) $stock->quantity ?><?= $stock->quantity < $product->reorderPoint ? ' <span class="badge badge-low">Low</span>' : '' ?></td>
+                        <td><?= (int) $stock->quantity ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row">Total</th>
+                        <td><strong><?= $totalQuantity ?></strong><?= $totalQuantity < $product->reorderPoint ? ' <span class="badge badge-low">Low</span>' : '' ?></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     <?php endif; ?>

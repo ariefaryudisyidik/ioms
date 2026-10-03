@@ -38,6 +38,7 @@ final class DashboardService
             'total_products' => $totalProducts,
             'low_stock_count' => $lowStockCount,
             'low_stock_items' => $this->stocks->lowStockList(),
+            'inventory_value' => $this->stocks->totalInventoryValue(),
             'pending_approval_count' => $soCounts[SalesOrder::STATUS_PENDING_APPROVAL] ?? 0,
             'so_draft_count' => $soCounts[SalesOrder::STATUS_DRAFT] ?? 0,
             'so_approved_count' => $soCounts[SalesOrder::STATUS_APPROVED] ?? 0,
@@ -45,11 +46,12 @@ final class DashboardService
             'so_cancelled_count' => $soCounts[SalesOrder::STATUS_CANCELLED] ?? 0,
             'po_draft_count' => $poCounts[PurchaseOrder::STATUS_DRAFT] ?? 0,
             'po_ordered_count' => $poCounts[PurchaseOrder::STATUS_ORDERED] ?? 0,
+            'po_partial_count' => $poCounts[PurchaseOrder::STATUS_PARTIALLY_RECEIVED] ?? 0,
             'po_received_count' => $poCounts[PurchaseOrder::STATUS_RECEIVED] ?? 0,
         ];
 
         if ($role === 'Sales') {
-            $summary['my_orders_count'] = $this->salesOrders->countSearch(['created_by' => $userId]);
+            $summary['my_so_counts'] = $this->salesOrders->countsByStatus($userId);
         }
 
         return $summary;

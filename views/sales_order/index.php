@@ -3,6 +3,7 @@
 /** @var int $total */
 /** @var int $page */
 /** @var array $filters */
+/** @var \App\Entity\Customer[] $customers */
 $pageTitle = 'Sales Orders';
 $role = $auth_user['role'] ?? '';
 include __DIR__ . '/../partials/header.php';
@@ -14,12 +15,17 @@ partial('order-list', [
     'role' => $role,
     'statuses' => ['Draft', 'PendingApproval', 'Approved', 'Fulfilled', 'Cancelled'],
     'filters' => $filters,
-    'extraFilter' => null,
+    'extraFilter' => [
+        'id' => 'customer_id',
+        'label' => 'Customer',
+        'options' => array_map(static fn ($customer) => [$customer->id, $customer->name], $customers),
+    ],
     'notice' => $role === 'Sales' ? 'Showing only sales orders you created.' : null,
     'emptyMessage' => 'Belum ada data sales order.',
-    'headers' => ['SO Number', 'Order Date', 'Status', ''],
+    'headers' => ['SO Number', 'Customer', 'Order Date', 'Status', ''],
     'rows' => array_map(static fn ($o) => [
         e($o->soNumber),
+        e($o->customerName ?? '-'),
         e($o->orderDate),
         '<span class="badge badge-' . strtolower($o->status) . '">' . e($o->status) . '</span>',
         '<a class="btn btn-secondary btn-sm" href="/sales-orders/' . (int) $o->id . '">View</a>',

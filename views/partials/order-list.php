@@ -21,7 +21,7 @@ $perPage = 10;
 $lastPage = (int) max(1, ceil($total / $perPage));
 $sort = $filters['sort'] ?? 'desc';
 $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $baseUrl, $sort) {
-    $params = ['status' => $filters['status'] ?? ''];
+    $params = ['search' => $filters['search'] ?? '', 'status' => $filters['status'] ?? ''];
     if ($extraFilter !== null) {
         $params[$extraFilter['id']] = $filters[$extraFilter['id']] ?? '';
     }
@@ -39,6 +39,10 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
 </div>
 
 <form class="filter-bar" method="get" action="<?= e($baseUrl) ?>">
+    <div class="field">
+        <label for="search">Search</label>
+        <input type="search" id="search" name="search" maxlength="100" placeholder="Order number or name" value="<?= e((string) ($filters['search'] ?? '')) ?>">
+    </div>
     <div class="field">
         <label for="status">Status</label>
         <select id="status" name="status">

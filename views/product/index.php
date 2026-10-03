@@ -4,7 +4,7 @@
 /** @var \App\Entity\Category[] $categories */
 $pageTitle = 'Products';
 $role = $auth_user['role'] ?? '';
-$canManage = in_array($role, ['Admin', 'WarehouseStaff'], true);
+$canManage = $role === 'Admin';
 include __DIR__ . '/../partials/header.php';
 
 $buildUrl = static function (array $overrides) use ($filters) {

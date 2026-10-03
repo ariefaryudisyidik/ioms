@@ -24,6 +24,7 @@ final class SalesOrder
         public ?int $approvedBy,
         public string $status,
         public string $orderDate,
+        public ?string $customerName = null,
     ) {
     }
 
@@ -38,6 +39,7 @@ final class SalesOrder
             isset($row['approved_by']) ? (int) $row['approved_by'] : null,
             (string) $row['status'],
             (string) $row['order_date'],
+            isset($row['customer_name']) ? (string) $row['customer_name'] : null,
         );
     }
 }

@@ -2,7 +2,7 @@
 /** @var \App\Entity\Customer[] $customers */
 $pageTitle = 'Customers';
 $role = $auth_user['role'] ?? '';
-$canEdit = in_array($role, ['Admin', 'Sales'], true);
+$canEdit = $role === 'Admin';
 include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">

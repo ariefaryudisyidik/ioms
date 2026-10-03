@@ -47,11 +47,9 @@ final class ReportController extends Controller
 
     public function orderStatusCsv(Request $request): void
     {
-        if (Auth::requireLogin()) {
-            return;
-        }
         $type = $request->query('type') === 'purchase' ? 'purchase' : 'sales';
-        if ($type === 'purchase' && Auth::requireRole('Admin', 'WarehouseStaff')) {
+        // Admin: all orders; Sales: own sales orders; Warehouse Staff only gets the stock report.
+        if (Auth::requireRole(...($type === 'purchase' ? ['Admin'] : ['Admin', 'Sales']))) {
             return;
         }
 

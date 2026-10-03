@@ -41,6 +41,11 @@ interface ProductStockRepositoryInterface
     public function countLowStock(): int;
 
     /**
+     * Value of all active products' stock at purchase price (sum of quantity x purchase_price).
+     */
+    public function totalInventoryValue(): float;
+
+    /**
      * @return array<int,array{product_id:int,sku:string,name:string,total:int,reorder_point:int}>
      */
     public function lowStockList(): array;

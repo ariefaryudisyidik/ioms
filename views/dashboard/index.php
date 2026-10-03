@@ -10,24 +10,31 @@ $role = $auth_user['role'] ?? '';
     <span class="text-muted">Welcome, <?= e($auth_user['name'] ?? '') ?> (<?= e($role) ?>)</span>
 </div>
 
+<?php
+$card = static fn (string $label, string $value, string $class = ''): string =>
+    '<div class="card' . $class . '"><div class="card-label">' . e($label) . '</div><div class="card-value">' . e($value) . '</div></div>';
+$count = static fn (string $key): string => (string) (int) ($summary[$key] ?? 0);
+$mine = $summary['my_so_counts'] ?? [];
+[$danger, $warning, $info, $success] = [' card-danger', ' card-warning', ' card-info', ' card-success'];
+?>
 <div class="card-grid">
     <?php if ($role === 'Admin'): ?>
-        <div class="card"><div class="card-label">Total Products</div><div class="card-value"><?= (int) ($summary['total_products'] ?? 0) ?></div></div>
-        <div class="card card-danger"><div class="card-label">Low Stock Products</div><div class="card-value"><?= (int) ($summary['low_stock_count'] ?? 0) ?></div></div>
-        <div class="card card-warning"><div class="card-label">SO Pending Approval</div><div class="card-value"><?= (int) ($summary['pending_approval_count'] ?? 0) ?></div></div>
-        <div class="card card-info"><div class="card-label">PO Ordered</div><div class="card-value"><?= (int) ($summary['po_ordered_count'] ?? 0) ?></div></div>
-        <div class="card card-success"><div class="card-label">SO Fulfilled</div><div class="card-value"><?= (int) ($summary['so_fulfilled_count'] ?? 0) ?></div></div>
-        <div class="card"><div class="card-label">PO Received</div><div class="card-value"><?= (int) ($summary['po_received_count'] ?? 0) ?></div></div>
+        <?= $card('Inventory Value', number_format((float) ($summary['inventory_value'] ?? 0), 2)) ?>
+        <?= $card('Total Products', $count('total_products')) ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), $danger) ?>
+        <?= $card('SO Pending Approval', $count('pending_approval_count'), $warning) ?>
+        <?= $card('SO Approved (to fulfill)', $count('so_approved_count'), $success) ?>
+        <?= $card('PO Ordered', $count('po_ordered_count'), $info) ?>
+        <?= $card('PO Partially Received', $count('po_partial_count')) ?>
     <?php elseif ($role === 'Sales'): ?>
-        <div class="card"><div class="card-label">My Orders</div><div class="card-value"><?= (int) ($summary['my_orders_count'] ?? 0) ?></div></div>
-        <div class="card card-warning"><div class="card-label">Pending Approval (All)</div><div class="card-value"><?= (int) ($summary['pending_approval_count'] ?? 0) ?></div></div>
-        <div class="card card-success"><div class="card-label">Fulfilled (All)</div><div class="card-value"><?= (int) ($summary['so_fulfilled_count'] ?? 0) ?></div></div>
-        <div class="card"><div class="card-label">Cancelled (All)</div><div class="card-value"><?= (int) ($summary['so_cancelled_count'] ?? 0) ?></div></div>
+        <?php foreach (['Draft' => '', 'PendingApproval' => $warning, 'Approved' => $info, 'Fulfilled' => $success, 'Cancelled' => ''] as $status => $class): ?>
+            <?= $card('My orders: ' . $status, (string) (int) ($mine[$status] ?? 0), $class) ?>
+        <?php endforeach; ?>
     <?php else: /* WarehouseStaff */ ?>
-        <div class="card card-danger"><div class="card-label">Low Stock Products</div><div class="card-value"><?= (int) ($summary['low_stock_count'] ?? 0) ?></div></div>
-        <div class="card card-info"><div class="card-label">PO Ordered (to receive)</div><div class="card-value"><?= (int) ($summary['po_ordered_count'] ?? 0) ?></div></div>
-        <div class="card"><div class="card-label">PO Received</div><div class="card-value"><?= (int) ($summary['po_received_count'] ?? 0) ?></div></div>
-        <div class="card card-success"><div class="card-label">SO Approved (to fulfill)</div><div class="card-value"><?= (int) ($summary['so_approved_count'] ?? 0) ?></div></div>
+        <?= $card('Awaiting goods receipt (PO Ordered)', $count('po_ordered_count'), $info) ?>
+        <?= $card('Awaiting goods receipt (PO Partially Received)', $count('po_partial_count'), $info) ?>
+        <?= $card('Awaiting goods issue (SO Approved)', $count('so_approved_count'), $success) ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), $danger) ?>
     <?php endif; ?>
 </div>
 

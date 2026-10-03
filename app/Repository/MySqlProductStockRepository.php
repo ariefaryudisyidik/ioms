@@ -103,6 +103,17 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
         $stmt->execute([$qty, $productId, $warehouseId]);
     }
 
+    public function totalInventoryValue(): float
+    {
+        $stmt = $this->pdo->query(
+            'SELECT COALESCE(SUM(ps.quantity * p.purchase_price), 0)
+             FROM product_stocks ps JOIN products p ON p.id = ps.product_id
+             WHERE p.is_active = 1'
+        );
+
+        return $stmt ? (float) $stmt->fetchColumn() : 0.0;
+    }
+
     public function countLowStock(): int
     {
         $sql = 'SELECT COUNT(*) FROM (

@@ -39,6 +39,8 @@ final class SalesOrderController extends Controller
             $repo = new MySqlSalesOrderRepository($this->pdo());
             $filters = [
                 'status' => $request->query('status', ''),
+                'search' => trim((string) $request->query('search', '')),
+                'customer_id' => (int) $request->query('customer_id', 0) ?: null,
                 'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
                 'limit' => 10,
                 'offset' => (max(1, (int) $request->query('page', 1)) - 1) * 10,
@@ -56,6 +58,7 @@ final class SalesOrderController extends Controller
                 'total' => $total,
                 'page' => (int) $request->query('page', 1),
                 'filters' => $filters,
+                'customers' => (new MySqlCustomerRepository($this->pdo()))->all(),
             ]);
         }, false, '/sales-orders');
     }

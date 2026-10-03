@@ -90,10 +90,12 @@ abstract class AbstractMySqlRepository
     }
 
     /** @return array<string, int> */
-    protected function countsByStatusFor(string $table): array
+    protected function countsByStatusFor(string $table, ?int $createdBy = null): array
     {
+        $where = $createdBy === null ? '' : ' WHERE created_by = ?';
         $counts = [];
-        foreach ($this->fetchRows("SELECT status, COUNT(*) AS cnt FROM {$table} GROUP BY status") as $row) {
+        $sql = "SELECT status, COUNT(*) AS cnt FROM {$table}{$where} GROUP BY status";
+        foreach ($this->fetchRows($sql, $createdBy === null ? [] : [$createdBy]) as $row) {
             $counts[(string) $row['status']] = (int) $row['cnt'];
         }
 
@@ -101,7 +103,8 @@ abstract class AbstractMySqlRepository
     }
 
     /**
-     * Build a WHERE clause from filters. Each rule is [filterKey, sqlCondition, cast, valueSuffix].
+     * Build a WHERE clause from filters. Each rule is [filterKey, sqlCondition, cast, valueSuffix];
+     * cast "like" binds the (wildcard-escaped) value as %value% to every placeholder of the condition.
      *
      * @param array<string, mixed> $filters
      * @param array<int, array<int, string>> $rules
@@ -116,12 +119,26 @@ abstract class AbstractMySqlRepository
                 continue;
             }
             $where[] = $rule[1];
-            $params[] = $rule[2] === 'int'
-                ? (int) $filters[$rule[0]]
-                : (string) $filters[$rule[0]] . ($rule[3] ?? '');
+            array_push($params, ...$this->ruleParams($rule, $filters[$rule[0]]));
         }
 
         return [$where ? self::SQL_WHERE . implode(' AND ', $where) : '', $params];
+    }
+
+    /**
+     * @param array<int, string> $rule
+     * @return array<int, int|string>
+     */
+    private function ruleParams(array $rule, mixed $value): array
+    {
+        if ($rule[2] === 'int') {
+            return [(int) $value];
+        }
+        if ($rule[2] === 'like') {
+            return array_fill(0, substr_count($rule[1], '?'), '%' . addcslashes((string) $value, '%_\\') . '%');
+        }
+
+        return [(string) $value . ($rule[3] ?? '')];
     }
 
     /**

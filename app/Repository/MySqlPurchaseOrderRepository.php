@@ -16,7 +16,9 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
         [self::COL_WAREHOUSE_ID, 'warehouse_id = ?', 'int'],
         [self::COL_DATE_FROM, 'order_date >= ?', 'string'],
         [self::COL_DATE_TO, 'order_date <= ?', 'string'],
+        ['search', '(po.po_number LIKE ? OR s.name LIKE ?)', 'like'],
     ];
+    private const SEARCH_FROM = 'purchase_orders po LEFT JOIN suppliers s ON s.id = po.supplier_id';
 
     public function findById(int $id): ?PurchaseOrder
     {
@@ -62,8 +64,7 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
         $rows = $this->searchRows(
             'SELECT po.id, po.po_number, po.supplier_id, po.warehouse_id, po.status, po.order_date, po.created_by,
                     s.name AS supplier_name
-             FROM purchase_orders po
-             LEFT JOIN suppliers s ON s.id = po.supplier_id',
+             FROM ' . self::SEARCH_FROM,
             $filters,
             self::RULES,
             $this->dateOrder($filters, 'po.'),
@@ -75,7 +76,7 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
 
     public function countSearch(array $filters = []): int
     {
-        return $this->countRows('purchase_orders', $filters, self::RULES);
+        return $this->countRows(self::SEARCH_FROM, $filters, self::RULES);
     }
 
     public function countsByStatus(): array

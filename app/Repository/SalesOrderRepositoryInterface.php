@@ -42,5 +42,5 @@ interface SalesOrderRepositoryInterface
     public function updateStatus(int $soId, string $status, ?int $approvedBy = null, ?PDO $pdo = null): void;
 
     /** @return array<string,int> */
-    public function countsByStatus(): array;
+    public function countsByStatus(?int $createdBy = null): array;
 }

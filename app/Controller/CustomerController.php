@@ -13,7 +13,6 @@ final class CustomerController extends CrudController
     protected const BASE_URL = '/customers';
     protected const ENTITY_KEY = 'customer';
     protected const LIST_KEY = 'customers';
-    protected const WRITE_ROLES = ['Admin', 'Sales'];
 
     protected function service(): CustomerService
     {

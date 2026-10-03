@@ -71,7 +71,7 @@ final class ProductController extends Controller
 
     public function create(): void
     {
-        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $this->render('product.create', ['categories' => (new MySqlCategoryRepository($this->pdo()))->all()]);
@@ -79,7 +79,7 @@ final class ProductController extends Controller
 
     public function store(Request $request): void
     {
-        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $this->handle(function () use ($request) {
@@ -90,7 +90,7 @@ final class ProductController extends Controller
 
     public function edit(array $params): void
     {
-        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $product = $this->service()->find((int) $params['id']);
@@ -107,7 +107,7 @@ final class ProductController extends Controller
 
     public function update(Request $request, array $params): void
     {
-        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
+        if (Auth::requireRole('Admin')) {
             return;
         }
         $id = (int) $params['id'];

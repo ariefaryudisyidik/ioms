@@ -38,6 +38,7 @@ final class PurchaseOrderController extends Controller
             $repo = new MySqlPurchaseOrderRepository($this->pdo());
             $filters = [
                 'status' => $request->query('status', ''),
+                'search' => trim((string) $request->query('search', '')),
                 'supplier_id' => (int) $request->query('supplier_id', 0) ?: null,
                 'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
                 'limit' => 10,

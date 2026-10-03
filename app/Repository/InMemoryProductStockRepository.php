@@ -102,6 +102,17 @@ final class InMemoryProductStockRepository implements ProductStockRepositoryInte
         $this->stocks[$key] = ($this->stocks[$key] ?? 0) - $qty;
     }
 
+    public function totalInventoryValue(): float
+    {
+        $value = 0.0;
+        foreach ($this->stocks as $key => $qty) {
+            $product = $this->products?->findById((int) explode(':', $key)[0]);
+            $value += $product !== null && $product->isActive ? $qty * $product->purchasePrice : 0.0;
+        }
+
+        return $value;
+    }
+
     public function countLowStock(): int
     {
         return count($this->lowStockList());

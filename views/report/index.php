@@ -7,6 +7,7 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <h1>Reports</h1>
 
+<?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
 <div class="panel">
     <h2>Stock Ledger</h2>
     <p class="text-muted">All stock movements (receipts, issues, adjustments) within a date range.</p>
@@ -24,8 +25,9 @@ include __DIR__ . '/../partials/header.php';
         <button type="submit" class="btn">Download CSV</button>
     </form>
 </div>
+<?php endif; ?>
 
-<?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
+<?php if ($role === 'Admin'): ?>
 <div class="panel">
     <h2>Purchase Orders</h2>
     <p class="text-muted">Purchase order status export within a date range.</p>
@@ -46,6 +48,7 @@ include __DIR__ . '/../partials/header.php';
 </div>
 <?php endif; ?>
 
+<?php if (in_array($role, ['Admin', 'Sales'], true)): ?>
 <div class="panel">
     <h2>Sales Orders</h2>
     <p class="text-muted">
@@ -66,4 +69,5 @@ include __DIR__ . '/../partials/header.php';
         <button type="submit" class="btn">Download CSV</button>
     </form>
 </div>
+<?php endif; ?>
 <?php include __DIR__ . '/../partials/footer.php'; ?>

@@ -103,10 +103,13 @@ final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterfac
         }
     }
 
-    public function countsByStatus(): array
+    public function countsByStatus(?int $createdBy = null): array
     {
         $counts = [];
         foreach ($this->orders as $o) {
+            if ($createdBy !== null && $o->createdBy !== $createdBy) {
+                continue;
+            }
             $counts[$o->status] = ($counts[$o->status] ?? 0) + 1;
         }
 
