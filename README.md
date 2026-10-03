@@ -69,9 +69,12 @@ composer test                       # menjalankan seluruh suite phpunit
 composer test:unit                  # hanya suite Unit (memakai InMemory*Repository, tidak butuh DB)
 vendor/bin/phpunit --testsuite Unit
 vendor/bin/phpunit --testsuite Integration   # butuh MySQL nyata (mis. lewat docker compose) yang sudah terisi schema
+composer coverage                   # Unit + Integration + E2E sekaligus, lengkap dengan coverage (lihat di bawah)
 ```
 
 Integration test menggunakan implementasi `MySql*Repository` dan membutuhkan koneksi database sungguhan — jalankan `docker compose up -d` (atau siapkan MySQL lokal dengan `database/schema.sql` sudah diimpor) sebelum menjalankan suite ini.
+
+Suite **E2E** (`tests/E2E`) menguji aplikasi lewat HTTP (login, CRUD, alur PO/SO, laporan, API, skrip cron) dan akan dilewati otomatis bila `E2E_BASE_URL` tidak di-set. `composer coverage` (`scripts/coverage.sh`) menyalakan MySQL sementara (Docker, tmpfs) dan server PHP built-in dengan perekam coverage per-request, menjalankan ketiga suite, lalu menggabungkan hasilnya (phpcov) menjadi `build/coverage/clover.xml`. Butuh Docker dan PHP dengan Xdebug.
 
 ## Static Analysis
 
@@ -90,9 +93,8 @@ SonarQube Community lokal dijalankan lewat `docker-compose.sonar.yml` (dashboard
 docker compose -f docker-compose.sonar.yml -p ioms-sonar up -d sonarqube   # tunggu status UP
 # buat token: My Account > Security, lalu export SONAR_TOKEN=<token>
 
-# 1. Coverage (unit + integration; butuh MySQL untuk TEST_DB_*), path dipetakan ke /usr/src untuk scanner
-XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-clover build/coverage/clover.xml --log-junit build/coverage/junit.xml
-sed -i.bak "s#$PWD/#/usr/src/#g" build/coverage/clover.xml build/coverage/junit.xml
+# 1. Coverage gabungan Unit + Integration + E2E (path sudah dipetakan ke /usr/src untuk scanner)
+composer coverage
 
 # 2. Scan
 docker compose -f docker-compose.sonar.yml -p ioms-sonar run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
@@ -141,7 +143,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 43 test lulus (84 assertion), 0 error static analysis, SonarQube 0 isu terbuka (lihat `docs/quality/sonarqube-report.md`) |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 166 test lulus (903 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 

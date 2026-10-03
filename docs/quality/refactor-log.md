@@ -131,3 +131,17 @@ $summary = [
 | 14 isu aksesibilitas form (label tanpa kontrol, `<th>` tanpa scope, `role="status"`) | Perbaikan markup | Label membungkus kontrolnya, `aria-label` pada input penerimaan barang, `scope="row"`, dan `<output>` untuk flash. |
 
 **Validasi:** unit + integration test hijau (43 test/84 assertion, termasuk `RouterTest` dan `EnvTest` baru untuk perubahan Router dan Env), PHPStan 0 error, PHPCS 0 error, smoke test end-to-end via Docker dari working tree bersih (semua route GET untuk tiga role, alur buat kategori/PO/SO termasuk jalur validasi gagal), dan scan SonarQube ulang menunjukkan 0 isu terbuka.
+
+## 6. Menghilangkan duplikasi (SonarQube CPD 8,1% → 0%)
+
+**Code smell:** scan SonarQube melaporkan ≈670 baris duplikat: lima controller CRUD hampir identik (Supplier, Warehouse, Category, User, Customer), view form/daftar yang disalin-tempel (PO/SO create dan index, product create/edit, customer/supplier create), dan `MySqlSalesOrderRepository`/`MySqlPurchaseOrderRepository`/`MySqlStockLedgerRepository` dengan query builder serupa.
+
+| Duplikasi | Teknik | Perubahan |
+|---|---|---|
+| Controller CRUD | Template Method / Extract Superclass | `CrudController` memegang alur index/create/store/edit/update/remove; tiap controller hanya mendeklarasikan view, URL dasar, role, dan service. |
+| View | Extract Partial | `views/partials/` (`text-field`, `select-field`, `form-footer`, `contact-form`, `product-form`, `order-form`, `order-item-row`, `order-list`) plus helper `partial()`; HTML hasil render dibandingkan sebelum/sesudah (0 selisih selain whitespace). |
+| Repository order/ledger | Extract Superclass | `AbstractMySqlRepository` berisi `fetchRows/fetchRow/execute/insert`, `buildWhere` berbasis aturan, `searchRows`, dan `countRows`; SQL dan parameter dibandingkan dengan versi lama (identik). |
+
+**Kode mati yang ikut dibuang:** `Controller::withOldInputOnError`, `View::e`, cabang `default => 'bin'` yang tidak mungkin tercapai di `ProductService`, dan guard `file()` ganda di `Env::load`. Handler error bootstrap diekstrak menjadi `Response::serverError()` agar bisa diuji.
+
+**Validasi:** 166 test/903 assertion hijau (termasuk suite E2E yang membuktikan perilaku HTTP tidak berubah), PHPStan 0 error, PHPCS 0 error, SonarQube 0 isu, 0% duplikasi, coverage 100%.
