@@ -13,7 +13,6 @@ services:
       DB_HOST: mysql
       DB_PORT: "3306"
     volumes:
-      - ./:/var/www/html
       - uploads_data:/var/www/html/public/uploads
     depends_on:
       mysql:

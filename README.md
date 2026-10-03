@@ -31,7 +31,9 @@ cp .env.example .env    # sesuaikan kredensial DB bila perlu
 docker compose up --build
 ```
 
-Aplikasi dan MySQL akan naik sesuai konfigurasi di `docker-compose.yml`. Jalankan seed data (bila belum otomatis) dengan mengimpor `database/schema.sql` lalu `database/seed.sql` ke database yang digunakan container.
+Aplikasi tersedia di http://localhost:8080 dan MySQL di port host 3307. Schema dan seed data (`database/schema.sql`, `database/seed.sql`) diimpor otomatis saat volume MySQL pertama kali dibuat. Untuk mengulang dari data bersih: `docker compose down -v && docker compose up --build`.
+
+Container memakai kode dan `vendor/` dari image (tanpa bind mount), sehingga perubahan kode memerlukan `docker compose up --build`.
 
 ### Opsi B — manual tanpa Docker
 
