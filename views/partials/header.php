@@ -2,6 +2,7 @@
 /** @var array{id:int,name:string,email:string,role:string}|null $auth_user */
 $auth_user = $auth_user ?? null;
 $pageTitle = $pageTitle ?? 'IOMS';
+require_once __DIR__ . '/partial.php';
 ?>
 <!doctype html>
 <html lang="en">
