@@ -13,9 +13,9 @@
 # Disallow directory listings.
 Options -Indexes
 
-# Never execute PHP inside the uploads directory.
-<IfModule mod_php7.c>
-    <Directory "uploads">
-        php_flag engine off
-    </Directory>
-</IfModule>
+# Uploads are made inert by public/uploads/.htaccess and by the Apache config in the Dockerfile.
+
+# Never serve hidden files (.htaccess, .env copies, ...).
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>

@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+// Never leak stack traces to the client (ERR-01), not even for bootstrap failures; still log everything.
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Controller\ApiController;
@@ -16,20 +20,20 @@ use App\Controller\SalesOrderController;
 use App\Controller\SupplierController;
 use App\Controller\UserController;
 use App\Controller\WarehouseController;
+use App\Core\Auth;
+use App\Core\Database;
 use App\Core\Env;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\Router;
+use App\Core\Security;
 use App\Core\View;
+use App\Repository\MySqlUserRepository;
 
 // Load .env + config (config.php loads Env internally too, but doing it
 // once here up-front keeps intent explicit for anyone reading this file).
 Env::load(dirname(__DIR__) . '/.env');
 $config = require dirname(__DIR__) . '/config/config.php';
-
-// Never leak stack traces to the client (ERR-01); still log everything.
-ini_set('display_errors', '0');
-error_reporting(E_ALL);
 
 View::setViewsPath(dirname(__DIR__) . '/views');
 
@@ -42,7 +46,6 @@ $router->get('/', [AuthController::class, 'showLogin']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/login', [AuthController::class, 'login']);
 $router->post('/logout', [AuthController::class, 'logout']);
-$router->get('/logout', [AuthController::class, 'logout']);
 
 // ---------------------------------------------------------------------
 // Dashboard
@@ -176,8 +179,14 @@ $router->setNotFoundHandler(static function (Request $request) {
 // the normal action bodies; this is the outermost fallback for anything
 // thrown before/after that (routing, bootstrap, etc).
 // ---------------------------------------------------------------------
+Security::sendHeaders();
+
 try {
-    $router->dispatch(Request::capture());
+    $request = Request::capture();
+    Auth::refresh(new MySqlUserRepository(Database::connection()));
+    if (!Security::rejectForgedRequest($request)) {
+        $router->dispatch($request);
+    }
 } catch (\Throwable $e) {
     error_log('[Unhandled/bootstrap] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 

@@ -71,6 +71,24 @@ abstract class AbstractMySqlRepository
         return $stmt->fetch() !== false;
     }
 
+    /**
+     * @param array<string,array{0:string,1:int,2:string}> $checks field => [table, id, message];
+     *        tables are code constants, never user input
+     * @return array<string,string> messages for the checks whose row is missing or inactive
+     */
+    protected function failedReferenceChecks(array $checks): array
+    {
+        $errors = [];
+        foreach ($checks as $field => [$table, $id, $message]) {
+            $row = $this->fetchRow("SELECT id FROM {$table} WHERE id = ? AND is_active = 1", [$id]);
+            if ($row === null) {
+                $errors[$field] = $message;
+            }
+        }
+
+        return $errors;
+    }
+
     /** @return array<string, int> */
     protected function countsByStatusFor(string $table): array
     {

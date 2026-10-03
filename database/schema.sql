@@ -244,4 +244,16 @@ CREATE TABLE IF NOT EXISTS stock_ledger (
         ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ---------------------------------------------------------------------
+-- login_attempts: failed sign-ins, used to throttle brute-force attempts
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS login_attempts (
+    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email           VARCHAR(190)        NOT NULL,
+    ip_address      VARCHAR(45)         NOT NULL,
+    attempted_at    TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_login_attempts_email_ip (email, ip_address, attempted_at),
+    KEY idx_login_attempts_ip (ip_address, attempted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;

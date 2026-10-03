@@ -54,36 +54,14 @@ final class PurchaseOrderService
 
     private function checkDateValue(string $orderDate): ?string
     {
-        $date = DateTimeImmutable::createFromFormat('!Y-m-d', $orderDate);
-        $errors = DateTimeImmutable::getLastErrors();
-        $hasParseIssues = $errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0);
-        $isValid = $date !== false && !$hasParseIssues;
-        if (!$isValid) {
+        if (!DateRules::isValidYmd($orderDate)) {
             return 'Order date must be a valid date (YYYY-MM-DD).';
         }
 
+        $date = new DateTimeImmutable($orderDate);
         $limit = (new DateTimeImmutable('today'))->modify("+{$this->futureDateToleranceDays} days");
 
         return $date > $limit ? 'Order date cannot be too far in the future.' : null;
-    }
-
-    /**
-     * @return array<string,string>
-     */
-    private function validateItems(mixed $items, string $qtyKey): array
-    {
-        if (!is_array($items) || count($items) === 0) {
-            return ['items' => 'At least one item is required.'];
-        }
-
-        $errors = [];
-        foreach ($items as $i => $item) {
-            if (empty($item['product_id']) || (int) ($item[$qtyKey] ?? 0) <= 0) {
-                $errors["items.$i"] = 'Each item requires a product and a positive quantity.';
-            }
-        }
-
-        return $errors;
     }
 
     /**
@@ -113,7 +91,15 @@ final class PurchaseOrderService
         }
 
         $items = $data['items'] ?? [];
-        $errors += $this->validateItems($items, 'qty_ordered');
+        $errors += OrderItemValidator::validate($items, 'qty_ordered', 'purchase_price');
+
+        if (!$errors) {
+            $errors = $this->purchaseOrders->invalidReferences(
+                (int) $data['supplier_id'],
+                (int) $data['warehouse_id'],
+                OrderItemValidator::productIds($items)
+            );
+        }
 
         if ($errors) {
             throw new ValidationException($errors);

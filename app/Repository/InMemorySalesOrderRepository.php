@@ -45,6 +45,11 @@ final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterfac
         return false;
     }
 
+    public function invalidReferences(int $customerId, int $warehouseId, array $productIds): array
+    {
+        return [];
+    }
+
     public function search(array $filters = []): array
     {
         $result = array_values($this->orders);

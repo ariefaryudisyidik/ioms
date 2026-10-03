@@ -9,6 +9,7 @@ require_once __DIR__ . '/partial.php';
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?= e(\App\Core\Csrf::token()) ?>">
     <title><?= e($pageTitle) ?> - IOMS</title>
     <link rel="stylesheet" href="/assets/css/style.css">
 </head>

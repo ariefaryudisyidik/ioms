@@ -14,6 +14,7 @@
 # Uploads (keep directory, ignore contents)
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/.htaccess
 
 # Logs
 *.log

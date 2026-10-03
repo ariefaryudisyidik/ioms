@@ -28,18 +28,19 @@ services:
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_change_me}
+      # The app only needs its own user; the root password is random and never used.
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       MYSQL_DATABASE: ${DB_DATABASE:-ioms}
-      MYSQL_USER: ${DB_USERNAME:-ioms_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-change_me}
+      MYSQL_USER: ${DB_USERNAME:?Set DB_USERNAME in .env (copy .env.example)}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env (copy .env.example)}
     ports:
-      - "3307:3306"
+      - "127.0.0.1:3307:3306"
     volumes:
       - db_data:/var/lib/mysql
       - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
       - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD:-root_change_me}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME}", "-p${DB_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10

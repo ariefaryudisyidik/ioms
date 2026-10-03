@@ -33,7 +33,7 @@ final class ReportController extends Controller
 
     public function stockLedgerCsv(Request $request): void
     {
-        if (Auth::requireLogin()) {
+        if (Auth::requireRole('Admin', 'WarehouseStaff')) {
             return;
         }
         $this->handle(function () use ($request) {
@@ -50,8 +50,12 @@ final class ReportController extends Controller
         if (Auth::requireLogin()) {
             return;
         }
-        $this->handle(function () use ($request) {
-            $type = (string) $request->query('type', 'sales');
+        $type = $request->query('type') === 'purchase' ? 'purchase' : 'sales';
+        if ($type === 'purchase' && Auth::requireRole('Admin', 'WarehouseStaff')) {
+            return;
+        }
+
+        $this->handle(function () use ($request, $type) {
             // Sales role only ever sees their own orders in the export.
             $restrict = Auth::role() === 'Sales' ? Auth::id() : null;
 

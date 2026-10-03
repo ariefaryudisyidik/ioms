@@ -49,7 +49,7 @@ namespace App\Core {
          */
         public static function display(string $template, array $data = [], int $status = 200): void
         {
-            Response::html(self::render($template, $data), $status);
+            Response::html(Csrf::inject(self::render($template, $data)), $status);
         }
 
         private static function resolve(string $template): string

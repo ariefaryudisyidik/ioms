@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Repository\UserRepositoryInterface;
+
 /**
  * Session-backed authentication helper used as a middleware-style guard
  * inside controllers.
@@ -30,6 +32,33 @@ final class Auth
     {
         Session::remove(self::SESSION_KEY);
         Session::destroy();
+    }
+
+    /**
+     * Re-validates the signed-in user against the database on every request:
+     * a deactivated or deleted account is signed out, and role/name changes
+     * take effect immediately instead of waiting for the session to expire.
+     */
+    public static function refresh(UserRepositoryInterface $users): void
+    {
+        $sessionUser = self::user();
+        if ($sessionUser === null) {
+            return;
+        }
+
+        $current = $users->findById((int) $sessionUser['id']);
+        if ($current === null || !$current->isActive) {
+            self::logout();
+
+            return;
+        }
+
+        Session::set(self::SESSION_KEY, [
+            'id' => $current->id,
+            'name' => $current->name,
+            'email' => $current->email,
+            'role' => $current->role,
+        ]);
     }
 
     public static function check(): bool

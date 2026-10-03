@@ -72,6 +72,11 @@ final class SalesOrderController extends Controller
 
             return;
         }
+        if (Auth::role() === 'Sales' && $so->createdBy !== Auth::id()) {
+            $this->render('errors.403', [], 403);
+
+            return;
+        }
         $this->render('sales_order.show', ['so' => $so]);
     }
 
@@ -143,7 +148,7 @@ final class SalesOrderController extends Controller
         }
         $id = (int) $params['id'];
         $this->handle(function () use ($id) {
-            $this->service()->cancel($id);
+            $this->service()->cancel($id, Auth::id(), Auth::role() ?? '');
             $this->redirect(self::DETAIL_URL_PREFIX . $id);
         }, false, self::DETAIL_URL_PREFIX . $id);
     }

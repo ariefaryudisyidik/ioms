@@ -109,12 +109,12 @@
         });
 
         var lines = [];
-        lines.push('<strong>' + escapeHtml(data.name || '') + '</strong> - total stock: ' + data.total);
+        lines.push('<strong>' + escapeHtml(data.name || '') + '</strong> - total stock: ' + Number(data.total));
         if (warehouseId && qtyInThisWarehouse !== null) {
-          lines.push('In selected warehouse: <strong>' + qtyInThisWarehouse + '</strong> unit(s)');
+          lines.push('In selected warehouse: <strong>' + Number(qtyInThisWarehouse) + '</strong> unit(s)');
         }
         var list = '<ul>' + (data.warehouses || []).map(function (w) {
-          return '<li>' + escapeHtml(w.warehouse) + ': ' + w.quantity + '</li>';
+          return '<li>' + escapeHtml(w.warehouse) + ': ' + Number(w.quantity) + '</li>';
         }).join('') + '</ul>';
 
         box.innerHTML = lines.join('<br>') + list;

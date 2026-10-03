@@ -38,25 +38,6 @@ final class SalesOrderService
     }
 
     /**
-     * @return array<string,string>
-     */
-    private function validateItems(mixed $items): array
-    {
-        if (!is_array($items) || count($items) === 0) {
-            return ['items' => 'At least one item is required.'];
-        }
-
-        $errors = [];
-        foreach ($items as $i => $item) {
-            if (empty($item['product_id']) || (int) ($item['qty'] ?? 0) <= 0) {
-                $errors["items.$i"] = 'Each item requires a product and a positive quantity.';
-            }
-        }
-
-        return $errors;
-    }
-
-    /**
      * @param array<string,mixed> $data raw input from request, keys not guaranteed present
      */
     public function create(array $data, int $userId): SalesOrder
@@ -76,12 +57,23 @@ final class SalesOrderService
         if (empty($data['warehouse_id'])) {
             $errors['warehouse_id'] = 'Warehouse is required.';
         }
-        if (empty(trim((string) ($data['order_date'] ?? '')))) {
+        $orderDate = trim((string) ($data['order_date'] ?? ''));
+        if ($orderDate === '') {
             $errors['order_date'] = 'Order date is required.';
+        } elseif (!DateRules::isValidYmd($orderDate)) {
+            $errors['order_date'] = 'Order date must be a valid date (YYYY-MM-DD).';
         }
 
         $items = $data['items'] ?? [];
-        $errors += $this->validateItems($items);
+        $errors += OrderItemValidator::validate($items, 'qty', 'selling_price');
+
+        if (!$errors) {
+            $errors = $this->salesOrders->invalidReferences(
+                (int) $data['customer_id'],
+                (int) $data['warehouse_id'],
+                OrderItemValidator::productIds($items)
+            );
+        }
 
         if ($errors) {
             throw new ValidationException($errors);
@@ -95,7 +87,7 @@ final class SalesOrderService
             createdBy: $userId,
             approvedBy: null,
             status: SalesOrder::STATUS_DRAFT,
-            orderDate: $data['order_date'],
+            orderDate: $orderDate,
         );
         $so = $this->salesOrders->save($so);
 
@@ -182,11 +174,15 @@ final class SalesOrderService
         return $so;
     }
 
-    public function cancel(int $soId): SalesOrder
+    public function cancel(int $soId, int $userId, string $role): SalesOrder
     {
         $so = $this->salesOrders->findById($soId);
         if ($so === null) {
             throw new ValidationException(['id' => self::ORDER_NOT_FOUND]);
+        }
+
+        if ($role === 'Sales' && $so->createdBy !== $userId) {
+            throw AuthorizationException::forbidden('Only the order owner can cancel it.');
         }
 
         $this->assertTransition($so->status, SalesOrder::STATUS_CANCELLED);

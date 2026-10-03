@@ -57,7 +57,7 @@ final class MySqlProductRepository implements ProductRepositoryInterface
 
         if (!empty($filters['search'])) {
             $where[] = '(p.name LIKE ? OR p.sku LIKE ?)';
-            $like = '%' . $filters['search'] . '%';
+            $like = '%' . addcslashes((string) $filters['search'], '%_\\') . '%';
             $params[] = $like;
             $params[] = $like;
         }

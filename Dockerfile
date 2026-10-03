@@ -1,47 +1,64 @@
+# ---- Stage 1: production dependencies only (composer never reaches the runtime image) ----
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --no-autoloader
+COPY app ./app
+RUN composer dump-autoload --optimize --no-dev
+
+# ---- Stage 2: runtime ----
 FROM php:8.2-apache
 
-# System deps + PHP extensions needed by the app (PDO MySQL driver, plus
-# mysqli in case any tooling expects it).
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        libzip-dev \
-        unzip \
-        git \
-    && docker-php-ext-install pdo pdo_mysql mysqli \
-    && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+# PDO MySQL driver (plus mysqli in case any tooling expects it).
+RUN docker-php-ext-install pdo pdo_mysql mysqli \
+    && a2enmod rewrite headers
 
 # Point Apache's DocumentRoot at the public/ front-controller directory.
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e "s!/var/www/html!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/sites-available/*.conf \
     && sed -ri -e "s!/var/www/!${APACHE_DOCUMENT_ROOT}!g" /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-# Allow .htaccess overrides (front-controller rewrite rules).
+# Allow .htaccess overrides (front-controller rewrite rules) and make the uploads
+# directory inert: no PHP execution and no MIME sniffing, whatever file lands there.
 RUN { \
         echo '<Directory /var/www/html/public>'; \
         echo '    AllowOverride All'; \
         echo '    Require all granted'; \
         echo '</Directory>'; \
+        echo '<Directory /var/www/html/public/uploads>'; \
+        echo '    <IfModule mod_php.c>'; \
+        echo '        php_admin_flag engine off'; \
+        echo '    </IfModule>'; \
+        echo '    <FilesMatch "\.(php|phtml|phar|php[0-9])$">'; \
+        echo '        Require all denied'; \
+        echo '    </FilesMatch>'; \
+        echo '    Header set X-Content-Type-Options "nosniff"'; \
+        echo '</Directory>'; \
     } > /etc/apache2/conf-available/ioms.conf \
     && a2enconf ioms
 
-# Composer, for building the vendor/ directory inside the image.
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Do not advertise server/PHP versions; never print errors to clients; harden session cookies.
+RUN { \
+        echo 'ServerTokens Prod'; \
+        echo 'ServerSignature Off'; \
+        echo 'TraceEnable Off'; \
+    } > /etc/apache2/conf-available/zz-security-hardening.conf \
+    && a2enconf zz-security-hardening \
+    && { \
+        echo 'expose_php = Off'; \
+        echo 'display_errors = Off'; \
+        echo 'log_errors = On'; \
+        echo 'session.use_strict_mode = 1'; \
+        echo 'session.use_only_cookies = 1'; \
+        echo 'session.cookie_httponly = 1'; \
+        echo 'session.cookie_samesite = Lax'; \
+    } > /usr/local/etc/php/conf.d/zz-security.ini
 
 WORKDIR /var/www/html
 
-# Install dependencies first for better layer caching.
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --optimize-autoloader \
-    || echo "composer install failed or offline; expecting a pre-built vendor/ to be copied in below"
-
-# Now copy the full application source (this also brings an existing
-# vendor/ from the host if composer install above could not run, e.g. in
-# a fully offline build environment).
+# Application source, then the production-only vendor/ built in stage 1.
 COPY . .
-
-# Re-run to make sure autoload files are generated against the final source.
-RUN composer dump-autoload --optimize --no-dev || true
+COPY --from=vendor /app/vendor ./vendor
 
 # Run as an unprivileged user instead of root. Non-root cannot bind port 80,
 # so Apache listens on 8080 and writes its runtime files to dirs we own.

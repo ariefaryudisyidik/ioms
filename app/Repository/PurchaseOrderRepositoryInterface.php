@@ -17,6 +17,14 @@ interface PurchaseOrderRepositoryInterface
     public function poNumberExists(string $poNumber): bool;
 
     /**
+     * Validation errors for references that do not exist or are inactive.
+     *
+     * @param array<int|string,int> $productIds
+     * @return array<string,string> errors keyed by field ("supplier_id", "warehouse_id", "items.<index>")
+     */
+    public function invalidReferences(int $supplierId, int $warehouseId, array $productIds): array;
+
+    /**
      * @param array{status?:string,supplier_id?:int,warehouse_id?:int,date_from?:string,date_to?:string,sort?:string,limit?:int,offset?:int} $filters
      * @return PurchaseOrder[]
      */

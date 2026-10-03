@@ -44,6 +44,19 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
         return $this->valueExists('purchase_orders', 'po_number', $poNumber);
     }
 
+    public function invalidReferences(int $supplierId, int $warehouseId, array $productIds): array
+    {
+        $checks = [
+            'supplier_id' => ['suppliers', $supplierId, 'Supplier not found or inactive.'],
+            'warehouse_id' => ['warehouses', $warehouseId, 'Warehouse not found or inactive.'],
+        ];
+        foreach ($productIds as $index => $productId) {
+            $checks["items.$index"] = ['products', $productId, 'Product not found or inactive.'];
+        }
+
+        return $this->failedReferenceChecks($checks);
+    }
+
     public function search(array $filters = []): array
     {
         $rows = $this->searchRows(

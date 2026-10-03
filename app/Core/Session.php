@@ -10,13 +10,61 @@ namespace App\Core;
  */
 final class Session
 {
+    private const DEFAULT_IDLE_TIMEOUT = 1800;
+    private const DEFAULT_ABSOLUTE_TIMEOUT = 28800;
+
     public static function start(): void
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            $name = (string) Env::get('SESSION_NAME', 'ioms_session');
-            session_name($name);
-            session_start();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return;
         }
+
+        session_name((string) Env::get('SESSION_NAME', 'ioms_session'));
+        if (!headers_sent() && ini_get('session.use_cookies') === '1') {
+            ini_set('session.use_strict_mode', '1');
+            ini_set('session.use_only_cookies', '1');
+            // NOSONAR php:S2092: the Secure flag is switched on automatically whenever the request
+            // arrives over HTTPS; it must stay off for plain-HTTP local demos or the browser drops the cookie.
+            session_set_cookie_params([ // NOSONAR
+                'lifetime' => 0,
+                'path' => '/',
+                'secure' => self::isHttps(),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+        session_start();
+        self::enforceTimeouts();
+    }
+
+    public static function isHttps(): bool
+    {
+        $https = $_SERVER['HTTPS'] ?? '';
+        $forwarded = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '';
+
+        return ($https !== '' && $https !== 'off') || $forwarded === 'https';
+    }
+
+    /**
+     * Drops the session data when it has been idle or alive for too long and
+     * issues a fresh session id.
+     */
+    private static function enforceTimeouts(): void
+    {
+        $now = time();
+        $idle = (int) Env::get('SESSION_IDLE_TIMEOUT', self::DEFAULT_IDLE_TIMEOUT);
+        $absolute = (int) Env::get('SESSION_ABSOLUTE_TIMEOUT', self::DEFAULT_ABSOLUTE_TIMEOUT);
+        $created = (int) ($_SESSION['_created_at'] ?? $now);
+        $lastSeen = (int) ($_SESSION['_last_activity'] ?? $now);
+
+        if ($now - $lastSeen > $idle || $now - $created > $absolute) {
+            $_SESSION = [];
+            session_regenerate_id(true);
+            $created = $now;
+        }
+
+        $_SESSION['_created_at'] = $created;
+        $_SESSION['_last_activity'] = $now;
     }
 
     public static function get(string $key, mixed $default = null): mixed

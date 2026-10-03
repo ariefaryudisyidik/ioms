@@ -155,7 +155,8 @@ final class ProductService
 
         $tmpName = (string) ($file['tmp_name'] ?? '');
         $mime = @mime_content_type($tmpName) ?: '';
-        if (!isset(self::EXTENSIONS[$mime])) {
+        // The declared type must match a real, decodable image (rejects polyglot/garbage payloads).
+        if (!isset(self::EXTENSIONS[$mime]) || @getimagesize($tmpName) === false) {
             throw new ValidationException(['image' => 'Image must be JPEG, PNG, or WEBP.']);
         }
 

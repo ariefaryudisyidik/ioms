@@ -45,6 +45,19 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
         return $this->valueExists('sales_orders', 'so_number', $soNumber);
     }
 
+    public function invalidReferences(int $customerId, int $warehouseId, array $productIds): array
+    {
+        $checks = [
+            'customer_id' => ['customers', $customerId, 'Customer not found or inactive.'],
+            'warehouse_id' => ['warehouses', $warehouseId, 'Warehouse not found or inactive.'],
+        ];
+        foreach ($productIds as $index => $productId) {
+            $checks["items.$index"] = ['products', $productId, 'Product not found or inactive.'];
+        }
+
+        return $this->failedReferenceChecks($checks);
+    }
+
     public function search(array $filters = []): array
     {
         $rows = $this->searchRows(
