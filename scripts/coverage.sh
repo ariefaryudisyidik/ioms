@@ -54,6 +54,7 @@ export E2E_COVERAGE_DIR="$COV_DIR"
 export DB_HOST=127.0.0.1 DB_PORT="$DB_PORT" DB_DATABASE=ioms DB_USERNAME=root DB_PASSWORD="$DB_PASSWORD"
 export APP_ENV=testing
 export APP_UPLOAD_DIR=build/uploads
+export E2E_CHILD_COVERAGE_DIR="$COV_DIR"
 
 php -d variables_order=EGPCS -d upload_max_filesize=3M -d post_max_size=16M -d auto_prepend_file="$ROOT/tests/support/coverage-prepend.php" \
     -S "127.0.0.1:$APP_PORT" -t public public/index.php >"$ROOT/build/server.log" 2>&1 &
