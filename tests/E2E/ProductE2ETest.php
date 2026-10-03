@@ -108,6 +108,7 @@ final class ProductE2ETest extends E2ETestCase
         $this->assertSame(302, $ok->status);
         $this->assertSame('Renamed Laptop', $this->value('SELECT name FROM products WHERE id = 1'));
         $this->assertNotNull($this->value('SELECT image_path FROM products WHERE id = 1'));
+        $this->assertStringContainsString('class="product-image"', $client->get('/products/1/edit')->body);
 
         $bad = $client->post('/products/1', $this->validProduct(['sku' => '', '_method' => 'PUT']));
         $this->assertStringEndsWith('/products/1/edit', $bad->location);

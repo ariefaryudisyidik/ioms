@@ -77,6 +77,28 @@ final class RouterTest extends TestCase
         $this->assertSame('missing /nope', $router->dispatch($this->request('GET', '/nope')));
     }
 
+    public function testPatchAndAnyRegisterRoutesForTheirMethods(): void
+    {
+        $router = new Router();
+        $router->patch('/patched', [RouterFixtureController::class, 'requestOnly']);
+        $router->any(['get', 'put'], '/multi', [RouterFixtureController::class, 'requestOnly']);
+
+        $this->assertSame('PATCH', $router->dispatch($this->request('PATCH', '/patched')));
+        $this->assertSame('GET', $router->dispatch($this->request('GET', '/multi')));
+        $this->assertSame('PUT', $router->dispatch($this->request('PUT', '/multi')));
+    }
+
+    public function testMissingRouteWithoutCustomHandlerRespondsWithJson404(): void
+    {
+        ob_start();
+        $result = (new Router())->dispatch($this->request('GET', '/nowhere'));
+        $output = (string) ob_get_clean();
+        http_response_code(200);
+
+        $this->assertNull($result);
+        $this->assertSame(['error' => 'Not Found'], json_decode($output, true));
+    }
+
     public function testRootRouteMatchesEmptyAndSlashPaths(): void
     {
         $router = new Router();

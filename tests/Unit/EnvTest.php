@@ -22,7 +22,7 @@ final class EnvTest extends TestCase
     {
         @unlink($this->file);
         $this->resetLoadedFlag();
-        foreach (['ENVT_PLAIN', 'ENVT_DQ', 'ENVT_SQ', 'ENVT_SPACED', 'ENVT_MIXED', 'ENVT_EXISTING', 'ENVT_BOOL'] as $key) {
+        foreach (['ENVT_PLAIN', 'ENVT_SQ2', 'ENVT_DQ', 'ENVT_SQ', 'ENVT_SPACED', 'ENVT_MIXED', 'ENVT_EXISTING', 'ENVT_BOOL'] as $key) {
             putenv($key);
             unset($_ENV[$key], $_SERVER[$key]);
         }
@@ -45,6 +45,7 @@ final class EnvTest extends TestCase
             'ENVT_DQ="double quoted"',
             "ENVT_SQ='single quoted'",
             '  ENVT_SPACED  =  padded  ',
+            'ENVT_SQ2=x',
             'ENVT_MIXED="unbalanced\'',
         ]));
 
@@ -54,6 +55,7 @@ final class EnvTest extends TestCase
         $this->assertSame('double quoted', $_ENV['ENVT_DQ']);
         $this->assertSame('single quoted', $_SERVER['ENVT_SQ']);
         $this->assertSame('padded', getenv('ENVT_SPACED'));
+        $this->assertSame('x', getenv('ENVT_SQ2'));
         $this->assertSame('"unbalanced\'', getenv('ENVT_MIXED'));
     }
 

@@ -70,4 +70,75 @@ final class ProductServiceTest extends TestCase
         $this->assertFalse($hardDeleted);
         $this->assertFalse($products->findById($product->id)->isActive);
     }
+
+    public function testFindBySkuReturnsTheMatchingProduct(): void
+    {
+        $products = new InMemoryProductRepository();
+        $products->save(new Product(null, 'FIND-1', 'Findable', 1, 'pcs', 100, 150, 5));
+        $service = new ProductService($products, $this->categoryRepo(), sys_get_temp_dir());
+
+        $this->assertSame('Findable', $service->findBySku('FIND-1')?->name);
+        $this->assertNull($service->findBySku('MISSING'));
+    }
+
+    /**
+     * @return array{0:ProductService,1:string,2:string}
+     */
+    private function serviceWithFreshUploadDir(): array
+    {
+        $dir = sys_get_temp_dir() . '/ioms-upload-' . bin2hex(random_bytes(4)) . '/nested';
+        $service = new ProductService(new InMemoryProductRepository(), $this->categoryRepo(), $dir);
+
+        return [$service, $dir, (string) tempnam(sys_get_temp_dir(), 'img')];
+    }
+
+    private function productData(): array
+    {
+        return ['sku' => 'IMG-1', 'name' => 'With image', 'category_id' => 1, 'purchase_price' => 1, 'selling_price' => 2, 'reorder_point' => 1];
+    }
+
+    public function testCreateStoresAnAllowedImageAndCreatesTheUploadDirectory(): void
+    {
+        [$service, $dir, $tmp] = $this->serviceWithFreshUploadDir();
+        file_put_contents($tmp, (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='));
+
+        $product = $service->create($this->productData(), ['error' => UPLOAD_ERR_OK, 'size' => 100, 'tmp_name' => $tmp]);
+
+        $this->assertStringEndsWith('.png', (string) $product->imagePath);
+        $this->assertFileExists($dir . '/' . $product->imagePath);
+    }
+
+    public function testImageValidationRejectsFailedOversizedAndWrongTypeUploads(): void
+    {
+        [$service, , $tmp] = $this->serviceWithFreshUploadDir();
+        file_put_contents($tmp, 'not an image');
+
+        foreach ([
+            ['error' => UPLOAD_ERR_INI_SIZE, 'size' => 1, 'tmp_name' => $tmp],
+            ['error' => UPLOAD_ERR_OK, 'size' => 3 * 1024 * 1024, 'tmp_name' => $tmp],
+            ['error' => UPLOAD_ERR_OK, 'size' => 10, 'tmp_name' => $tmp],
+        ] as $file) {
+            try {
+                $service->create($this->productData(), $file);
+                $this->fail('Expected the upload to be rejected.');
+            } catch (ValidationException $e) {
+                $this->assertArrayHasKey('image', $e->errors());
+            }
+        }
+    }
+
+    public function testStorageFailureIsReportedAsAValidationError(): void
+    {
+        $blocker = (string) tempnam(sys_get_temp_dir(), 'blocker');
+        $service = new ProductService(new InMemoryProductRepository(), $this->categoryRepo(), $blocker . '/not-a-dir');
+        $tmp = (string) tempnam(sys_get_temp_dir(), 'img');
+        file_put_contents($tmp, (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='));
+
+        try {
+            @$service->create($this->productData(), ['error' => UPLOAD_ERR_OK, 'size' => 100, 'tmp_name' => $tmp]);
+            $this->fail('Expected a storage failure.');
+        } catch (ValidationException $e) {
+            $this->assertStringContainsString('Failed to store', $e->errors()['image']);
+        }
+    }
 }

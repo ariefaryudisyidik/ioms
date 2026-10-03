@@ -24,6 +24,17 @@ final class AuthE2ETest extends E2ETestCase
         $this->assertSame(302, $client->get('/login')->status);
     }
 
+    public function testLoginAcceptsAJsonBody(): void
+    {
+        $client = $this->client();
+
+        $response = $client->postJson('/login', ['email' => self::ADMIN, 'password' => self::PASSWORD]);
+
+        $this->assertSame(302, $response->status);
+        $this->assertStringEndsWith('/dashboard', $response->location);
+        $this->assertSame(200, $client->get('/dashboard')->status);
+    }
+
     public function testWrongPasswordReturnsToLoginWithErrorAndKeepsOldEmail(): void
     {
         $client = $this->client();
@@ -69,7 +80,12 @@ final class AuthE2ETest extends E2ETestCase
     {
         $client = $this->client();
 
-        foreach (['/dashboard', '/products', '/purchase-orders', '/sales-orders', '/reports'] as $path) {
+        $paths = [
+            '/dashboard', '/products', '/products/1', '/products/create', '/purchase-orders', '/purchase-orders/1',
+            '/purchase-orders/create', '/sales-orders', '/sales-orders/1', '/sales-orders/create', '/reports',
+            '/categories', '/users', '/customers/create',
+        ];
+        foreach ($paths as $path) {
             $response = $client->get($path);
             $this->assertSame(302, $response->status, $path);
             $this->assertStringEndsWith('/login', $response->location, $path);
