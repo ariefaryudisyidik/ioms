@@ -116,3 +116,18 @@ $summary = [
 ];
 ```
 `countByStatus(string $status): int` yang jadi tidak terpakai dihapus dari interface dan kedua implementasinya (MySQL + in-memory) agar tidak ada kode mati. Divalidasi dengan menjalankan ulang unit + integration test (tetap hijau) dan membandingkan angka dashboard terhadap hasil `GROUP BY` manual langsung di MySQL — cocok persis.
+
+## 5. Temuan SonarQube: complexity, literal duplikat, parameter mati, aksesibilitas
+
+**Code smell:** scan SonarQube pertama menemukan 192 isu terbuka (100 "bug", 92 code smell). Setelah S2003 (`include`/`require` di template, false positive yang dikecualikan dengan alasan tertulis di `sonar-project.properties`) dipisahkan, sisanya diperbaiki satu per satu.
+
+| Temuan | Teknik | Perubahan |
+|---|---|---|
+| `Controller::handle()` punya 9 `return` (S1142) | Extract Method | Satu `try/catch (Throwable)` yang mendelegasikan ke `respondValidation/Forbidden/Conflict/Unexpected`; kontrak ERR-01 (422/403/409/500) tidak berubah. |
+| `Env::load()` kompleksitas 22 (S3776) | Extract Method | Parsing baris dipisah ke `parseLine()` dan `stripQuotes()`. |
+| `PurchaseOrderService::create()` / `SalesOrderService::create()` kompleksitas 16 (S3776) | Extract Method | Validasi item dipindah ke `validateItems()`; `validateOrderDate()` jadi satu titik return. |
+| 27 literal URL/pesan duplikat (S1192) | Introduce Constant | `BASE_URL`, `DETAIL_URL_PREFIX`, `LOGIN_URL`, `ORDER_NOT_FOUND`, dst. |
+| 43 parameter `$request` tidak terpakai + `$forbiddenUrl` + `$approverId` (S1172) | Remove Parameter | Router sekarang memetakan argumen handler berdasarkan nama parameter (`$request`, `$params`) lewat reflection, sehingga handler hanya mendeklarasikan yang dipakai. `Auth::requireRole()` dan `SalesOrderService::reject()` disederhanakan beserta pemanggilnya. |
+| 14 isu aksesibilitas form (label tanpa kontrol, `<th>` tanpa scope, `role="status"`) | Perbaikan markup | Label membungkus kontrolnya, `aria-label` pada input penerimaan barang, `scope="row"`, dan `<output>` untuk flash. |
+
+**Validasi:** unit + integration test hijau (43 test/84 assertion, termasuk `RouterTest` dan `EnvTest` baru untuk perubahan Router dan Env), PHPStan 0 error, PHPCS 0 error, smoke test end-to-end via Docker dari working tree bersih (semua route GET untuk tiga role, alur buat kategori/PO/SO termasuk jalur validasi gagal), dan scan SonarQube ulang menunjukkan 0 isu terbuka.

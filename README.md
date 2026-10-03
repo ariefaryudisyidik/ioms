@@ -80,7 +80,7 @@ vendor/bin/phpstan analyse --no-progress
 vendor/bin/phpcs --standard=phpcs.xml app/
 ```
 
-Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 32 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
+Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 33 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
 
 ## SonarQube
 
@@ -98,7 +98,7 @@ sed -i.bak "s#$PWD/#/usr/src/#g" build/coverage/clover.xml build/coverage/junit.
 docker compose -f docker-compose.sonar.yml -p ioms-sonar run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
 ```
 
-Konfigurasi analisis ada di `sonar-project.properties`.
+Konfigurasi analisis ada di `sonar-project.properties`. Hasil dan penjelasan temuan: `docs/quality/sonarqube-report.md`.
 
 ## Dokumentasi
 
@@ -141,7 +141,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 26 test lulus (63 assertion), 0 error static analysis |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 43 test lulus (84 assertion), 0 error static analysis, SonarQube 0 isu terbuka (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 
