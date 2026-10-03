@@ -32,3 +32,9 @@ Diverifikasi end-to-end via Docker + HTTP request nyata (bukan hanya membaca kod
 - Lihat `docs/quality/tech-debt.md` untuk keterbatasan desain yang diambil sadar karena keterbatasan waktu.
 
 Jika ditemukan bug fungsional baru pada tahap review berikutnya, perbarui dokumen ini dengan ID bug, langkah reproduksi, dan status perbaikan.
+
+## Pembaruan 2026-10-03
+
+- Full test suite sekarang **166 test / 903 assertion** (Unit 73, Integration 9, E2E 84 lewat HTTP), semuanya lulus lewat `composer coverage`. Line coverage 100%.
+- PHPStan 0 error; PHPCS 0 error dengan 27 warning panjang baris (kosmetik).
+- Tidak ada bug fungsional baru ditemukan oleh suite E2E. Satu bug *environment* ditemukan dan diperbaiki lebih awal: `docker-compose.yml` memasang source di atas `vendor/` image sehingga clone bersih langsung fatal error (sudah diperbaiki, bind mount dihapus).

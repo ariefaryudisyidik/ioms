@@ -11,6 +11,8 @@
 
 Saat ini keempat tanggung jawab tersebut hidup berdampingan dalam satu class dengan satu constructor yang men-inject tiga Repository + PDO sekaligus (`SalesOrderRepositoryInterface`, `ProductStockRepositoryInterface`, `StockLedgerRepositoryInterface`, `PDO`), sehingga class ini punya lebih dari satu "customer" konseptual: layer Controller yang butuh validasi CRUD sederhana, dan layer domain yang butuh state machine + logic gudang.
 
+> **Pembaruan 2026-10-03:** validasi item di `create()` sudah diekstrak ke method privat `validateItems()` (menurunkan kompleksitas kognitif di bawah ambang SonarQube), tetapi keempat tanggung jawab di atas masih berada dalam satu kelas. Pemecahan penuh tetap ditunda sampai kompleksitas bertambah (lihat rencana di bawah).
+
 ## Dampak jika dibiarkan tumbuh
 
 Untuk skala saat ini (6 method, ~255 baris) kelas ini masih dapat dibaca dan diuji dalam satu file, sehingga belum "harus" dipecah segera. Namun risiko yang mulai terlihat:

@@ -31,3 +31,15 @@ Beberapa area yang secara eksplisit dicatat masih perlu verifikasi lebih lanjut 
 - Validasi keamanan menyeluruh (SQL injection, XSS, CSRF, rate limiting) belum diaudit secara khusus oleh alat security-scanning terpisah — hanya mengikuti praktik minimum yang diwajibkan brief (prepared statement, escape output, password hashing, session aman).
 - Race condition goods-issue diverifikasi lewat skenario terkontrol (dua `fulfill()` berurutan terhadap MySQL nyata), bukan lewat request paralel/thread sungguhan — sesuai batas yang diizinkan brief.
 - 32 warning PHPCS "line exceeds 120 characters" masih tersisa (kosmetik, bukan error) — lihat `docs/quality/static-analysis-report.txt`.
+
+## Pembaruan 2026-10-03 — kualitas kode dan bukti pengujian
+
+Sesi Claude Code berikutnya (atas instruksi pengguna yang sama) menambahkan dan mengubah:
+
+- **SonarQube lokal** (`docker-compose.sonar.yml`, `sonar-project.properties`) dan perbaikan seluruh temuan: kompleksitas, literal duplikat, parameter tak terpakai, aksesibilitas form.
+- **Refactor duplikasi** (8,1% → 0%): `CrudController`, `AbstractMySqlRepository`, dan partial view. Sebagian dikerjakan oleh subagent paralel pada worktree terpisah, lalu diverifikasi dengan membandingkan perilaku/HTML sebelum dan sesudah, kemudian digabung dan diuji ulang oleh sesi utama.
+- **Suite test**: unit, integration, dan E2E lewat HTTP dengan coverage gabungan (`scripts/coverage.sh`), dari 26 menjadi 166 test dengan line coverage 100%.
+- **Perbaikan bug**: bind mount `docker-compose.yml` yang membuat clone bersih gagal berjalan.
+- Dokumentasi terkait: ADR-003, class diagram as-built, refactor log (entri 5 dan 6), laporan SonarQube, dan tech debt.
+
+Pengguna tetap bertanggung jawab memahami dan menjelaskan seluruh kode di atas, serta me-review hasil perubahan sebelum presentasi.

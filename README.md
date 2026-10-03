@@ -105,7 +105,7 @@ Konfigurasi analisis ada di `sonar-project.properties`. Hasil dan penjelasan tem
 ## Dokumentasi
 
 - Perencanaan: `docs/planning/` (user story, scope, ERD, class diagram awal, backlog)
-- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock)
+- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock, ADR strategi test E2E/coverage)
 - Kualitas kode: `docs/quality/` (refactor log, audit SRP, tech debt, critique, laporan static analysis)
 - Testing: `docs/testing/` (skenario test, known bugs)
 - Disclosure penggunaan AI: `ai-usage-log.md`
