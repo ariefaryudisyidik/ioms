@@ -77,9 +77,9 @@ kill "$SERVER_PID" 2>/dev/null || true
 SERVER_PID=""
 
 # CLI script (cron job) is exercised by the E2E suite through the same prepend file.
-vendor/bin/phpcov merge --clover "$ROOT/build/coverage/clover.xml" "$COV_DIR"
+vendor/bin/phpcov merge --clover "$ROOT/build/coverage/clover.xml" --html "$ROOT/build/coverage/html" "$COV_DIR"
 
 # SonarQube's scanner runs in a container that sees the project at /usr/src.
 sed -i.bak "s#$ROOT/#/usr/src/#g" "$ROOT/build/coverage/clover.xml" "$ROOT/build/coverage/junit.xml"
 rm -f "$ROOT"/build/coverage/*.bak
-echo "Coverage written to build/coverage/clover.xml"
+echo "Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)"
