@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>IOMS - Presentasi Final Project</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  :root {
+    --ink: #14213d;
+    --muted: #5b6577;
+    --line: #dfe4ec;
+    --accent: #1d4ed8;
+    --accent-soft: #e8eefc;
+    --ok: #15803d;
+    --ok-soft: #e6f4ea;
+    --warn: #b45309;
+    --warn-soft: #fdf1e0;
+    --bg: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 13.333in; height: 7.5in; padding: 0.6in 0.8in 0.55in; position: relative; page-break-after: always; overflow: hidden; display: flex; flex-direction: column; }
+  .slide:last-child { page-break-after: auto; }
+  .tag { font-size: 12.5pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 8px; }
+  h1 { font-size: 40pt; line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.02em; }
+  h2 { font-size: 30pt; line-height: 1.15; margin: 0 0 18px; letter-spacing: -0.015em; }
+  h3 { font-size: 16pt; margin: 0 0 6px; }
+  p, li { font-size: 16.5pt; line-height: 1.42; margin: 0; }
+  ul { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 7px; }
+  .muted { color: var(--muted); }
+  .foot { position: absolute; left: 0.8in; right: 0.8in; bottom: 0.3in; display: flex; justify-content: space-between; font-size: 10.5pt; color: var(--muted); }
+  .cols { display: flex; gap: 0.4in; flex: 1; min-height: 0; }
+  .col { flex: 1; min-width: 0; }
+  .card { border: 1.5px solid var(--line); border-radius: 12px; padding: 16px 20px; background: #fff; }
+  .card.soft { background: var(--accent-soft); border-color: transparent; }
+  .card.ok { background: var(--ok-soft); border-color: transparent; }
+  .card.warn { background: var(--warn-soft); border-color: transparent; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5pt; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1.5px solid var(--line); }
+  th { color: var(--muted); font-size: 11.5pt; text-transform: uppercase; letter-spacing: 0.08em; }
+  td.c, th.c { text-align: center; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  code { background: #eef1f6; padding: 1px 6px; border-radius: 5px; font-size: 0.88em; }
+  pre { background: #0f1b33; color: #e7ecf7; border-radius: 12px; padding: 16px 20px; font-size: 12.5pt; line-height: 1.5; margin: 0; }
+  pre .k { color: #7aa2ff; } pre .c { color: #8a97b4; } pre .g { color: #6ee7a8; }
+  .big { font-size: 46pt; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  .stat { text-align: left; }
+  .stat .lbl { font-size: 12.5pt; color: var(--muted); margin-top: 6px; line-height: 1.3; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .flow { display: flex; align-items: stretch; gap: 10px; }
+  .flow .box { flex: 1; border-radius: 12px; padding: 14px 14px; background: var(--accent-soft); }
+  .flow .box b { display: block; font-size: 15pt; margin-bottom: 4px; }
+  .flow .box span { font-size: 12.5pt; color: var(--muted); line-height: 1.3; display: block; }
+  .flow .arrow { align-self: center; font-size: 22pt; color: var(--accent); }
+  .layers .row { display: flex; align-items: center; gap: 18px; padding: 11px 18px; border-radius: 12px; margin-bottom: 10px; }
+  .layers .row b { width: 2.1in; font-size: 16pt; }
+  .layers .row span { font-size: 13.5pt; color: var(--muted); }
+  .l1 { background: #e8eefc; } .l2 { background: #dbe6ff; } .l3 { background: #cddcff; } .l4 { background: #bcd0fb; }
+  .pill { display: inline-block; font-size: 12pt; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-right: 6px; }
+  .num { display: inline-flex; width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; font-size: 14pt; align-items: center; justify-content: center; margin-right: 10px; flex: none; }
+  .step { display: flex; align-items: flex-start; margin-bottom: 12px; }
+  .step p { font-size: 15.5pt; }
+  .title-slide { justify-content: center; background: linear-gradient(135deg, #f4f7ff 0%, #e8eefc 100%); }
+  .title-slide h1 { font-size: 54pt; }
+  .meta { display: flex; gap: 0.7in; margin-top: 0.5in; }
+  .meta div { font-size: 12.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .meta b { display: block; font-size: 16pt; color: var(--ink); text-transform: none; letter-spacing: 0; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<!-- 1. Title -->
+<section class="slide title-slide">
+  <div class="tag">Intermediate Programmer · Final Project</div>
+  <h1>Inventory &amp; Order<br>Management System</h1>
+  <p class="muted" style="font-size:20pt;max-width:9.5in">Aplikasi web multi-gudang dengan tiga peran, berlapis (Controller → Service → Repository), dan integritas stok yang terjaga saat proses berjalan bersamaan.</p>
+  <div class="meta">
+    <div>Disusun oleh<b>Arief Aryudi Syidik</b></div>
+    <div>Program<b>PT Neuronworks Indonesia</b></div>
+    <div>Sesi<b>Rabu, 7 Oktober 2026</b></div>
+  </div>
+</section>
+
+<!-- 2. Problem -->
+<section class="slide">
+  <div class="tag">01 · Pembukaan</div>
+  <h2>Masalah dan pengguna</h2>
+  <div class="cols">
+    <div class="col">
+      <p>Tim gudang dan sales perlu mencatat pembelian dari supplier dan penjualan ke customer di beberapa gudang, dengan <b>angka stok yang bisa dipertanggungjawabkan</b>, termasuk ketika dua proses berjalan bersamaan.</p>
+      <div class="card ok" style="margin-top:22px">
+        <h3>Status penyelesaian</h3>
+        <p style="font-size:15pt">Semua fitur wajib selesai: master data, PO, SO dengan approval, goods receipt/issue, perpindahan stok, stock ledger, laporan CSV, dashboard, dan endpoint JSON.</p>
+      </div>
+      <p class="muted" style="margin-top:18px;font-size:14pt">Kontribusi saya: perancangan dan implementasi proyek. Sebagian besar kode, test, dan dokumentasi dibuat dengan bantuan Claude Code, dan saya bertanggung jawab memahami dan menjelaskannya (lihat slide terakhir).</p>
+    </div>
+    <div class="col">
+      <table>
+        <tr><th>Aktivitas</th><th class="c">Admin</th><th class="c">Sales</th><th class="c">Gudang</th></tr>
+        <tr><td>Buat dan ajukan SO</td><td class="c">Ya</td><td class="c">Miliknya</td><td class="c">Tidak</td></tr>
+        <tr><td>Setujui / tolak SO</td><td class="c">Ya*</td><td class="c">Tidak</td><td class="c">Tidak</td></tr>
+        <tr><td>Goods issue (SO)</td><td class="c">Ya</td><td class="c">Tidak</td><td class="c">Ya</td></tr>
+        <tr><td>Goods receipt (PO)</td><td class="c">Ya</td><td class="c">Tidak</td><td class="c">Ya</td></tr>
+        <tr><td>Kelola user</td><td class="c">Ya</td><td class="c">Tidak</td><td class="c">Tidak</td></tr>
+      </table>
+      <p class="muted" style="margin-top:12px;font-size:13pt">* Bukan untuk SO yang ia buat sendiri. Aturan ditegakkan di server, bukan hanya disembunyikan di UI.</p>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>02</span></div>
+</section>
+
+<!-- 3. Demo -->
+<section class="slide">
+  <div class="tag">02 · Demo alur utama</div>
+  <h2>Dua alur yang mewakili requirement</h2>
+  <div class="cols">
+    <div class="col card soft">
+      <h3>A · Purchase Order → penerimaan barang</h3>
+      <div class="step" style="margin-top:12px"><span class="num">1</span><p>Warehouse membuat PO (Draft) lalu <b>Order</b></p></div>
+      <div class="step"><span class="num">2</span><p><b>Receive</b> sebagian → PartiallyReceived</p></div>
+      <div class="step"><span class="num">3</span><p>Stok naik dan baris <code>stock_ledger</code> tipe Receipt, dalam <b>satu transaksi</b></p></div>
+    </div>
+    <div class="col card soft">
+      <h3>B · Sales Order → anti-oversell</h3>
+      <div class="step" style="margin-top:12px"><span class="num">1</span><p>Sales membuat SO; stok tampil lewat <b>Fetch API</b>; submit</p></div>
+      <div class="step"><span class="num">2</span><p>Sales tidak bisa approve (server <b>403</b>); Admin approve</p></div>
+      <div class="step"><span class="num">3</span><p>Warehouse <b>Fulfill</b> dengan qty melebihi stok → ditolak, stok dan ledger <b>tidak berubah</b></p></div>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:14px;font-size:13.5pt">Bukti perubahan data ditunjukkan langsung dari database (stok dan <code>stock_ledger</code>) sebelum dan sesudah.</p>
+  <div class="foot"><span>IOMS · Final Project</span><span>03</span></div>
+</section>
+
+<!-- 4. Architecture -->
+<section class="slide">
+  <div class="tag">03 · Implementasi teknis</div>
+  <h2>Arsitektur berlapis dan alur request</h2>
+  <div class="flow" style="margin-bottom:18px">
+    <div class="box"><b>index.php</b><span>front controller</span></div><div class="arrow">→</div>
+    <div class="box"><b>Router</b><span>regex + {param}, args by name</span></div><div class="arrow">→</div>
+    <div class="box"><b>Controller</b><span>HTTP + otorisasi</span></div><div class="arrow">→</div>
+    <div class="box"><b>Service</b><span>aturan bisnis, transaksi</span></div><div class="arrow">→</div>
+    <div class="box"><b>Repository</b><span>SQL prepared statement</span></div><div class="arrow">→</div>
+    <div class="box"><b>View</b><span>template PHP, e()</span></div>
+  </div>
+  <div class="cols">
+    <div class="col layers">
+      <div class="row l1"><b>Controller</b><span>app/Controller · <code>CrudController</code> untuk 5 master data</span></div>
+      <div class="row l2"><b>Service</b><span>app/Service · validasi, state machine, transaksi</span></div>
+      <div class="row l3"><b>Repository interface</b><span>Dependency Inversion (ADR-001)</span></div>
+      <div class="row l4"><b>MySQL / In-Memory</b><span>runtime sungguhan / test double</span></div>
+    </div>
+    <div class="col">
+      <ul>
+        <li>Service hanya tahu <b>interface</b>, jadi diuji tanpa database.</li>
+        <li>Tanpa framework dan ORM; PDO prepared statement di semua query.</li>
+        <li>Error domain dipetakan terpusat di <code>Controller::handle</code>: 422 / 403 / 409 / 500, tanpa membocorkan detail.</li>
+        <li>Diagram: <code>docs/architecture/class-diagram-as-built.md</code></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>04</span></div>
+</section>
+
+<!-- 5. Stock integrity -->
+<section class="slide">
+  <div class="tag">03 · Implementasi teknis</div>
+  <h2>Integritas stok: tidak ada oversell</h2>
+  <div class="cols">
+    <div class="col">
+<pre><span class="c">// SalesOrderService::fulfill()</span>
+<span class="k">$pdo</span>->beginTransaction();
+<span class="k">foreach</span> (<span class="k">$items</span> as <span class="k">$item</span>) {
+  <span class="k">$available</span> = <span class="k">$stocks</span>->lockForUpdate(...);
+  <span class="c">// SELECT quantity ... FOR UPDATE</span>
+  <span class="k">if</span> (<span class="k">$available</span> &lt; <span class="k">$item</span>->qty) {
+    <span class="k">throw</span> InsufficientStockException;
+  }
+}
+<span class="c">// decrement + tulis stock_ledger</span>
+<span class="k">$pdo</span>->commit();   <span class="c">// kegagalan → rollBack()</span></pre>
+    </div>
+    <div class="col">
+      <ul>
+        <li><b>Pessimistic row lock</b> InnoDB: dua goods issue pada produk dan gudang yang sama dipaksa antre.</li>
+        <li>Cek stok dilakukan <b>setelah</b> lock, sehingga hasilnya tidak basi.</li>
+        <li>Kekurangan di satu item <b>membatalkan seluruh transaksi</b>: tidak ada stok setengah berkurang.</li>
+        <li>Terbukti lewat integration test terhadap MySQL asli dan test E2E.</li>
+        <li>Keputusan dan alternatif: <code>ADR-002</code>.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>05</span></div>
+</section>
+
+<!-- 6. Security / frontend / docker -->
+<section class="slide">
+  <div class="tag">03 · Implementasi teknis</div>
+  <h2>Keamanan, frontend, dan Docker</h2>
+  <div class="cols">
+    <div class="col card">
+      <h3>Keamanan</h3>
+      <ul style="margin-top:8px">
+        <li><code>password_hash</code> / <code>password_verify</code></li>
+        <li><code>session_regenerate_id</code> saat login</li>
+        <li>Role dicek di <b>server</b> (<code>Auth::requireRole</code>)</li>
+        <li>Output di-escape; prepared statement</li>
+        <li>Upload: tipe MIME asli, maks 2MB, nama acak</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3>Frontend dan JSON</h3>
+      <ul style="margin-top:8px">
+        <li>HTML semantik, CSS sendiri, responsif</li>
+        <li>Vanilla JS: validasi form, baris item dinamis</li>
+        <li><b>Fetch API</b>: <code>GET /api/products/{sku}/availability</code></li>
+        <li>401 tanpa login, 404 SKU tidak ada</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3>Docker</h3>
+      <ul style="margin-top:8px">
+        <li><code>docker compose up --build</code>: app + MySQL</li>
+        <li>Schema dan seed diimpor otomatis</li>
+        <li>App berjalan sebagai <b>non-root</b>, ada healthcheck</li>
+        <li>Diverifikasi dari <b>clone bersih</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>06</span></div>
+</section>
+
+<!-- 7. Quality evidence -->
+<section class="slide">
+  <div class="tag">04 · Bukti kualitas</div>
+  <h2>Test dan SonarQube</h2>
+  <div class="grid4" style="margin-bottom:26px">
+    <div class="card ok stat"><div class="big">166</div><div class="lbl">test lulus, 903 assertion<br>Unit 73 · Integration 9 · E2E 84</div></div>
+    <div class="card ok stat"><div class="big">100%</div><div class="lbl">line coverage<br>(3.512 baris)</div></div>
+    <div class="card ok stat"><div class="big">0</div><div class="lbl">isu terbuka: bug, vulnerability, smell, hotspot</div></div>
+    <div class="card ok stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <table>
+        <tr><th>Metrik</th><th class="c">Scan awal</th><th class="c">Akhir</th></tr>
+        <tr><td>Isu terbuka</td><td class="c">192</td><td class="c"><b>0</b></td></tr>
+        <tr><td>Reliability / Security / Maintainability</td><td class="c">C / A / A</td><td class="c"><b>A / A / A</b></td></tr>
+        <tr><td>Coverage</td><td class="c">21,1%</td><td class="c"><b>100%</b></td></tr>
+        <tr><td>Duplikasi</td><td class="c">8,1%</td><td class="c"><b>0%</b></td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <ul>
+        <li>E2E menembak aplikasi lewat HTTP dan merekam coverage dari server (ADR-003), digabung dengan Unit + Integration.</li>
+        <li>PHPStan level 5 dan PHPCS PSR-12: 0 error.</li>
+        <li>Satu aturan dikecualikan dengan alasan tertulis: <code>php:S2003</code> (view dan config).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>07</span></div>
+</section>
+
+<!-- 8. Refactor -->
+<section class="slide">
+  <div class="tag">04 · Bukti kualitas</div>
+  <h2>Perbaikan utama yang dilakukan</h2>
+  <table>
+    <tr><th style="width:28%">Temuan</th><th style="width:30%">Teknik</th><th>Hasil</th></tr>
+    <tr><td>5 controller CRUD hampir identik</td><td>Template Method (<code>CrudController</code>)</td><td>≈200 baris duplikat hilang</td></tr>
+    <tr><td>Query builder PO/SO/ledger berulang</td><td>Extract Superclass (<code>AbstractMySqlRepository</code>)</td><td>SQL dibandingkan: identik</td></tr>
+    <tr><td>HTML form/daftar disalin-tempel</td><td>Partial view (<code>views/partials/</code>)</td><td>Render dibandingkan: identik</td></tr>
+    <tr><td>43 parameter <code>$request</code> tidak terpakai</td><td>Router memetakan argumen by nama (reflection)</td><td>Handler hanya deklarasi yang dipakai</td></tr>
+    <tr><td>Method besar (kompleksitas, banyak return)</td><td>Extract Method</td><td>Di bawah ambang SonarQube</td></tr>
+    <tr><td>Form tanpa label terasosiasi</td><td>Label membungkus kontrol, <code>aria-label</code></td><td>Isu aksesibilitas 0</td></tr>
+  </table>
+  <p class="muted" style="margin-top:16px;font-size:14pt">Dokumentasi: class diagram initial vs as-built, ADR-001/002/003, <code>refactor-log.md</code>, <code>sonarqube-report.md</code>.</p>
+  <div class="foot"><span>IOMS · Final Project</span><span>08</span></div>
+</section>
+
+<!-- 9. Reflection -->
+<section class="slide">
+  <div class="tag">05 · Refleksi</div>
+  <h2>Kendala, keterbatasan, dan langkah berikutnya</h2>
+  <div class="cols">
+    <div class="col">
+      <div class="card soft" style="margin-bottom:16px">
+        <h3>Kendala dan solusi</h3>
+        <ul style="margin-top:6px">
+          <li>Stok benar saat konkuren → transaksi + row lock.</li>
+          <li>Clone bersih gagal jalan (bind mount menimpa <code>vendor/</code>) → ketahuan saat verifikasi, diperbaiki.</li>
+          <li>Coverage Controller/view awalnya 0% → test E2E lewat HTTP.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card warn" style="margin-bottom:16px">
+        <h3>Keterbatasan (jujur)</h3>
+        <ul style="margin-top:6px">
+          <li>Tanpa rate limiting dan CSRF token.</li>
+          <li>API memakai session cookie; <code>ApiController</code> melewati Service.</li>
+          <li>100% adalah <i>line</i> coverage, bukan semua kombinasi input.</li>
+          <li>Tanpa CI/CD.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:2px">
+    <h3>Prioritas berikutnya</h3>
+    <p style="font-size:15pt"><span class="pill">1</span>ProductAvailabilityService <span class="pill">2</span>Rate limiting login/API <span class="pill">3</span>Audit log master data <span class="pill">4</span>Token API &amp; CSRF</p>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>09</span></div>
+</section>
+
+<!-- 10. AI disclosure -->
+<section class="slide">
+  <div class="tag">Transparansi</div>
+  <h2>Penggunaan AI</h2>
+  <div class="cols">
+    <div class="col">
+      <ul>
+        <li>Sebagian besar kode, test, dan dokumentasi dibuat dengan <b>Claude Code</b> (Anthropic).</li>
+        <li>Subagent paralel dipakai untuk refactor duplikasi di worktree terpisah, lalu perilakunya <b>dibandingkan sebelum dan sesudah</b> dan diuji ulang.</li>
+        <li>Saya memverifikasi hasil: build Docker dari clone bersih, test, SonarQube, dan smoke test semua route per role.</li>
+      </ul>
+    </div>
+    <div class="col card soft">
+      <h3>Tanggung jawab</h3>
+      <p style="font-size:15pt;margin-top:6px">Saya bertanggung jawab memahami dan menjelaskan seluruh kode, termasuk <code>SalesOrderService::fulfill</code>, <code>Router</code>, dan <code>CrudController</code>.</p>
+      <p class="muted" style="font-size:13.5pt;margin-top:12px">Rincian: <code>ai-usage-log.md</code></p>
+    </div>
+  </div>
+  <div class="foot"><span>IOMS · Final Project</span><span>10</span></div>
+</section>
+
+<!-- 11. Q&A -->
+<section class="slide title-slide">
+  <div class="tag">Terima kasih</div>
+  <h1>Tanya jawab</h1>
+  <p class="muted" style="font-size:19pt;max-width:9in">Repository, README, ADR, class diagram, laporan SonarQube, dan laporan coverage siap ditelusuri langsung dari kode.</p>
+  <div class="meta">
+    <div>Akun demo<b>admin@ioms.test · Password123!</b></div>
+    <div>Aplikasi<b>localhost:8080</b></div>
+    <div>SonarQube<b>localhost:9001</b></div>
+  </div>
+</section>
+
+</body>
+</html>
