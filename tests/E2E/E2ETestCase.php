@@ -84,6 +84,34 @@ abstract class E2ETestCase extends TestCase
         return $rows === [] ? null : array_values($rows[0])[0];
     }
 
+    /**
+     * Writes bytes to a temp file and returns an upload wrapper for it.
+     */
+    protected function upload(string $bytes, string $name, string $mime): \CURLFile
+    {
+        $path = (string) tempnam(sys_get_temp_dir(), 'e2e-upload');
+        file_put_contents($path, $bytes);
+
+        return new \CURLFile($path, $mime, $name);
+    }
+
+    protected function png(): string
+    {
+        return (string) base64_decode(
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+        );
+    }
+
+    protected function jpeg(): string
+    {
+        return "\xFF\xD8\xFF\xE0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00" . str_repeat("\x00", 32);
+    }
+
+    protected function webp(): string
+    {
+        return 'RIFF' . pack('V', 26) . 'WEBPVP8 ' . pack('V', 10) . str_repeat("\x00", 10);
+    }
+
     private function resetDatabase(): void
     {
         $pdo = $this->db();

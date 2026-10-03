@@ -26,16 +26,17 @@ trap cleanup EXIT
 
 rm -rf "$COV_DIR" "$ROOT/build/coverage"
 mkdir -p "$COV_DIR" "$ROOT/build/coverage"
-rm -f public/uploads/e2e-*
+rm -rf "$ROOT/build/uploads"
 
 docker rm -f "$DB_CONTAINER" >/dev/null 2>&1 || true
 docker run -d --rm --name "$DB_CONTAINER" \
     -e MYSQL_ROOT_PASSWORD="$DB_PASSWORD" -e MYSQL_DATABASE=ioms \
     -p "$DB_PORT:3306" \
+    --tmpfs /var/lib/mysql \
     -v "$ROOT/tests/support/create-test-db.sql:/docker-entrypoint-initdb.d/00-test-db.sql:ro" \
     -v "$ROOT/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro" \
     -v "$ROOT/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro" \
-    mysql:8.0 >/dev/null
+    mysql:8.0 --innodb-flush-log-at-trx-commit=0 --skip-log-bin >/dev/null
 
 echo "Waiting for MySQL..."
 for _ in $(seq 1 60); do
@@ -52,8 +53,9 @@ export XDEBUG_MODE=coverage
 export E2E_COVERAGE_DIR="$COV_DIR"
 export DB_HOST=127.0.0.1 DB_PORT="$DB_PORT" DB_DATABASE=ioms DB_USERNAME=root DB_PASSWORD="$DB_PASSWORD"
 export APP_ENV=testing
+export APP_UPLOAD_DIR=build/uploads
 
-php -d variables_order=EGPCS -d auto_prepend_file="$ROOT/tests/support/coverage-prepend.php" \
+php -d variables_order=EGPCS -d upload_max_filesize=3M -d post_max_size=16M -d auto_prepend_file="$ROOT/tests/support/coverage-prepend.php" \
     -S "127.0.0.1:$APP_PORT" -t public public/index.php >"$ROOT/build/server.log" 2>&1 &
 SERVER_PID=$!
 for _ in $(seq 1 30); do
