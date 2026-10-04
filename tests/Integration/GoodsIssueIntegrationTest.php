@@ -6,6 +6,7 @@ namespace Tests\Integration;
 
 use App\Entity\SalesOrder;
 use App\Repository\MySqlProductStockRepository;
+use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlSalesOrderRepository;
 use App\Repository\MySqlStockLedgerRepository;
 use App\Service\Exception\InsufficientStockException;
@@ -44,7 +45,7 @@ final class GoodsIssueIntegrationTest extends IntegrationTestCase
         $orders = new MySqlSalesOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new SalesOrderService($orders, $stocks, $ledger, $pdo);
+        $service = new SalesOrderService($orders, $stocks, $ledger, new PdoTransactionManager($pdo));
 
         $so1 = $this->approvedOrder($orders, $service, 'SO-INT-1', 10);
         $result1 = $service->fulfill($so1->id, 1);

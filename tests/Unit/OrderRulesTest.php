@@ -12,7 +12,7 @@ use App\Service\DateRules;
 use App\Service\Exception\AuthorizationException;
 use App\Service\OrderItemValidator;
 use App\Service\SalesOrderService;
-use PDO;
+use App\Repository\InMemoryTransactionManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -77,7 +77,7 @@ final class OrderRulesTest extends TestCase
             $orders,
             new InMemoryProductStockRepository(),
             $this->createMock(StockLedgerRepositoryInterface::class),
-            $this->createMock(PDO::class),
+            new InMemoryTransactionManager(),
         );
     }
 

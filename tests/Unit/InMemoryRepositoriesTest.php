@@ -12,7 +12,6 @@ use App\Repository\InMemoryProductRepository;
 use App\Repository\InMemoryProductStockRepository;
 use App\Repository\InMemorySalesOrderRepository;
 use App\Repository\InMemoryUserRepository;
-use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -78,8 +77,8 @@ final class InMemoryRepositoriesTest extends TestCase
         $this->assertCount(3, $stocks->findByProduct($p->id));
         $this->assertCount(1, $stocks->findByWarehouse(2));
         $this->assertSame(5, $stocks->totalForProduct($p->id));
-        $this->assertSame(5, $stocks->lockForUpdate(new PDO('sqlite::memory:'), $p->id, 1));
-        $this->assertSame(0, $stocks->lockForUpdate(new PDO('sqlite::memory:'), $p->id, 77));
+        $this->assertSame(5, $stocks->lockForUpdate($p->id, 1));
+        $this->assertSame(0, $stocks->lockForUpdate($p->id, 77));
         $this->assertSame(1, $stocks->countLowStock());
         $this->assertSame(5 * 1.0, $stocks->totalInventoryValue(), 'purchase price 1 x total quantity 5');
         $this->assertSame(0.0, (new InMemoryProductStockRepository())->totalInventoryValue());

@@ -6,6 +6,7 @@ namespace Tests\Integration;
 
 use App\Entity\PurchaseOrder;
 use App\Repository\MySqlProductStockRepository;
+use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlPurchaseOrderRepository;
 use App\Repository\MySqlStockLedgerRepository;
 use App\Service\PurchaseOrderService;
@@ -23,7 +24,7 @@ final class GoodsReceiptIntegrationTest extends IntegrationTestCase
         $purchaseOrders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, $pdo);
+        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo));
 
         $po = $service->create([
             'po_number' => 'PO-INT-1',
@@ -65,7 +66,7 @@ final class GoodsReceiptIntegrationTest extends IntegrationTestCase
         $purchaseOrders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, $pdo);
+        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo));
 
         $po = $service->create([
             'po_number' => 'PO-INT-2',

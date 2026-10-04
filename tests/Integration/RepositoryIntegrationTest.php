@@ -10,6 +10,7 @@ use App\Entity\SalesOrder;
 use App\Entity\SalesOrderItem;
 use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
+use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlPurchaseOrderRepository;
 use App\Repository\MySqlSalesOrderRepository;
 use App\Repository\MySqlStockLedgerRepository;
@@ -103,7 +104,7 @@ final class RepositoryIntegrationTest extends IntegrationTestCase
         $pdo = $this->pdo();
         $orders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
-        $service = new PurchaseOrderService($orders, $stocks, new MySqlStockLedgerRepository($pdo), $pdo);
+        $service = new PurchaseOrderService($orders, $stocks, new MySqlStockLedgerRepository($pdo), new PdoTransactionManager($pdo));
 
         $po = $service->create([
             'po_number' => 'PO-R-ROLLBACK',

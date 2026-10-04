@@ -13,21 +13,21 @@ use App\Service\Exception\AuthorizationException;
 use App\Service\Exception\InsufficientStockException;
 use App\Service\Exception\InvalidStatusTransitionException;
 use App\Service\SalesOrderService;
-use PDO;
+use App\Repository\InMemoryTransactionManager;
 use PHPUnit\Framework\TestCase;
 
 final class SalesOrderServiceTest extends TestCase
 {
-    private function pdo(): PDO
+    private InMemoryTransactionManager $transactions;
+
+    protected function setUp(): void
     {
-        // A real (in-memory sqlite) PDO so beginTransaction/commit/rollBack
-        // work; the fakes never issue real SQL against it.
-        return new PDO('sqlite::memory:');
+        $this->transactions = new InMemoryTransactionManager();
     }
 
     private function makeService(InMemorySalesOrderRepository $orders, InMemoryProductStockRepository $stocks): SalesOrderService
     {
-        return new SalesOrderService($orders, $stocks, new FakeStockLedgerRepository(), $this->pdo());
+        return new SalesOrderService($orders, $stocks, new FakeStockLedgerRepository(), $this->transactions);
     }
 
     private function seedApprovedOrder(InMemorySalesOrderRepository $orders, int $qty = 10): SalesOrder
@@ -51,9 +51,11 @@ final class SalesOrderServiceTest extends TestCase
         try {
             $service->fulfill($so->id, 4);
         } finally {
-            // status must remain unchanged (rolled back)
+            // nothing was written, and the unit of work was rolled back rather than committed
             $this->assertSame(SalesOrder::STATUS_APPROVED, $orders->findById($so->id)->status);
             $this->assertSame(3, $stocks->find(100, 1)->quantity);
+            $this->assertSame(1, $this->transactions->rollbacks);
+            $this->assertSame(0, $this->transactions->commits);
         }
     }
 
@@ -69,6 +71,8 @@ final class SalesOrderServiceTest extends TestCase
 
         $this->assertSame(SalesOrder::STATUS_FULFILLED, $result->status);
         $this->assertSame(40, $stocks->find(100, 1)->quantity);
+        $this->assertSame(1, $this->transactions->commits, 'goods issue is one committed unit of work');
+        $this->assertSame(0, $this->transactions->rollbacks);
     }
 
     public function testInvalidStatusTransitionIsRejected(): void
@@ -199,7 +203,7 @@ final class SalesOrderServiceTest extends TestCase
  */
 final class FakeStockLedgerRepository implements StockLedgerRepositoryInterface
 {
-    public function record(\App\Entity\StockLedger $entry, ?PDO $pdo = null): \App\Entity\StockLedger
+    public function record(\App\Entity\StockLedger $entry): \App\Entity\StockLedger
     {
         $entry->id = random_int(1, 1000000);
 

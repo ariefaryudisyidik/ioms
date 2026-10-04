@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Service\PurchaseOrderService;
-use PDO;
+use App\Repository\InMemoryTransactionManager;
 use PHPUnit\Framework\TestCase;
 
 final class PurchaseOrderDateValidationTest extends TestCase
@@ -16,7 +16,7 @@ final class PurchaseOrderDateValidationTest extends TestCase
             $this->createMock(\App\Repository\PurchaseOrderRepositoryInterface::class),
             $this->createMock(\App\Repository\ProductStockRepositoryInterface::class),
             $this->createMock(\App\Repository\StockLedgerRepositoryInterface::class),
-            new PDO('sqlite::memory:'),
+            new InMemoryTransactionManager(),
             $tolerance,
         );
     }
