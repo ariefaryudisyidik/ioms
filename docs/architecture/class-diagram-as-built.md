@@ -41,6 +41,9 @@ classDiagram
     class PurchaseOrderRepositoryInterface { <<interface>> }
     class SalesOrderRepositoryInterface { <<interface>> }
     class StockLedgerRepositoryInterface { <<interface>> }
+    class TransactionManagerInterface { <<interface>> +run(work) }
+    class PdoTransactionManager
+    class InMemoryTransactionManager { +commits +rollbacks }
     class LoginAttemptRepositoryInterface { <<interface>> +recordFailure() +countRecent() +countRecentForIp() +clear() +purgeOlderThan() }
 
     %% ===== Repository Implementations (MySQL) =====
@@ -78,6 +81,8 @@ classDiagram
     MySqlSalesOrderRepository ..|> SalesOrderRepositoryInterface
     InMemorySalesOrderRepository ..|> SalesOrderRepositoryInterface
     MySqlStockLedgerRepository ..|> StockLedgerRepositoryInterface
+    PdoTransactionManager ..|> TransactionManagerInterface
+    InMemoryTransactionManager ..|> TransactionManagerInterface
     MySqlLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
     InMemoryLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
     MySqlLoginAttemptRepository --|> AbstractMySqlRepository
@@ -125,11 +130,11 @@ classDiagram
     PurchaseOrderService --> PurchaseOrderRepositoryInterface
     PurchaseOrderService --> ProductStockRepositoryInterface
     PurchaseOrderService --> StockLedgerRepositoryInterface
-    PurchaseOrderService --> Database : uses PDO
+    PurchaseOrderService --> TransactionManagerInterface
     SalesOrderService --> SalesOrderRepositoryInterface
     SalesOrderService --> ProductStockRepositoryInterface
     SalesOrderService --> StockLedgerRepositoryInterface
-    SalesOrderService --> Database : uses PDO
+    SalesOrderService --> TransactionManagerInterface
     StockLedgerService --> StockLedgerRepositoryInterface
     ReportService --> StockLedgerRepositoryInterface
     ReportService --> PurchaseOrderRepositoryInterface
@@ -208,6 +213,4 @@ classDiagram
 11. **`OrderItemValidator` dan `DateRules` ditambahkan** sebagai aturan validasi bersama untuk PO dan SO (item, harga, qty, tanggal), menggantikan `validateItems()` yang sebelumnya diduplikasi di dua Service. Repository PO/SO juga mendapat `invalidReferences()` agar pengecekan ID customer/supplier/gudang/produk tetap lewat interface (Service tidak menyentuh SQL).
 12. **Penyesuaian dengan matriks peran brief (§1.2):** `ProductController` kini hanya Admin untuk menulis (Warehouse Staff hanya melihat produk dan stok), `CustomerController` hanya Admin untuk menulis, dan pencarian order (`search`, filter customer) menambah rule `like` di `AbstractMySqlRepository::buildWhere`. `ProductStockRepositoryInterface::totalInventoryValue()` dan `SalesOrderRepositoryInterface::countsByStatus(?createdBy)` dipakai `DashboardService` untuk nilai inventori Admin dan ringkasan order milik Sales.
 
-## Catatan: Service dan `PDO`
-
-`SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor (bukan `new PDO()` tersembunyi) hanya untuk `beginTransaction/commit/rollBack`; semua SQL tetap di Repository. Ini kompromi sadar: transaksi lintas beberapa repository perlu satu koneksi bersama. Alternatif yang lebih murni (antarmuka `TransactionManager`) dicatat di `docs/quality/tech-debt.md` sebagai perbaikan ideal.
+13. **Service tidak lagi bergantung pada `PDO` (ADR-005).** `SalesOrderService` dan `PurchaseOrderService` menerima `TransactionManagerInterface` (implementasi `PdoTransactionManager` untuk runtime dan `InMemoryTransactionManager` untuk unit test) dan membungkus operasi stok dalam `run()`. Parameter `PDO` juga dihapus dari metode repository (`lockForUpdate`, `record`, `updateStatus`, `updateItemReceived`) karena semua repository berbagi satu koneksi. `ArchitectureTest` menjaga agar kelas di `app/Service` tidak merujuk `PDO`, session, atau superglobal.

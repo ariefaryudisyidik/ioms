@@ -81,7 +81,7 @@ Sekarang Controller bisa `catch (ValidationException $e)` secara spesifik dan me
 
 **Tindakan Boy Scout:** Menambahkan/mempertahankan komentar penjelas satu baris tepat di atas query tersebut (`// Ensure a row exists so it can be locked deterministically.`) — komentar ini sudah ada di kode dan dikonfirmasi tetap dipertahankan sebagai dokumentasi inline yang benar, bukan dihapus saat refactor lain menyentuh file ini. Prinsipnya: setiap kali file ini disentuh untuk keperluan apa pun, baris komentar krusial seperti ini dijaga agar tidak hilang, karena tanpanya intent locking-nya tidak terlihat jelas hanya dari baca SQL mentah.
 
-**Tindak lanjut (dieksekusi, commit `refactor:`):** pola "pastikan baris ada sebelum dikunci" di `lockForUpdate()` diekstrak menjadi private helper `ensureRowExists(PDO $pdo, int $productId, int $warehouseId): void` di `MySqlProductStockRepository`. `lockForUpdate()` kini hanya memanggil helper ini lalu melakukan `SELECT ... FOR UPDATE`, memisahkan "memastikan baris ada" dari "mengunci baris" sebagai dua langkah yang masing-masing bisa dibaca sendiri. Divalidasi dengan menjalankan ulang seluruh test suite (unit + integration terhadap MySQL nyata di Docker) — tetap hijau tanpa perubahan perilaku.
+**Tindak lanjut (dieksekusi, commit `refactor:`):** pola "pastikan baris ada sebelum dikunci" di `lockForUpdate()` diekstrak menjadi private helper `ensureRowExists(int $productId, int $warehouseId): void` (parameter `PDO` yang semula ada dihapus pada entri 7) di `MySqlProductStockRepository`. `lockForUpdate()` kini hanya memanggil helper ini lalu melakukan `SELECT ... FOR UPDATE`, memisahkan "memastikan baris ada" dari "mengunci baris" sebagai dua langkah yang masing-masing bisa dibaca sendiri. Divalidasi dengan menjalankan ulang seluruh test suite (unit + integration terhadap MySQL nyata di Docker) — tetap hijau tanpa perubahan perilaku.
 
 ## 4. Dashboard melakukan 8 query count terpisah untuk satu halaman (Consolidate Query / GROUP BY)
 
@@ -145,3 +145,36 @@ $summary = [
 **Kode mati yang ikut dibuang:** `Controller::withOldInputOnError`, `View::e`, cabang `default => 'bin'` yang tidak mungkin tercapai di `ProductService`, dan guard `file()` ganda di `Env::load`. Handler error bootstrap diekstrak menjadi `Response::serverError()` agar bisa diuji.
 
 **Validasi:** 166 test/903 assertion hijau (termasuk suite E2E yang membuktikan perilaku HTTP tidak berubah), PHPStan 0 error, PHPCS 0 error, SonarQube 0 isu, 0% duplikasi, coverage 100%.
+
+## 7. Service bergantung pada PDO untuk transaksi (Extract Interface + Remove Parameter)
+
+**Code smell:** `SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor hanya untuk `beginTransaction/commit/rollBack`, lalu meneruskannya sebagai parameter ke metode repository (`lockForUpdate($pdo, ...)`, `record($entry, $pdo)`, `updateStatus(..., $pdo)`, `updateItemReceived(..., $pdo)`). Detail teknologi penyimpanan bocor ke lapisan business logic dan membuat unit test memakai `PDO` palsu (sqlite/mock) hanya agar transaksi bisa berjalan.
+
+**Teknik:** Extract Interface (`TransactionManagerInterface::run(callable)` dengan implementasi `PdoTransactionManager` dan `InMemoryTransactionManager`), Remove Parameter (parameter `PDO` dihapus dari interface dan implementasi repository), serta Extract Method (`fulfill()` dipecah menjadi `assertStockAvailable()` dan `issueStock()`; `receiveGoods()` memakai `receiveLine()`).
+
+**Sebelum (representatif):**
+```php
+$this->pdo->beginTransaction();
+try {
+    $available = $this->stocks->lockForUpdate($this->pdo, $item->productId, $so->warehouseId);
+    // ... decrement, $this->ledger->record($entry, $this->pdo) ...
+    $this->pdo->commit();
+} catch (Throwable $e) {
+    $this->pdo->rollBack();
+    throw $e;
+}
+```
+
+**Sesudah (kode nyata di `app/Service/SalesOrderService.php`):**
+```php
+return $this->transactions->run(function () use ($so, $userId): SalesOrder {
+    $this->assertStockAvailable($so);   // lockForUpdate per item, gagal sebelum menulis apa pun
+    $this->issueStock($so, $userId);    // decrement + ledger
+    $this->salesOrders->updateStatus((int) $so->id, SalesOrder::STATUS_FULFILLED);
+    $so->status = SalesOrder::STATUS_FULFILLED;
+
+    return $so;
+});
+```
+
+**Validasi:** seluruh test integration terhadap MySQL asli (rollback saat gagal, goods issue kedua ditolak, partial/full receipt) tetap lulus; unit test kini membuktikan commit/rollback lewat `InMemoryTransactionManager` tanpa database; `ArchitectureTest` mencegah `PDO`, session, atau superglobal masuk ke `app/Service`. 252 test, coverage 100%.

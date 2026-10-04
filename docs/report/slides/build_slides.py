@@ -256,16 +256,16 @@ def main():
     d.card(MX, top, 570, 390, CODE_BG, CODE_BG)
     lines = [
         ('c', '// SalesOrderService::fulfill()'),
-        ('', '$pdo->beginTransaction();'),
-        ('', 'foreach ($items as $item) {'),
-        ('', '  $available = $stocks->lockForUpdate(...);'),
-        ('c', '  // SELECT quantity ... FOR UPDATE'),
-        ('', '  if ($available < $item->qty) {'),
-        ('', '    throw InsufficientStockException;'),
+        ('', 'return $this->transactions->run(function () {'),
+        ('', '  foreach ($so->items as $item) {'),
+        ('', '    $available = $stocks->lockForUpdate(...);'),
+        ('c', '    // SELECT quantity ... FOR UPDATE'),
+        ('', '    if ($available < $item->qty) {'),
+        ('', '      throw InsufficientStockException;'),
+        ('', '    }'),
         ('', '  }'),
-        ('', '}'),
-        ('c', '// decrement + tulis stock_ledger'),
-        ('', '$pdo->commit();   // gagal → rollBack()'),
+        ('c', '  // decrement + stock_ledger + status'),
+        ('', '});  // sukses: commit, gagal: rollBack'),
     ]
     ly = top - 36
     for kind, text in lines:
@@ -277,6 +277,7 @@ def main():
         '<b>Pessimistic row lock</b> InnoDB: dua goods issue pada produk dan gudang yang sama dipaksa antre.',
         'Cek stok dilakukan <b>setelah</b> lock, sehingga hasilnya tidak basi.',
         'Kekurangan di satu item <b>membatalkan seluruh transaksi</b>: tidak ada stok setengah berkurang.',
+        f'Service memakai {code("TransactionManagerInterface")}, tanpa {code("PDO")} sama sekali (ADR-005).',
         'Terbukti lewat integration test terhadap MySQL asli dan test E2E.',
         f'Keputusan dan alternatif: {code("ADR-002")}'],
         680, top - 8, 525, size=19, gap=13)
@@ -319,7 +320,7 @@ def main():
 
     # 8 ── quality evidence ───────────────────────────────────────────
     d.new('04 · Bukti kualitas', 'Test dan SonarQube')
-    stats = [('246', 'test lulus, 1.197 assertion\nUnit 124 · Integration 9 · E2E 113'),
+    stats = [('252', 'test lulus, 1.216 assertion\nUnit 130 · Integration 9 · E2E 113'),
              ('100%', 'line coverage\n(semua baris ter-cover)'),
              ('0', 'isu terbuka: bug, vulnerability,\nsmell, hotspot'),
              ('0%', 'duplikasi kode\nquality gate: Passed')]

@@ -1,4 +1,4 @@
-# Hasil test (Unit + Integration + E2E) — 2026-10-03 09:39 WIB
+# Hasil test (Unit + Integration + E2E) — 2026-10-03 10:21 WIB
 # Perintah: composer coverage   (scripts/coverage.sh --testdox)
 
 PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
@@ -6,12 +6,18 @@ PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
 Runtime:       PHP 8.4.8 with Xdebug 3.4.2
 Configuration: /Users/Expiro/Project/ioms/phpunit.xml
 
-...............................................................  63 / 246 ( 25%)
-............................................................... 126 / 246 ( 51%)
-............................................................... 189 / 246 ( 76%)
-.........................................................       246 / 246 (100%)
+...............................................................  63 / 252 ( 25%)
+............................................................... 126 / 252 ( 50%)
+............................................................... 189 / 252 ( 75%)
+............................................................... 252 / 252 (100%)
 
-Time: 04:04.905, Memory: 25.00 MB
+
+Time: 04:11.282, Memory: 25.00 MB
+
+Architecture (Tests\Unit\Architecture)
+ ✔ Services do not depend on pdo session or superglobals
+ ✔ Guard actually detects forbidden references
+ ✔ Repository interfaces do not expose pdo
 
 Auth E2E (Tests\E2E\AuthE2E)
  ✔ Login page is shown to guests and root redirects to itself
@@ -318,10 +324,15 @@ Session Hardening (Tests\Unit\SessionHardening)
  ✔ Refresh signs out deactivated and deleted users
  ✔ Refresh applies role changes immediately
 
+Transaction Manager (Tests\Unit\TransactionManager)
+ ✔ Pdo manager commits when the work succeeds and returns its result
+ ✔ Pdo manager rolls back everything and rethrows when the work fails
+ ✔ In memory manager counts commits and rollbacks
+
 Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
  ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
 
-OK (246 tests, 1197 assertions)
+OK (252 tests, 1216 assertions)
 
 
 Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)

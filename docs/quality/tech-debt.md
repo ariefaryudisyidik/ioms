@@ -20,7 +20,7 @@ Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02 
 
 13. **Risiko keamanan yang tersisa** (rinci di `docs/quality/security-review.md`): TLS tidak disediakan compose; akun demo di seed; token CSRF per-sesi; tanpa MFA; harga jual SO diisi Sales tanpa batas kewenangan diskon; gambar lama tidak dihapus saat diganti.
 
-14. **Service bergantung pada `PDO` untuk transaksi.** `SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor hanya untuk `beginTransaction/commit/rollBack` (dan meneruskannya ke metode repository yang bertipe `PDO`). Constructor injection terpenuhi dan SQL tetap di Repository, tetapi bentuk yang lebih murni adalah antarmuka `TransactionManager` yang menyembunyikan `PDO` dari Service. Ditunda karena perubahan menyentuh seluruh interface repository dan unit test.
+14. ~~**Service bergantung pada `PDO` untuk transaksi.**~~ **Sudah dilunasi 2026-10-03 (ADR-005):** Service kini memakai `TransactionManagerInterface`; catatan lama di bawah dipertahankan sebagai riwayat. Semula: `SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor hanya untuk `beginTransaction/commit/rollBack` (dan meneruskannya ke metode repository yang bertipe `PDO`). Constructor injection terpenuhi dan SQL tetap di Repository, tetapi bentuk yang lebih murni adalah antarmuka `TransactionManager` yang menyembunyikan `PDO` dari Service. Ditunda karena perubahan menyentuh seluruh interface repository dan unit test.
 15. **Tidak ada halaman profil sendiri.** Brief menyebut "profil sendiri" pada matriks peran, tetapi tidak ada requirement fungsional untuk halaman profil; user melihat nama dan role di header, dan password hanya diubah oleh Admin.
 
 ## Rencana Perbaikan ke Depan

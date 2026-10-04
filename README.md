@@ -118,7 +118,7 @@ Produksi: pasang TLS di depan aplikasi (reverse proxy), ganti semua kredensial d
 ## Dokumentasi
 
 - Perencanaan: `docs/planning/` (user story, scope, ERD, class diagram awal, backlog)
-- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock, ADR strategi test E2E/coverage, ADR kontrol keamanan)
+- Arsitektur: `docs/architecture/` (class diagram as-built, ADR repository pattern, ADR concurrency-safe stock, ADR strategi test E2E/coverage, ADR kontrol keamanan, ADR TransactionManager)
 - Kualitas kode: `docs/quality/` (refactor log, audit SRP, tech debt, critique, laporan static analysis, laporan SonarQube, tinjauan keamanan)
 - Testing: `docs/testing/` (skenario test, known bugs)
 - Disclosure penggunaan AI: `ai-usage-log.md`
@@ -156,7 +156,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 246 test lulus (1197 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 252 test lulus (1216 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 

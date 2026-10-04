@@ -1,9 +1,9 @@
-=== PHPStan level 5 (composer stan) — 2026-10-03 09:43 WIB ===
+=== PHPStan level 5 (composer stan) — 2026-10-03 10:26 WIB ===
  [OK] No errors                                                                 
 
-=== PHPCS PSR-12 (phpcs.xml) — 2026-10-03 09:43 WIB ===
-.......[33mW[0m.[33mW[0m..[33mW[0m.[33mW[0m.[33mW[0m..[33mW[0m......[33mW[0m....[33mW[0m.[33mW[0m.......................... 60 / 83 (72%)
-....[33mW[0m[33mW[0m.....[33mW[0m...[33mW[0m[33mW[0m[33mW[0m.....                                      83 / 83 (100%)
+=== PHPCS PSR-12 (phpcs.xml) — 2026-10-03 10:26 WIB ===
+.......[33mW[0m.[33mW[0m...[33mW[0m.[33mW[0m..[33mW[0m..[33mW[0m......[33mW[0m.....[33mW[0m.[33mW[0m....................... 60 / 86 (70%)
+.......[33mW[0m[33mW[0m.....[33mW[0m...[33mW[0m[33mW[0m[33mW[0m.....                                   86 / 86 (100%)
 
 
 
@@ -27,7 +27,7 @@
 --------------------------------------------------------------------------------
 [1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
 --------------------------------------------------------------------------------
- 28 | [33mWARNING[0m | Line exceeds 120 characters; contains 165 characters
+ 27 | [33mWARNING[0m | Line exceeds 120 characters; contains 165 characters
 --------------------------------------------------------------------------------
 
 
@@ -57,7 +57,7 @@
 --------------------------------------------------------------------------------
 [1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
 --------------------------------------------------------------------------------
- 28 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+ 27 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
 --------------------------------------------------------------------------------
 
 
@@ -65,7 +65,7 @@
 --------------------------------------------------------------------------------
 [1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
 --------------------------------------------------------------------------------
- 15 | [33mWARNING[0m | Line exceeds 120 characters; contains 142 characters
+ 14 | [33mWARNING[0m | Line exceeds 120 characters; contains 142 characters
 --------------------------------------------------------------------------------
 
 
@@ -89,7 +89,7 @@
 ----------------------------------------------------------------------
 [1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
 ----------------------------------------------------------------------
- 26 | [33mWARNING[0m | Line exceeds 120 characters; contains 133 characters
+ 25 | [33mWARNING[0m | Line exceeds 120 characters; contains 133 characters
 ----------------------------------------------------------------------
 
 
@@ -136,10 +136,10 @@
 ----------------------------------------------------------------------
 [1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
 ----------------------------------------------------------------------
- 24 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+ 23 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
 ----------------------------------------------------------------------
 
-Time: 2.36 secs; Memory: 10MB
+Time: 2.84 secs; Memory: 10MB
 
 
 === SonarQube (lihat docs/quality/sonarqube-report.md) ===

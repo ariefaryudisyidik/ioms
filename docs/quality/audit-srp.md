@@ -13,6 +13,8 @@ Saat ini keempat tanggung jawab tersebut hidup berdampingan dalam satu class den
 
 > **Pembaruan 2026-10-03:** validasi item di `create()` sudah diekstrak ke method privat `validateItems()` (menurunkan kompleksitas kognitif di bawah ambang SonarQube), tetapi keempat tanggung jawab di atas masih berada dalam satu kelas. Pemecahan penuh tetap ditunda sampai kompleksitas bertambah (lihat rencana di bawah).
 
+> **Pembaruan 2026-10-03:** constructor `SalesOrderService` sekarang menerima `TransactionManagerInterface` (bukan `PDO`), dan `fulfill()` dipecah menjadi `assertStockAvailable()` dan `issueStock()` di dalam satu unit kerja transaksional. Empat tanggung jawab di atas masih berada di satu kelas.
+
 ## Dampak jika dibiarkan tumbuh
 
 Untuk skala saat ini (6 method, ~255 baris) kelas ini masih dapat dibaca dan diuji dalam satu file, sehingga belum "harus" dipecah segera. Namun risiko yang mulai terlihat:

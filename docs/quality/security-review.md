@@ -37,7 +37,7 @@ Tanggal: 2026-10-03. Cakupan: seluruh kode aplikasi (`app/`, `views/`, `public/`
 ## Cara memverifikasi
 
 ```bash
-composer coverage                                  # 246 test, termasuk SecurityE2ETest (CSRF, header, lockout, sesi, IDOR, CSV, upload, ...)
+composer coverage                                  # 252 test, termasuk SecurityE2ETest (CSRF, header, lockout, sesi, IDOR, CSV, upload, ...)
 curl -sI http://localhost:8080/login               # header keamanan, tanpa X-Powered-By
 curl -s -o /dev/null -w "%{http_code}\n" -d 'email=a&password=b' http://localhost:8080/login   # 403 tanpa token CSRF
 ```

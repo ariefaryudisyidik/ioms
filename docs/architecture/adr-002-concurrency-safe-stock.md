@@ -17,10 +17,10 @@ Alternatif yang dipertimbangkan:
 
 Menggunakan **pessimistic row lock** lewat `SELECT ... FOR UPDATE`, diimplementasikan di:
 
-- `App\Repository\MySqlProductStockRepository::lockForUpdate(PDO $pdo, int $productId, int $warehouseId): int` — memastikan baris `product_stocks` untuk kombinasi produk+gudang tersebut ada (`INSERT ... ON DUPLICATE KEY UPDATE product_id = product_id` agar baris bisa dikunci secara deterministik walau qty masih 0), lalu menjalankan `SELECT quantity FROM product_stocks WHERE product_id = ? AND warehouse_id = ? FOR UPDATE` dan mengembalikan kuantitas yang terkunci.
-- `App\Service\SalesOrderService::fulfill(int $soId, int $userId)` — membungkus seluruh proses dalam satu transaksi PDO (`$this->pdo->beginTransaction()` ... `commit()`/`rollBack()`):
+- `App\Repository\MySqlProductStockRepository::lockForUpdate(int $productId, int $warehouseId): int` — memastikan baris `product_stocks` untuk kombinasi produk+gudang tersebut ada (`INSERT ... ON DUPLICATE KEY UPDATE product_id = product_id` agar baris bisa dikunci secara deterministik walau qty masih 0), lalu menjalankan `SELECT quantity FROM product_stocks WHERE product_id = ? AND warehouse_id = ? FOR UPDATE` dan mengembalikan kuantitas yang terkunci.
+- `App\Service\SalesOrderService::fulfill(int $soId, int $userId)` — membungkus seluruh proses dalam satu unit kerja transaksional lewat `TransactionManagerInterface::run()` (implementasi `PdoTransactionManager`: `beginTransaction()`, lalu `commit()` bila selesai atau `rollBack()` bila ada exception; lihat ADR-005):
   1. Untuk setiap item SO, panggil `lockForUpdate()` untuk mengunci baris stok terkait dan membaca `$available`.
-  2. Jika `$available < $item->qty`, lempar `InsufficientStockException::forProduct(...)` — transaksi otomatis di-`rollBack()` di blok `catch (Throwable $e)`, tidak ada perubahan stok yang tertulis.
+  2. Jika `$available < $item->qty`, lempar `InsufficientStockException::forProduct(...)` — transaksi otomatis di-`rollBack()` oleh `PdoTransactionManager`, tidak ada perubahan stok yang tertulis.
   3. Jika semua item lolos verifikasi, baru dijalankan `decrement()` per item dan pencatatan `StockLedger` (`movementType: StockLedger::TYPE_ISSUE`), lalu `updateStatus(... STATUS_FULFILLED ...)`, dan `commit()`.
 
 Karena lock diambil untuk **semua item lebih dulu** sebelum ada decrement yang ditulis, transaksi lain yang mencoba fulfill SO berbeda namun menyentuh produk/gudang yang sama akan diblokir oleh InnoDB pada baris yang sama hingga transaksi pertama commit/rollback — mencegah dua transaksi membaca stok "available" yang sama secara bersamaan (mencegah oversell).
@@ -30,7 +30,7 @@ Karena lock diambil untuk **semua item lebih dulu** sebelum ada decrement yang d
 **Positif:**
 - Stok tidak pernah menjadi negatif secara logis (diperkuat pula oleh `CHECK (quantity >= 0)` di skema sebagai lapisan pertahanan kedua).
 - Tidak perlu logic retry di level aplikasi — MySQL yang menangani antrean lock.
-- Konsisten dengan pola yang sama dipakai untuk goods receipt (`PurchaseOrderService::receiveGoods`), yang juga membungkus update `qty_received`, `product_stocks`, dan `stock_ledger` dalam satu transaksi PDO (meski `receiveGoods` menambah stok/`increment`, sehingga risiko race condition lebih rendah karena tidak ada batas bawah yang bisa dilanggar — namun tetap transaksional demi konsistensi ledger vs stok).
+- Konsisten dengan pola yang sama dipakai untuk goods receipt (`PurchaseOrderService::receiveGoods`), yang juga membungkus update `qty_received`, `product_stocks`, dan `stock_ledger` dalam satu unit kerja transaksional (meski `receiveGoods` menambah stok/`increment`, sehingga risiko race condition lebih rendah karena tidak ada batas bawah yang bisa dilanggar — namun tetap transaksional demi konsistensi ledger vs stok).
 
 **Negatif / trade-off:**
 - Row lock menahan koneksi DB lebih lama selama transaksi berjalan; pada beban sangat tinggi dengan banyak SO memperebutkan produk populer yang sama, bisa terjadi antrean lock (lock wait), dan berpotensi `Lock wait timeout` jika transaksi lain macet — namun untuk skala IOMS (aplikasi internal, bukan e-commerce publik), ini dianggap dapat diterima.
