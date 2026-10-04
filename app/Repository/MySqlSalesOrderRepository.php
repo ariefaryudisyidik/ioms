@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\SalesOrder;
 use App\Entity\SalesOrderItem;
-use PDO;
 
 final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements SalesOrderRepositoryInterface
 {
@@ -134,19 +133,18 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
         return array_map(fn ($r) => SalesOrderItem::fromRow($r), $rows);
     }
 
-    public function updateStatus(int $soId, string $status, ?int $approvedBy = null, ?PDO $pdo = null): void
+    public function updateStatus(int $soId, string $status, ?int $approvedBy = null): void
     {
         if ($approvedBy !== null) {
             $this->execute(
                 'UPDATE sales_orders SET status = ?, approved_by = ? WHERE id = ?',
-                [$status, $approvedBy, $soId],
-                $pdo
+                [$status, $approvedBy, $soId]
             );
 
             return;
         }
 
-        $this->execute('UPDATE sales_orders SET status = ? WHERE id = ?', [$status, $soId], $pdo);
+        $this->execute('UPDATE sales_orders SET status = ? WHERE id = ?', [$status, $soId]);
     }
 
     public function countsByStatus(?int $createdBy = null): array

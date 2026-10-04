@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\ProductStock;
-use PDO;
 
 interface ProductStockRepositoryInterface
 {
@@ -22,9 +21,9 @@ interface ProductStockRepositoryInterface
     /**
      * Lock the row for update within an already-open transaction and
      * return the current quantity (0 if the row does not yet exist).
-     * Must be called with an active transaction on the given PDO.
+     * Must be called inside TransactionManagerInterface::run() so the lock is held until commit.
      */
-    public function lockForUpdate(PDO $pdo, int $productId, int $warehouseId): int;
+    public function lockForUpdate(int $productId, int $warehouseId): int;
 
     /**
      * Increase stock (upsert). Used for goods receipt.

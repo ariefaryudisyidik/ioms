@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\PurchaseOrder;
 use App\Entity\PurchaseOrderItem;
-use PDO;
 
 final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository implements PurchaseOrderRepositoryInterface
 {
@@ -136,13 +135,13 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
         return array_map(fn ($r) => PurchaseOrderItem::fromRow($r), $rows);
     }
 
-    public function updateItemReceived(int $itemId, int $qtyReceived, ?PDO $pdo = null): void
+    public function updateItemReceived(int $itemId, int $qtyReceived): void
     {
-        $this->execute('UPDATE purchase_order_items SET qty_received = ? WHERE id = ?', [$qtyReceived, $itemId], $pdo);
+        $this->execute('UPDATE purchase_order_items SET qty_received = ? WHERE id = ?', [$qtyReceived, $itemId]);
     }
 
-    public function updateStatus(int $poId, string $status, ?PDO $pdo = null): void
+    public function updateStatus(int $poId, string $status): void
     {
-        $this->execute('UPDATE purchase_orders SET status = ? WHERE id = ?', [$status, $poId], $pdo);
+        $this->execute('UPDATE purchase_orders SET status = ? WHERE id = ?', [$status, $poId]);
     }
 }

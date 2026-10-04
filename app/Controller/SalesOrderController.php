@@ -12,6 +12,7 @@ use App\Repository\MySqlProductStockRepository;
 use App\Repository\MySqlSalesOrderRepository;
 use App\Repository\MySqlStockLedgerRepository;
 use App\Repository\MySqlWarehouseRepository;
+use App\Repository\PdoTransactionManager;
 use App\Service\Exception\AuthorizationException;
 use App\Service\SalesOrderService;
 
@@ -25,7 +26,7 @@ final class SalesOrderController extends Controller
             new MySqlSalesOrderRepository($this->pdo()),
             new MySqlProductStockRepository($this->pdo()),
             new MySqlStockLedgerRepository($this->pdo()),
-            $this->pdo(),
+            new PdoTransactionManager($this->pdo()),
         );
     }
 

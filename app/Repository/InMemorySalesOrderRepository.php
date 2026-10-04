@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\SalesOrder;
 use App\Entity\SalesOrderItem;
-use PDO;
 
 final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterface
 {
@@ -93,7 +92,7 @@ final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterfac
         return array_values(array_filter($this->items, fn ($i) => $i->salesOrderId === $soId));
     }
 
-    public function updateStatus(int $soId, string $status, ?int $approvedBy = null, ?PDO $pdo = null): void
+    public function updateStatus(int $soId, string $status, ?int $approvedBy = null): void
     {
         if (isset($this->orders[$soId])) {
             $this->orders[$soId]->status = $status;

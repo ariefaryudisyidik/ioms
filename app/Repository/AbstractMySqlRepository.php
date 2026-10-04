@@ -48,19 +48,18 @@ abstract class AbstractMySqlRepository
     }
 
     /** @param array<int|string, mixed> $params */
-    protected function execute(string $sql, array $params, ?PDO $conn = null): void
+    protected function execute(string $sql, array $params): void
     {
-        $stmt = ($conn ?? $this->pdo)->prepare($sql);
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
     }
 
     /** @param array<int|string, mixed> $params */
-    protected function insert(string $sql, array $params, ?PDO $conn = null): int
+    protected function insert(string $sql, array $params): int
     {
-        $conn ??= $this->pdo;
-        $this->execute($sql, $params, $conn);
+        $this->execute($sql, $params);
 
-        return (int) $conn->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     protected function valueExists(string $table, string $column, string $value): bool

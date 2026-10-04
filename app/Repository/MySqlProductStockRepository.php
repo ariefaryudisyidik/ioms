@@ -55,11 +55,11 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
         return (int) $stmt->fetchColumn();
     }
 
-    public function lockForUpdate(PDO $pdo, int $productId, int $warehouseId): int
+    public function lockForUpdate(int $productId, int $warehouseId): int
     {
-        $this->ensureRowExists($pdo, $productId, $warehouseId);
+        $this->ensureRowExists($productId, $warehouseId);
 
-        $stmt = $pdo->prepare(
+        $stmt = $this->pdo->prepare(
             'SELECT quantity FROM product_stocks WHERE product_id = ? AND warehouse_id = ? FOR UPDATE'
         );
         $stmt->execute([$productId, $warehouseId]);
@@ -85,9 +85,9 @@ final class MySqlProductStockRepository implements ProductStockRepositoryInterfa
      * future caller needing the same guarantee does not duplicate the
      * upsert-with-no-op pattern (see docs/quality/refactor-log.md #3).
      */
-    private function ensureRowExists(PDO $pdo, int $productId, int $warehouseId): void
+    private function ensureRowExists(int $productId, int $warehouseId): void
     {
-        $insert = $pdo->prepare(
+        $insert = $this->pdo->prepare(
             'INSERT INTO product_stocks (product_id, warehouse_id, quantity)
              VALUES (?, ?, 0)
              ON DUPLICATE KEY UPDATE product_id = product_id'

@@ -10,11 +10,10 @@ use App\Entity\StockLedger;
 use App\Repository\ProductStockRepositoryInterface;
 use App\Repository\PurchaseOrderRepositoryInterface;
 use App\Repository\StockLedgerRepositoryInterface;
+use App\Repository\TransactionManagerInterface;
 use App\Service\Exception\InvalidStatusTransitionException;
 use App\Service\Exception\ValidationException;
 use DateTimeImmutable;
-use PDO;
-use Throwable;
 
 final class PurchaseOrderService
 {
@@ -31,7 +30,7 @@ final class PurchaseOrderService
         private PurchaseOrderRepositoryInterface $purchaseOrders,
         private ProductStockRepositoryInterface $stocks,
         private StockLedgerRepositoryInterface $ledger,
-        private PDO $pdo,
+        private TransactionManagerInterface $transactions,
         /** Tolerance in days for how far in the future an order_date may be. */
         private int $futureDateToleranceDays = 0,
     ) {
@@ -184,61 +183,56 @@ final class PurchaseOrderService
             $itemsById[$poItem->id] = $poItem;
         }
 
-        $this->pdo->beginTransaction();
-
-        try {
-            $allFullyReceived = true;
-
+        return $this->transactions->run(function () use ($po, $itemsById, $items, $userId): PurchaseOrder {
             foreach ($items as $received) {
-                $itemId = (int) $received['item_id'];
-                $qty = (int) $received['qty'];
-
-                if ($qty <= 0 || !isset($itemsById[$itemId])) {
-                    continue;
-                }
-
-                $poItem = $itemsById[$itemId];
-                $newReceived = min($poItem->qtyOrdered, $poItem->qtyReceived + $qty);
-                $actualAdded = $newReceived - $poItem->qtyReceived;
-
-                if ($actualAdded <= 0) {
-                    continue;
-                }
-
-                $this->purchaseOrders->updateItemReceived($itemId, $newReceived, $this->pdo);
-
-                $this->ledger->record(new StockLedger(
-                    id: null,
-                    productId: $poItem->productId,
-                    warehouseId: $po->warehouseId,
-                    movementType: StockLedger::TYPE_RECEIPT,
-                    quantity: $actualAdded,
-                    referenceType: 'purchase_order',
-                    referenceId: $po->id,
-                    performedBy: $userId,
-                ), $this->pdo);
-
-                $this->stocks->increment($poItem->productId, $po->warehouseId, $actualAdded);
-
-                $poItem->qtyReceived = $newReceived;
+                $this->receiveLine($po, $itemsById, (int) $received['item_id'], (int) $received['qty'], $userId);
             }
 
-            foreach ($itemsById as $poItem) {
-                if ($poItem->qtyReceived < $poItem->qtyOrdered) {
-                    $allFullyReceived = false;
-                }
-            }
-
+            $allFullyReceived = array_reduce(
+                $itemsById,
+                static fn (bool $all, PurchaseOrderItem $line): bool => $all && $line->qtyReceived >= $line->qtyOrdered,
+                true
+            );
             $newStatus = $allFullyReceived ? PurchaseOrder::STATUS_RECEIVED : PurchaseOrder::STATUS_PARTIALLY_RECEIVED;
-            $this->purchaseOrders->updateStatus($poId, $newStatus, $this->pdo);
+            $this->purchaseOrders->updateStatus((int) $po->id, $newStatus);
             $po->status = $newStatus;
 
-            $this->pdo->commit();
-        } catch (Throwable $e) {
-            $this->pdo->rollBack();
-            throw $e;
+            return $po;
+        });
+    }
+
+    /**
+     * Applies one received quantity: caps it at what is still outstanding,
+     * then updates the item, writes the Receipt ledger row, and adds stock.
+     *
+     * @param array<int,PurchaseOrderItem> $itemsById
+     */
+    private function receiveLine(PurchaseOrder $po, array $itemsById, int $itemId, int $qty, int $userId): void
+    {
+        if ($qty <= 0 || !isset($itemsById[$itemId])) {
+            return;
         }
 
-        return $po;
+        $poItem = $itemsById[$itemId];
+        $newReceived = min($poItem->qtyOrdered, $poItem->qtyReceived + $qty);
+        $actualAdded = $newReceived - $poItem->qtyReceived;
+        if ($actualAdded <= 0) {
+            return;
+        }
+
+        $this->purchaseOrders->updateItemReceived($itemId, $newReceived);
+        $this->ledger->record(new StockLedger(
+            id: null,
+            productId: $poItem->productId,
+            warehouseId: $po->warehouseId,
+            movementType: StockLedger::TYPE_RECEIPT,
+            quantity: $actualAdded,
+            referenceType: 'purchase_order',
+            referenceId: $po->id,
+            performedBy: $userId,
+        ));
+        $this->stocks->increment($poItem->productId, $po->warehouseId, $actualAdded);
+
+        $poItem->qtyReceived = $newReceived;
     }
 }

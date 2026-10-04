@@ -10,12 +10,11 @@ use App\Entity\StockLedger;
 use App\Repository\ProductStockRepositoryInterface;
 use App\Repository\SalesOrderRepositoryInterface;
 use App\Repository\StockLedgerRepositoryInterface;
+use App\Repository\TransactionManagerInterface;
 use App\Service\Exception\AuthorizationException;
 use App\Service\Exception\InsufficientStockException;
 use App\Service\Exception\InvalidStatusTransitionException;
 use App\Service\Exception\ValidationException;
-use PDO;
-use Throwable;
 
 final class SalesOrderService
 {
@@ -33,7 +32,7 @@ final class SalesOrderService
         private SalesOrderRepositoryInterface $salesOrders,
         private ProductStockRepositoryInterface $stocks,
         private StockLedgerRepositoryInterface $ledger,
-        private PDO $pdo,
+        private TransactionManagerInterface $transactions,
     ) {
     }
 
@@ -193,11 +192,11 @@ final class SalesOrderService
     }
 
     /**
-     * Goods issue: Approved -> Fulfilled. Runs in a single PDO transaction
-     * that locks each affected product_stocks row with SELECT ... FOR
-     * UPDATE, verifies sufficient quantity, and only then decrements stock
-     * and writes the ledger. Any shortage rolls the whole transaction back
-     * and throws InsufficientStockException.
+     * Goods issue: Approved -> Fulfilled. Runs as one transaction that locks
+     * each affected product_stocks row (SELECT ... FOR UPDATE), verifies
+     * sufficient quantity, and only then decrements stock and writes the
+     * ledger. Any shortage rolls the whole transaction back and throws
+     * InsufficientStockException.
      */
     public function fulfill(int $soId, int $userId): SalesOrder
     {
@@ -208,42 +207,48 @@ final class SalesOrderService
 
         $this->assertTransition($so->status, SalesOrder::STATUS_FULFILLED);
 
-        $this->pdo->beginTransaction();
+        return $this->transactions->run(function () use ($so, $userId): SalesOrder {
+            $this->assertStockAvailable($so);
+            $this->issueStock($so, $userId);
 
-        try {
-            foreach ($so->items as $item) {
-                $available = $this->stocks->lockForUpdate($this->pdo, $item->productId, $so->warehouseId);
-
-                if ($available < $item->qty) {
-                    throw InsufficientStockException::forProduct($item->productId, $item->qty, $available);
-                }
-            }
-
-            foreach ($so->items as $item) {
-                $this->stocks->decrement($item->productId, $so->warehouseId, $item->qty);
-
-                $this->ledger->record(new StockLedger(
-                    id: null,
-                    productId: $item->productId,
-                    warehouseId: $so->warehouseId,
-                    movementType: StockLedger::TYPE_ISSUE,
-                    quantity: $item->qty,
-                    referenceType: 'sales_order',
-                    referenceId: $so->id,
-                    performedBy: $userId,
-                ), $this->pdo);
-            }
-
-            $this->salesOrders->updateStatus($soId, SalesOrder::STATUS_FULFILLED, null, $this->pdo);
+            $this->salesOrders->updateStatus((int) $so->id, SalesOrder::STATUS_FULFILLED);
             $so->status = SalesOrder::STATUS_FULFILLED;
 
-            $this->pdo->commit();
-        } catch (Throwable $e) {
-            $this->pdo->rollBack();
-            throw $e;
-        }
+            return $so;
+        });
+    }
 
-        return $so;
+    /**
+     * Locks every affected stock row and fails before anything is written
+     * when one of them cannot cover its item.
+     */
+    private function assertStockAvailable(SalesOrder $so): void
+    {
+        foreach ($so->items as $item) {
+            $available = $this->stocks->lockForUpdate($item->productId, $so->warehouseId);
+
+            if ($available < $item->qty) {
+                throw InsufficientStockException::forProduct($item->productId, $item->qty, $available);
+            }
+        }
+    }
+
+    private function issueStock(SalesOrder $so, int $userId): void
+    {
+        foreach ($so->items as $item) {
+            $this->stocks->decrement($item->productId, $so->warehouseId, $item->qty);
+
+            $this->ledger->record(new StockLedger(
+                id: null,
+                productId: $item->productId,
+                warehouseId: $so->warehouseId,
+                movementType: StockLedger::TYPE_ISSUE,
+                quantity: $item->qty,
+                referenceType: 'sales_order',
+                referenceId: $so->id,
+                performedBy: $userId,
+            ));
+        }
     }
 
     private function assertTransition(string $from, string $to): void

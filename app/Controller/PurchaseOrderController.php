@@ -12,6 +12,7 @@ use App\Repository\MySqlPurchaseOrderRepository;
 use App\Repository\MySqlStockLedgerRepository;
 use App\Repository\MySqlSupplierRepository;
 use App\Repository\MySqlWarehouseRepository;
+use App\Repository\PdoTransactionManager;
 use App\Service\PurchaseOrderService;
 
 final class PurchaseOrderController extends Controller
@@ -24,7 +25,7 @@ final class PurchaseOrderController extends Controller
             new MySqlPurchaseOrderRepository($this->pdo()),
             new MySqlProductStockRepository($this->pdo()),
             new MySqlStockLedgerRepository($this->pdo()),
-            $this->pdo(),
+            new PdoTransactionManager($this->pdo()),
         );
     }
 

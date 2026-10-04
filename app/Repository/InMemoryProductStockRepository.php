@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\ProductStock;
-use PDO;
 
 /**
  * In-memory fake for ProductStockRepositoryInterface. Locking is simulated
@@ -85,7 +84,7 @@ final class InMemoryProductStockRepository implements ProductStockRepositoryInte
         return $total;
     }
 
-    public function lockForUpdate(PDO $pdo, int $productId, int $warehouseId): int
+    public function lockForUpdate(int $productId, int $warehouseId): int
     {
         return $this->stocks[$this->key($productId, $warehouseId)] ?? 0;
     }

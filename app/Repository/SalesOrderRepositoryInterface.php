@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\SalesOrder;
 use App\Entity\SalesOrderItem;
-use PDO;
 
 interface SalesOrderRepositoryInterface
 {
@@ -39,7 +38,7 @@ interface SalesOrderRepositoryInterface
     /** @return SalesOrderItem[] */
     public function itemsFor(int $soId): array;
 
-    public function updateStatus(int $soId, string $status, ?int $approvedBy = null, ?PDO $pdo = null): void;
+    public function updateStatus(int $soId, string $status, ?int $approvedBy = null): void;
 
     /** @return array<string,int> */
     public function countsByStatus(?int $createdBy = null): array;

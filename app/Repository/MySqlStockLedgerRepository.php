@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\StockLedger;
-use PDO;
 
 final class MySqlStockLedgerRepository extends AbstractMySqlRepository implements StockLedgerRepositoryInterface
 {
@@ -17,7 +16,7 @@ final class MySqlStockLedgerRepository extends AbstractMySqlRepository implement
         [self::COL_DATE_TO, 'created_at <= ?', 'string', ' 23:59:59'],
     ];
 
-    public function record(StockLedger $entry, ?PDO $pdo = null): StockLedger
+    public function record(StockLedger $entry): StockLedger
     {
         $entry->id = $this->insert(
             'INSERT INTO stock_ledger (product_id, warehouse_id, movement_type, quantity, reference_type, reference_id,
@@ -31,8 +30,7 @@ final class MySqlStockLedgerRepository extends AbstractMySqlRepository implement
                 $entry->referenceType,
                 $entry->referenceId,
                 $entry->performedBy,
-            ],
-            $pdo
+            ]
         );
 
         return $entry;

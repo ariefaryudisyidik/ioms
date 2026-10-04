@@ -6,7 +6,6 @@ namespace App\Repository;
 
 use App\Entity\PurchaseOrder;
 use App\Entity\PurchaseOrderItem;
-use PDO;
 
 interface PurchaseOrderRepositoryInterface
 {
@@ -42,7 +41,7 @@ interface PurchaseOrderRepositoryInterface
     /** @return PurchaseOrderItem[] */
     public function itemsFor(int $poId): array;
 
-    public function updateItemReceived(int $itemId, int $qtyReceived, ?PDO $pdo = null): void;
+    public function updateItemReceived(int $itemId, int $qtyReceived): void;
 
-    public function updateStatus(int $poId, string $status, ?PDO $pdo = null): void;
+    public function updateStatus(int $poId, string $status): void;
 }
