@@ -100,26 +100,24 @@ def slides():
 <div style="position:absolute;right:-70px;top:96px;width:640px;transform:rotate(-3deg)">{browser('dashboard','localhost:8080/dashboard')}</div>
 <div style="width:600px;margin-top:70px"><div class="eyebrow">{ic('boxes',18)} Intermediate Programmer · Final Project</div>
 <h1>Inventory &amp; Order Management System</h1>
-<p style="font-size:21px">Stok multi-gudang yang bisa dipertanggungjawabkan, bahkan saat dua proses berjalan bersamaan.</p>
+<p style="font-size:21px">Stok multi-gudang yang konsisten, termasuk saat ada proses yang berjalan bersamaan.</p>
 <div style="margin-top:46px;display:flex;gap:44px;font-size:15px;color:#c7d6f5"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:18px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:18px">PT Neuronworks Indonesia</b></div><div>SESI<br><b style="color:#fff;font-size:18px">Rabu, 7 Oktober 2026</b></div></div></div></section>""")
     # 2 problem + roles
-    s.append(f"""<section class="slide"><div class="eyebrow">01 · Pembukaan</div><h2>Satu sistem, tiga peran, satu sumber kebenaran stok</h2>
-<p style="max-width:900px;margin-bottom:28px">Tim gudang dan sales perlu mencatat pembelian, penjualan, dan stok di beberapa gudang. Angka stok harus akurat, termasuk saat dua proses berjalan bersamaan.</p>
+    s.append(f"""<section class="slide"><div class="eyebrow">01 · Pembukaan</div><h2>Satu sistem, tiga peran, stok tercatat konsisten</h2>
+<p style="max-width:900px;margin-bottom:28px">Tim gudang dan sales mencatat pembelian, penjualan, dan stok di beberapa gudang. Angka stoknya perlu tetap konsisten, termasuk saat dua proses berjalan bersamaan.</p>
 <div class="grid3">
-<div class="card soft"><div class="badge-ic">{ic('user-cog',26)}</div><h3>Admin</h3><p style="font-size:16px">Kelola master data dan user. Satu-satunya peran yang boleh menyetujui SO, dan bukan SO miliknya sendiri.</p></div>
-<div class="card soft"><div class="badge-ic">{ic('shopping-cart',26)}</div><h3>Sales</h3><p style="font-size:16px">Membuat dan mengajukan Sales Order, hanya melihat SO miliknya, dan mengecek ketersediaan stok langsung.</p></div>
-<div class="card soft"><div class="badge-ic">{ic('warehouse',26)}</div><h3>Warehouse Staff</h3><p style="font-size:16px">Memproses penerimaan barang (PO) dan pengeluaran barang (SO); stok dan ledger terbarui atomik.</p></div></div>
-<div style="margin-top:26px"><span class="chip ok">{ic('check',16)} Semua fitur wajib selesai</span><span class="chip">PO + goods receipt</span><span class="chip">SO + approval + goods issue</span><span class="chip">Stock ledger</span><span class="chip">Laporan CSV</span><span class="chip">JSON endpoint</span><span class="chip">Dashboard per role</span></div>
+<div class="card soft"><div class="badge-ic">{ic('user-cog',26)}</div><h3>Admin</h3><p style="font-size:16px">Mengelola master data dan user. Satu-satunya yang boleh menyetujui SO, tapi tidak untuk SO buatannya sendiri.</p></div>
+<div class="card soft"><div class="badge-ic">{ic('shopping-cart',26)}</div><h3>Sales</h3><p style="font-size:16px">Membuat dan mengajukan SO, hanya bisa melihat SO miliknya sendiri, dan bisa cek stok langsung.</p></div>
+<div class="card soft"><div class="badge-ic">{ic('warehouse',26)}</div><h3>Warehouse Staff</h3><p style="font-size:16px">Memproses barang masuk (PO) dan barang keluar (SO); stok dan ledger ikut terupdate dalam satu transaksi.</p></div></div>
+<div style="margin-top:26px"><span class="chip ok">{ic('check',16)} Fitur wajib tersedia</span><span class="chip">PO + goods receipt</span><span class="chip">SO + approval + goods issue</span><span class="chip">Stock ledger</span><span class="chip">Laporan CSV</span><span class="chip">JSON endpoint</span><span class="chip">Dashboard per role</span></div>
 {foot(2)}</section>""")
     # 3 stack
-    s.append(f"""<section class="slide"><div class="eyebrow">01 · Pembukaan</div><h2>Dibangun tanpa framework, sesuai ketentuan brief</h2>
+    s.append(f"""<section class="slide"><div class="eyebrow">01 · Pembukaan</div><h2>Teknologi yang digunakan</h2>
 <div class="grid4">
 <div class="card"><div class="badge-ic">{ic('code-xml',26)}</div><h3>PHP 8.2 native</h3><p style="font-size:15px">OOP berlapis, tanpa framework dan ORM; PDO prepared statement.</p></div>
 <div class="card"><div class="badge-ic">{ic('database',26)}</div><h3>MySQL 8</h3><p style="font-size:15px">Relasi, constraint, index, transaksi eksplisit.</p></div>
 <div class="card"><div class="badge-ic">{ic('route',26)}</div><h3>Vanilla JS + Fetch</h3><p style="font-size:15px">HTML semantik, CSS buatan sendiri, ikon Lucide (SVG lokal).</p></div>
-<div class="card"><div class="badge-ic">{ic('container',26)}</div><h3>Docker Compose</h3><p style="font-size:15px">App (Apache non-root) + MySQL; schema dan seed otomatis.</p></div></div>
-<div class="row" style="margin-top:30px;align-items:center">
-<div class="grow card warn"><div style="display:flex;gap:14px;align-items:center">{ic('bot',30)}<div><h3>Transparansi AI</h3><p style="font-size:16px;color:#7c4a0a">Sebagian besar kode, test, dan dokumentasi dibuat dengan Claude Code. Saya mereview, memverifikasi, dan bertanggung jawab menjelaskannya (<code>ai-usage-log.md</code>).</p></div></div></div></div>
+<div class="card"><div class="badge-ic">{ic('container',26)}</div><h3>Docker Compose</h3><p style="font-size:15px">App (Apache non-root) + MySQL; schema dan seed jalan otomatis.</p></div></div>
 {foot(3)}</section>""")
     # 4 demo A
     s.append(f"""<section class="slide"><div class="eyebrow">02 · Demo A</div><h2>Purchase Order → penerimaan barang</h2>
@@ -128,16 +126,16 @@ def slides():
 <ul class="steps"><li><span class="num">1</span><span>Warehouse membuat PO (SKU-0001, qty 10) lalu klik <b>Order</b>.</span></li>
 <li><span class="num">2</span><span><b>Receive</b> sebagian (4) → status PartiallyReceived.</span></li>
 <li><span class="num">3</span><span>Stok produk naik 4 dan muncul baris <code>stock_ledger</code> tipe Receipt, semuanya dalam <b>satu transaksi</b>.</span></li></ul>
-<div class="card soft" style="margin-top:6px"><p style="font-size:15px;color:#1e3a8a">Bukti ditunjukkan langsung dari database, bukan hanya dari UI.</p></div></div>
+<div class="card soft" style="margin-top:6px"><p style="font-size:15px;color:#1e3a8a">Perubahan data ditampilkan langsung dari database.</p></div></div>
 <div class="grow">{browser('po','localhost:8080/purchase-orders')}</div></div>{foot(4)}</section>""")
     # 5 demo B
-    s.append(f"""<section class="slide"><div class="eyebrow">02 · Demo B</div><h2>Sales Order, approval, dan anti-oversell</h2>
+    s.append(f"""<section class="slide"><div class="eyebrow">02 · Demo B</div><h2>Sales Order, approval, dan validasi stok</h2>
 <div class="row"><div style="width:470px"><ul class="steps">
 <li><span class="num">1</span><span>Sales membuat SO; stok per gudang terisi lewat <b>Fetch API</b> tanpa reload.</span></li>
 <li><span class="num">2</span><span>Sales mencoba approve → server membalas <b>403</b>. Admin approve.</span></li>
 <li><span class="num">3</span><span>Warehouse <b>Fulfill</b> dengan qty melebihi stok → ditolak.</span></li>
 <li><span class="num">4</span><span>Stok dan ledger <b>tidak berubah</b> (rollback).</span></li></ul>
-<div class="card bad" style="display:flex;gap:12px;align-items:center;margin-top:8px">{ic('shield-check',28)}<p style="font-size:15px;color:#7f1d1d">Pemisahan tugas ditegakkan di server, bukan hanya disembunyikan di UI.</p></div></div>
+<div class="card bad" style="display:flex;gap:12px;align-items:center;margin-top:8px">{ic('shield-check',28)}<p style="font-size:15px;color:#7f1d1d">Pemisahan tugas dicek di sisi server.</p></div></div>
 <div class="grow">{browser('so-create','localhost:8080/sales-orders/create')}</div></div>{foot(5)}</section>""")
     # 6 architecture
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Arsitektur berlapis dengan Dependency Inversion</h2>
@@ -150,9 +148,9 @@ def slides():
 <div class="grid3" style="margin-top:34px">
 <div class="card"><h3>Service hanya tahu interface</h3><p style="font-size:15px">Diuji dengan <code>InMemory*Repository</code>, tanpa database (ADR-001).</p></div>
 <div class="card"><h3>Service bebas PDO</h3><p style="font-size:15px"><code>TransactionManagerInterface</code> membungkus commit/rollback (ADR-005), dijaga <code>ArchitectureTest</code>.</p></div>
-<div class="card"><h3>Error terpusat</h3><p style="font-size:15px">Exception domain dipetakan ke 422 / 403 / 409 / 500 tanpa membocorkan detail.</p></div></div>{foot(6)}</section>""")
+<div class="card"><h3>Error terpusat</h3><p style="font-size:15px">Exception domain diubah jadi 422 / 403 / 409 / 500 tanpa membocorkan detail.</p></div></div>{foot(6)}</section>""")
     # 7 oversell
-    s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Integritas stok: tidak ada oversell</h2>
+    s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Menjaga konsistensi stok</h2>
 <div class="row"><div style="width:600px"><pre><span class="c">// SalesOrderService::fulfill()</span>
 $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</span> () {{
   <span class="k">foreach</span> ($items <span class="k">as</span> $item) {{
@@ -164,19 +162,19 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
   <span class="c">// decrement + stock_ledger + status</span>
 }}); <span class="c">// sukses: commit · gagal: rollBack</span></pre></div>
 <div class="grow"><ul class="steps">
-<li><span class="num">1</span><span><b>Row lock</b> InnoDB: dua fulfill pada produk dan gudang yang sama dipaksa antre.</span></li>
-<li><span class="num">2</span><span>Cek stok <b>setelah</b> lock, sehingga hasilnya tidak basi.</span></li>
+<li><span class="num">1</span><span><b>Row lock</b> InnoDB: dua fulfill untuk produk dan gudang yang sama harus antre.</span></li>
+<li><span class="num">2</span><span>Stok dicek <b>setelah</b> lock, jadi hasilnya pasti yang terbaru.</span></li>
 <li><span class="num">3</span><span>Satu item kurang → <b>seluruh transaksi dibatalkan</b>.</span></li>
-<li><span class="num">4</span><span>Pessimistic lock dipilih karena konflik stok panas sering (ADR-002).</span></li></ul></div></div>{foot(7)}</section>""")
+<li><span class="num">4</span><span>Pendekatan pessimistic lock dipilih agar pengecekan dan pengurangan stok konsisten (ADR-002).</span></li></ul></div></div>{foot(7)}</section>""")
     # 8 security
-    sec = [('lock','CSRF','Token per sesi di semua form POST'),('user-cog','Sesi &amp; role','HttpOnly, SameSite, user divalidasi ulang tiap request'),('shield-check','Brute force','Throttling login 5 gagal per akun+IP'),('eye','IDOR','Sales hanya melihat SO miliknya'),('database','Injeksi','Prepared statement, output di-escape + CSP'),('container','Container','Non-root, MySQL hanya di 127.0.0.1')]
+    sec = [('lock','CSRF','Token per sesi di semua form POST'),('user-cog','Sesi &amp; role','HttpOnly, SameSite, user divalidasi ulang tiap request'),('shield-check','Brute force','Login dibatasi: 5 kali gagal per akun+IP'),('eye','IDOR','Sales hanya bisa melihat SO miliknya'),('database','Injeksi','Prepared statement, output di-escape + CSP'),('container','Container','Non-root, MySQL hanya di 127.0.0.1')]
     cards = ''.join(f'<div class="card"><div class="badge-ic">{ic(i,24)}</div><h3>{t}</h3><p style="font-size:15px">{d}</p></div>' for i,t,d in sec)
-    s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Keamanan: ancaman, kontrol, bukti</h2><div class="grid3">{cards}</div>
-<p style="margin-top:22px;font-size:15px">Sisa risiko (jujur): TLS perlu reverse proxy, rate limiting baru untuk login, MFA belum ada. Rincian: <code>docs/quality/security-review.md</code>, ADR-004.</p>{foot(8)}</section>""")
+    s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Keamanan: kontrol yang diterapkan</h2><div class="grid3">{cards}</div>
+<p style="margin-top:22px;font-size:15px">Pengembangan berikutnya: TLS lewat reverse proxy, rate limiting API, dan MFA. Rincian: <code>docs/quality/security-review.md</code>, ADR-004.</p>{foot(8)}</section>""")
     # 9 dashboard visual
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Dashboard per role dan antarmuka konsisten</h2>
 <div class="row"><div class="grow clip">{browser('dashboard','localhost:8080/dashboard')}</div>
-<div style="width:300px"><ul class="steps"><li><span class="num">1</span><span>Kartu ringkasan berbeda untuk Admin, Sales, dan Warehouse.</span></li><li><span class="num">2</span><span>Daftar <b>Low Stock</b> dihitung dari stok total vs reorder point.</span></li><li><span class="num">3</span><span>Ikon Lucide inline (SVG lokal), tanpa library JS atau CDN.</span></li></ul></div></div>{foot(9)}</section>""")
+<div style="width:300px"><ul class="steps"><li><span class="num">1</span><span>Kartu ringkasan berbeda untuk Admin, Sales, dan Warehouse.</span></li><li><span class="num">2</span><span>Daftar <b>Low Stock</b> dihitung dari stok total vs reorder point.</span></li><li><span class="num">3</span><span>Sidebar memuat info user dan Logout; ikon Lucide inline (SVG lokal), tanpa library JS atau CDN.</span></li></ul></div></div>{foot(9)}</section>""")
     # 10 quality
     s.append(f"""<section class="slide"><div class="eyebrow">04 · Bukti kualitas</div><h2>Test dan SonarQube</h2>
 <div class="grid4"><div class="stat"><div class="big">252</div><div class="lbl">test lulus<br>Unit 130 · Integration 9 · E2E 113</div></div>
@@ -185,25 +183,24 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
 <div class="stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div></div>
 <table style="margin-top:30px;max-width:760px"><tr><th>Metrik</th><th>Scan awal</th><th>Akhir</th></tr>
 <tr><td>Isu terbuka</td><td>192</td><td class="after">0</td></tr><tr><td>Coverage</td><td>21,1%</td><td class="after">100%</td></tr><tr><td>Duplikasi</td><td>8,1%</td><td class="after">0%</td></tr></table>
-<p style="margin-top:14px;font-size:14px">Coverage adalah <i>line coverage</i>, bukan semua kombinasi input. PHPStan level 5 dan PHPCS PSR-12: 0 error.</p>{foot(10)}</section>""")
+<p style="margin-top:14px;font-size:14px">Coverage yang diukur adalah <i>line coverage</i>. PHPStan level 5 dan PHPCS PSR-12: 0 error.</p>{foot(10)}</section>""")
     # 11 refleksi
-    s.append(f"""<section class="slide"><div class="eyebrow">05 · Refleksi</div><h2>Kendala, keterbatasan, dan langkah berikutnya</h2>
+    s.append(f"""<section class="slide"><div class="eyebrow">05 · Refleksi</div><h2>Kendala, solusi, dan rencana pengembangan</h2>
 <div class="grid3">
-<div class="card soft"><div class="badge-ic">{ic('hourglass',24)}</div><h3>Kendala &amp; solusi</h3><p style="font-size:15px;color:#1e3a8a">Stok konkuren → transaksi + row lock. Clone bersih gagal jalan karena bind mount menimpa <code>vendor/</code> → diperbaiki. Coverage Controller awalnya 0% → E2E lewat HTTP.</p></div>
-<div class="card warn"><div class="badge-ic">{ic('triangle-alert',24)}</div><h3>Keterbatasan (jujur)</h3><p style="font-size:15px;color:#7c4a0a">Tanpa TLS di compose, rate limiting hanya login, API memakai session cookie, <code>ApiController</code> melewati Service, tanpa CI/CD.</p></div>
-<div class="card ok"><div class="badge-ic">{ic('route',24)}</div><h3>Berikutnya</h3><p style="font-size:15px;color:#14532d">1 Rate limiting API · 2 TLS + reverse proxy · 3 Audit log master data · 4 MFA &amp; token API</p></div></div>{foot(11)}</section>""")
+<div class="card soft"><div class="badge-ic">{ic('hourglass',24)}</div><h3>Kendala &amp; solusi</h3><p style="font-size:15px;color:#1e3a8a">Stok konkuren → transaksi + row lock. Verifikasi dari clone bersih menemukan bind mount menimpa <code>vendor/</code> → sudah diperbaiki. Coverage Controller awalnya 0% → ditutup dengan E2E lewat HTTP.</p></div>
+<div class="card warn"><div class="badge-ic">{ic('triangle-alert',24)}</div><h3>Pengembangan lanjutan</h3><p style="font-size:15px;color:#7c4a0a">TLS lewat reverse proxy, rate limiting untuk API, token API, menyambungkan <code>ApiController</code> ke Service, dan CI/CD.</p></div>
+<div class="card ok"><div class="badge-ic">{ic('route',24)}</div><h3>Prioritas</h3><p style="font-size:15px;color:#14532d">1 Rate limiting API · 2 TLS + reverse proxy · 3 Audit log master data · 4 MFA &amp; token API</p></div></div>{foot(11)}</section>""")
     # 12 AI
-    s.append(f"""<section class="slide"><div class="eyebrow">Transparansi</div><h2>Penggunaan AI dan tanggung jawab</h2>
+    s.append(f"""<section class="slide"><div class="eyebrow">Transparansi</div><h2>Penggunaan AI</h2>
 <div class="row"><div class="grow"><ul class="steps">
-<li><span class="num">1</span><span>Claude Code (Anthropic) membantu kode, test, dan dokumentasi.</span></li>
-<li><span class="num">2</span><span>Subagent paralel untuk refactor duplikasi; perilaku <b>dibandingkan sebelum dan sesudah</b>.</span></li>
-<li><span class="num">3</span><span>Saya memverifikasi: build Docker dari clone bersih, test, SonarQube, smoke test per role.</span></li></ul></div>
-<div class="card soft" style="width:420px"><h3>Saya bisa menjelaskan</h3><p style="font-size:16px;color:#1e3a8a"><code>SalesOrderService::fulfill</code>, <code>Router</code>, <code>CrudController</code>, dan seluruh ADR 001–005. Rincian: <code>ai-usage-log.md</code>.</p></div></div>{foot(12)}</section>""")
+<li><span class="num">1</span><span>AI membantu menulis kode, test, dan dokumentasi.</span></li>
+<li><span class="num">2</span><span>Subagent paralel dipakai untuk refactor duplikasi; perilakunya saya <b>bandingkan sebelum dan sesudah</b>.</span></li>
+<li><span class="num">3</span><span>Hasilnya saya cek sendiri: build Docker dari clone bersih, test, SonarQube, dan smoke test tiap role.</span></li></ul></div>
+<div class="card soft" style="width:420px"><h3>Referensi</h3><p style="font-size:16px;color:#1e3a8a">Kode utama: <code>SalesOrderService::fulfill</code>, <code>Router</code>, <code>CrudController</code>. Keputusan desain: ADR 001–005. Rincian penggunaan AI: <code>ai-usage-log.md</code>.</p></div></div>{foot(12)}</section>""")
     # 13 QA
     s.append(f"""<section class="slide dark"><div style="position:absolute;right:70px;top:120px;width:470px;transform:rotate(2deg)">{browser('login','localhost:8080/login')}</div>
-<div style="margin-top:120px"><div class="eyebrow">Terima kasih</div><h1 style="font-size:84px">Tanya jawab</h1>
-<p style="max-width:520px;font-size:20px">Repository, README, ADR, class diagram, laporan SonarQube, dan coverage siap ditelusuri langsung dari kode.</p>
-<div style="margin-top:44px;display:flex;gap:40px;font-size:14px;color:#9db7f0"><div>AKUN DEMO<br><b style="color:#fff;font-size:17px">admin@ioms.test · Password123!</b></div><div>APLIKASI<br><b style="color:#fff;font-size:17px">localhost:8080</b></div><div>SONARQUBE<br><b style="color:#fff;font-size:17px">localhost:9001</b></div></div></div></section>""")
+<div style="margin-top:170px"><h1 style="font-size:96px">Terima kasih</h1>
+<div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:19px">PT Neuronworks Indonesia</b></div></div></div></section>""")
     return s
 
 
