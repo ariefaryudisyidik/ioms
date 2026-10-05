@@ -16,20 +16,26 @@ require_once __DIR__ . '/../partials/partial.php';
 <body>
 <div class="auth-page">
     <div class="auth-card">
-        <h1>IOMS</h1>
+        <h1 class="auth-brand"><?= icon('boxes') ?>IOMS</h1>
         <p class="subtitle">Inventory &amp; Order Management System</p>
         <?php include __DIR__ . '/../partials/flash.php'; ?>
         <?php include __DIR__ . '/../partials/form-errors.php'; ?>
         <form method="post" action="/login" data-validate novalidate>
             <div class="field<?= isset($errors['email']) ? ' has-error' : '' ?>">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" data-required data-type="email"
-                       value="<?= e($old['email'] ?? '') ?>" autocomplete="username" required>
+                <div class="input-icon">
+                    <?= icon('mail') ?>
+                    <input type="email" id="email" name="email" data-required data-type="email"
+                           value="<?= e($old['email'] ?? '') ?>" autocomplete="username" required>
+                </div>
                 <?php if (isset($errors['email'])): ?><div class="field-error"><?= e($errors['email']) ?></div><?php endif; ?>
             </div>
             <div class="field">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" data-required autocomplete="current-password" required>
+                <div class="input-icon">
+                    <?= icon('lock') ?>
+                    <input type="password" id="password" name="password" data-required autocomplete="current-password" required>
+                </div>
             </div>
             <button type="submit" class="btn"><?= icon('log-in') ?>Log In</button>
         </form>

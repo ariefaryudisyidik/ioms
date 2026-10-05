@@ -36,4 +36,16 @@ $isActive = static function (string $prefix) use ($currentPath): string {
             <li><a href="/users"<?= $isActive('/users') ?>><?= icon('user-cog') ?>Users</a></li>
         <?php endif; ?>
     </ul>
+    <div class="nav-footer">
+        <div class="nav-user">
+            <span class="nav-avatar" aria-hidden="true"><?= e(mb_strtoupper(mb_substr((string) ($auth_user['name'] ?? '?'), 0, 1))) ?></span>
+            <span class="nav-user-text">
+                <strong><?= e($auth_user['name'] ?? '') ?></strong>
+                <small><?= e($role ?? '') ?></small>
+            </span>
+        </div>
+        <form method="post" action="/logout">
+            <button type="submit" class="btn btn-secondary"><?= icon('log-out') ?>Logout</button>
+        </form>
+    </div>
 </nav>

@@ -7,7 +7,6 @@ $role = $auth_user['role'] ?? '';
 ?>
 <div class="page-head">
     <h1>Dashboard</h1>
-    <span class="text-muted">Welcome, <?= e($auth_user['name'] ?? '') ?> (<?= e($role) ?>)</span>
 </div>
 
 <?php
