@@ -25,7 +25,7 @@ $buildUrl = static function (array $overrides) use ($filters) {
 </div>
 
 <form class="filter-bar" method="get" action="/products">
-    <div class="field">
+    <div class="field field-search">
         <label for="search">Search</label>
         <input type="text" id="search" name="search" value="<?= e($filters['search'] ?? '') ?>" placeholder="SKU or name">
     </div>

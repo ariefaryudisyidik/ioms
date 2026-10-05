@@ -23,6 +23,10 @@ include __DIR__ . '/../partials/header.php';
     <a class="btn btn-secondary" href="/sales-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
 
+<?php if ($role !== 'Admin' && $so->status === 'PendingApproval'): ?>
+    <div class="alert alert-warning alert-inline" role="note"><?= icon('triangle-alert') ?>Only an Admin can approve or reject this order.</div>
+<?php endif; ?>
+
 <div class="panel">
     <dl class="detail-grid">
         <div><dt>Customer</dt><dd><?= e($customer?->name ?? ('#' . $so->customerId)) ?></dd></div>
@@ -57,9 +61,6 @@ include __DIR__ . '/../partials/header.php';
             </form>
         <?php endif; ?>
     </div>
-    <?php if ($role !== 'Admin' && $so->status === 'PendingApproval'): ?>
-        <p class="text-muted" style="margin-top:12px;">Only an Admin can approve or reject this order.</p>
-    <?php endif; ?>
 </div>
 
 <div class="panel">

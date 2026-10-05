@@ -18,7 +18,7 @@ include __DIR__ . '/../partials/header.php';
                 <tr>
                     <td><?= e($u->name) ?></td>
                     <td><?= e($u->email) ?></td>
-                    <td><?= e($u->role) ?></td>
+                    <td><?= e(role_label($u->role)) ?></td>
                     <td><span class="badge badge-<?= $u->isActive ? 'active' : 'inactive' ?>"><?= $u->isActive ? 'Active' : 'Inactive' ?></span></td>
                     <td>
                         <div class="btn-row">

@@ -287,6 +287,10 @@ p { margin: 0 0 var(--space-3); }
 .alert-success { background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success); }
 .alert-error { background: var(--color-danger-bg); color: var(--color-danger); border-color: var(--color-danger); }
 .alert-info { background: var(--color-info-bg); color: var(--color-info); border-color: var(--color-info); }
+.alert-warning { background: var(--color-warning-bg); color: var(--color-warning); border-color: var(--color-warning); }
+
+.alert-inline { display: flex; align-items: center; gap: var(--space-2); }
+.alert-inline .icon { width: 18px; height: 18px; }
 
 /* ---------- Buttons ---------- */
 .btn {
@@ -498,6 +502,10 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
 }
 
 .filter-bar .field { margin-bottom: 0; min-width: 160px; }
+.cell-field { margin-bottom: 0; width: 160px; max-width: 100%; }
+.field input:disabled { background: var(--color-bg); color: var(--color-text-muted); cursor: not-allowed; }
+
+.filter-bar .field-search { flex: 1 1 280px; max-width: 360px; }
 
 /* ---------- Login page ---------- */
 .auth-page {
@@ -565,13 +573,20 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
 
 .item-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-template-columns: 2fr 1fr auto;
   gap: var(--space-2);
   align-items: end;
   border-bottom: 1px dashed var(--color-border);
   padding-bottom: var(--space-3);
   margin-bottom: var(--space-3);
 }
+
+.item-row .field { margin-bottom: 0; }
+.item-row .field label { margin-bottom: 0; }
+.item-row input,
+.item-row select,
+.item-row .btn { height: 42px; box-sizing: border-box; }
+.availability-box:empty { display: none; }
 
 @media (max-width: 700px) {
   .item-row { grid-template-columns: 1fr; }
@@ -612,6 +627,7 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
   .card-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
   .filter-bar .field { flex: 1 1 180px; min-width: 0; }
   .filter-bar .field[style*="min-width:auto"] { flex: 0 0 auto; }
+  .filter-bar .field-search { flex: 1 1 240px; min-width: 220px; max-width: none; }
 }
 
 @media (max-width: 600px) {
@@ -626,6 +642,7 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
   .filter-bar { flex-direction: column; align-items: stretch; padding: var(--space-3); }
   .filter-bar .field,
   .filter-bar .field[style*="min-width:auto"] { flex: none; width: 100%; min-width: 0; }
+  .filter-bar .field-search { max-width: none; min-width: 0; }
   .filter-bar .btn { width: 100%; }
 
   .btn-row .btn { flex: 1 1 auto; }

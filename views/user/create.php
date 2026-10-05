@@ -34,7 +34,7 @@ include __DIR__ . '/../partials/header.php';
                 <label for="role">Role</label>
                 <select id="role" name="role" data-required required>
                     <?php foreach (['Admin', 'Sales', 'WarehouseStaff'] as $r): ?>
-                        <option value="<?= e($r) ?>" <?= $old['role'] === $r ? 'selected' : '' ?>><?= e($r) ?></option>
+                        <option value="<?= e($r) ?>" <?= $old['role'] === $r ? 'selected' : '' ?>><?= e(role_label($r)) ?></option>
                     <?php endforeach; ?>
                 </select>
                 <?php if (isset($errors['role'])): ?><div class="field-error"><?= e($errors['role']) ?></div><?php endif; ?>

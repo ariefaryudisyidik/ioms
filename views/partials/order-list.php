@@ -39,7 +39,7 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
 </div>
 
 <form class="filter-bar" method="get" action="<?= e($baseUrl) ?>">
-    <div class="field">
+    <div class="field field-search">
         <label for="search">Search</label>
         <input type="search" id="search" name="search" maxlength="100" placeholder="Order number or name" value="<?= e((string) ($filters['search'] ?? '')) ?>">
     </div>

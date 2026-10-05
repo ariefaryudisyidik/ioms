@@ -41,7 +41,7 @@ $isActive = static function (string $prefix) use ($currentPath): string {
             <span class="nav-avatar" aria-hidden="true"><?= e(mb_strtoupper(mb_substr((string) ($auth_user['name'] ?? '?'), 0, 1))) ?></span>
             <span class="nav-user-text">
                 <strong><?= e($auth_user['name'] ?? '') ?></strong>
-                <small><?= e($role ?? '') ?></small>
+                <small><?= e(role_label((string) ($role ?? ''))) ?></small>
             </span>
         </div>
         <form method="post" action="/logout">

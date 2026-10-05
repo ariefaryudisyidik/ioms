@@ -12,7 +12,7 @@ final class BriefRequirementsE2ETest extends E2ETestCase
 {
     private function card(string $html, string $label): ?string
     {
-        $pattern = '#<div class="card-label">' . preg_quote(htmlspecialchars($label), '#') . '</div><div class="card-value">([^<]*)</div>#';
+        $pattern = '#<div class="card-label">(?:<svg.*?</svg>\s*)?<span>' . preg_quote(htmlspecialchars($label), '#') . '</span></div><div class="card-value">([^<]*)</div>#s';
 
         return preg_match($pattern, $html, $match) === 1 ? $match[1] : null;
     }

@@ -35,6 +35,16 @@ if (!function_exists('icon')) {
             1
         ) ?? $svg;
 
-        return $svg;
+        return trim($svg);
+    }
+}
+
+if (!function_exists('role_label')) {
+    /**
+     * Display name of a role ("WarehouseStaff" -> "Warehouse Staff"); the stored value is unchanged.
+     */
+    function role_label(string $role): string
+    {
+        return (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $role);
     }
 }
