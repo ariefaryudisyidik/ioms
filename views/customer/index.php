@@ -7,7 +7,7 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
     <h1>Customers</h1>
-    <?php if ($canEdit): ?><a class="btn" href="/customers/create">+ New Customer</a><?php endif; ?>
+    <?php if ($canEdit): ?><a class="btn" href="/customers/create"><?= icon('plus') ?>New Customer</a><?php endif; ?>
 </div>
 <?php if (empty($customers)): ?>
     <div class="empty-state"><div class="empty-icon">&#128100;</div><p>Belum ada data pelanggan.</p></div>
@@ -25,10 +25,10 @@ include __DIR__ . '/../partials/header.php';
                     <?php if ($canEdit): ?>
                     <td>
                         <div class="btn-row">
-                            <a class="btn btn-secondary btn-sm" href="/customers/<?= (int) $c->id ?>/edit">Edit</a>
+                            <a class="btn btn-secondary btn-sm" href="/customers/<?= (int) $c->id ?>/edit"><?= icon('pencil') ?>Edit</a>
                             <?php if ($role === 'Admin' && $c->isActive): ?>
                             <form method="post" action="/customers/<?= (int) $c->id ?>/deactivate" data-confirm="Deactivate this customer?">
-                                <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><?= icon('ban') ?>Deactivate</button>
                             </form>
                             <?php endif; ?>
                         </div>

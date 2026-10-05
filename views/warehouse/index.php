@@ -6,10 +6,10 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
     <h1>Warehouses</h1>
-    <?php if ($role === 'Admin'): ?><a class="btn" href="/warehouses/create">+ New Warehouse</a><?php endif; ?>
+    <?php if ($role === 'Admin'): ?><a class="btn" href="/warehouses/create"><?= icon('plus') ?>New Warehouse</a><?php endif; ?>
 </div>
 <?php if (empty($warehouses)): ?>
-    <div class="empty-state"><div class="empty-icon">&#127970;</div><p>Belum ada data gudang.</p></div>
+    <div class="empty-state"><div class="empty-icon"><?= icon('warehouse') ?></div><p>Belum ada data gudang.</p></div>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
@@ -23,10 +23,10 @@ include __DIR__ . '/../partials/header.php';
                     <?php if ($role === 'Admin'): ?>
                     <td>
                         <div class="btn-row">
-                            <a class="btn btn-secondary btn-sm" href="/warehouses/<?= (int) $w->id ?>/edit">Edit</a>
+                            <a class="btn btn-secondary btn-sm" href="/warehouses/<?= (int) $w->id ?>/edit"><?= icon('pencil') ?>Edit</a>
                             <?php if ($w->isActive): ?>
                             <form method="post" action="/warehouses/<?= (int) $w->id ?>/deactivate" data-confirm="Deactivate this warehouse?">
-                                <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><?= icon('ban') ?>Deactivate</button>
                             </form>
                             <?php endif; ?>
                         </div>

@@ -28,7 +28,7 @@ partial('order-list', [
         e($o->supplierName ?? '-'),
         e($o->orderDate),
         '<span class="badge badge-' . strtolower($o->status) . '">' . e($o->status) . '</span>',
-        '<a class="btn btn-secondary btn-sm" href="/purchase-orders/' . (int) $o->id . '">View</a>',
+        '<a class="btn btn-secondary btn-sm" href="/purchase-orders/' . (int) $o->id . '">' . icon('eye') . 'View</a>',
     ], $items),
     'page' => $page,
     'total' => $total,

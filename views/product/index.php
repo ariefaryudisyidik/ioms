@@ -21,7 +21,7 @@ $buildUrl = static function (array $overrides) use ($filters) {
 ?>
 <div class="page-head">
     <h1>Products</h1>
-    <?php if ($canManage): ?><a class="btn" href="/products/create">+ New Product</a><?php endif; ?>
+    <?php if ($canManage): ?><a class="btn" href="/products/create"><?= icon('plus') ?>New Product</a><?php endif; ?>
 </div>
 
 <form class="filter-bar" method="get" action="/products">
@@ -54,12 +54,12 @@ $buildUrl = static function (array $overrides) use ($filters) {
         </select>
     </div>
     <div class="field" style="min-width:auto;">
-        <button type="submit" class="btn">Apply</button>
+        <button type="submit" class="btn"><?= icon('funnel') ?>Apply</button>
     </div>
 </form>
 
 <?php if (empty($result['items'])): ?>
-    <div class="empty-state"><div class="empty-icon">&#128230;</div><p>Belum ada data produk yang cocok dengan filter ini.</p></div>
+    <div class="empty-state"><div class="empty-icon"><?= icon('package') ?></div><p>Belum ada data produk yang cocok dengan filter ini.</p></div>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
@@ -79,11 +79,11 @@ $buildUrl = static function (array $overrides) use ($filters) {
                     <?php if ($canManage): ?>
                     <td>
                         <div class="btn-row">
-                            <a class="btn btn-secondary btn-sm" href="/products/<?= (int) $p->id ?>/edit">Edit</a>
+                            <a class="btn btn-secondary btn-sm" href="/products/<?= (int) $p->id ?>/edit"><?= icon('pencil') ?>Edit</a>
                             <?php if ($role === 'Admin' && $p->isActive): ?>
                             <form method="post" action="/products/<?= (int) $p->id ?>/delete" data-confirm="Deactivate this product?">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><?= icon('ban') ?>Deactivate</button>
                             </form>
                             <?php endif; ?>
                         </div>

@@ -53,12 +53,12 @@ $rowVars = [
             <div class="js-item-rows">
                 <?php partial('order-item-row', $rowVars + ['index' => '0']); ?>
             </div>
-            <button type="button" class="btn btn-secondary btn-sm js-add-item-row">+ Add Item</button>
+            <button type="button" class="btn btn-secondary btn-sm js-add-item-row"><?= icon('plus') ?>Add Item</button>
         </fieldset>
 
         <div class="btn-row">
-            <button type="submit" class="btn"><?= e($submitLabel) ?></button>
-            <a class="btn btn-secondary" href="<?= e($listHref) ?>">Cancel</a>
+            <button type="submit" class="btn"><?= icon('save') ?><?= e($submitLabel) ?></button>
+            <a class="btn btn-secondary" href="<?= e($listHref) ?>"><?= icon('x') ?>Cancel</a>
         </div>
     </form>
 </div>

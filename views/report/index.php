@@ -22,7 +22,7 @@ include __DIR__ . '/../partials/header.php';
                 <input type="date" id="ledger_date_to" name="date_to" data-type="date" value="<?= e($today) ?>">
             </div>
         </div>
-        <button type="submit" class="btn">Download CSV</button>
+        <button type="submit" class="btn"><?= icon('download') ?>Download CSV</button>
     </form>
 </div>
 <?php endif; ?>
@@ -43,7 +43,7 @@ include __DIR__ . '/../partials/header.php';
                 <input type="date" id="po_date_to" name="date_to" data-type="date" value="<?= e($today) ?>">
             </div>
         </div>
-        <button type="submit" class="btn">Download CSV</button>
+        <button type="submit" class="btn"><?= icon('download') ?>Download CSV</button>
     </form>
 </div>
 <?php endif; ?>
@@ -66,7 +66,7 @@ include __DIR__ . '/../partials/header.php';
                 <input type="date" id="so_date_to" name="date_to" data-type="date" value="<?= e($today) ?>">
             </div>
         </div>
-        <button type="submit" class="btn">Download CSV</button>
+        <button type="submit" class="btn"><?= icon('download') ?>Download CSV</button>
     </form>
 </div>
 <?php endif; ?>

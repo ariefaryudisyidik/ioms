@@ -10,6 +10,6 @@
     <label for="is_active" style="margin:0;">Active</label>
 </div>
 <div class="btn-row">
-    <button type="submit" class="btn">Save</button>
-    <a class="btn btn-secondary" href="<?= e($cancelHref) ?>">Cancel</a>
+    <button type="submit" class="btn"><?= icon('save') ?>Save</button>
+    <a class="btn btn-secondary" href="<?= e($cancelHref) ?>"><?= icon('x') ?>Cancel</a>
 </div>

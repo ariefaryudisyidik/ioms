@@ -20,7 +20,7 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
     <h1>Sales Order <?= e($so->soNumber) ?> <span class="badge badge-<?= strtolower($so->status) ?>"><?= e($so->status) ?></span></h1>
-    <a class="btn btn-secondary" href="/sales-orders">Back to list</a>
+    <a class="btn btn-secondary" href="/sales-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
 
 <div class="panel">
@@ -33,27 +33,27 @@ include __DIR__ . '/../partials/header.php';
     <div class="btn-row">
         <?php if ($canSubmit): ?>
             <form method="post" action="/sales-orders/<?= (int) $so->id ?>/submit">
-                <button type="submit" class="btn">Submit for Approval</button>
+                <button type="submit" class="btn"><?= icon('send') ?>Submit for Approval</button>
             </form>
         <?php endif; ?>
         <?php if ($canApprove): ?>
             <form method="post" action="/sales-orders/<?= (int) $so->id ?>/approve">
-                <button type="submit" class="btn">Approve</button>
+                <button type="submit" class="btn"><?= icon('check') ?>Approve</button>
             </form>
         <?php endif; ?>
         <?php if ($canReject): ?>
             <form method="post" action="/sales-orders/<?= (int) $so->id ?>/reject" data-confirm="Reject this sales order back to draft?">
-                <button type="submit" class="btn btn-danger">Reject</button>
+                <button type="submit" class="btn btn-danger"><?= icon('circle-x') ?>Reject</button>
             </form>
         <?php endif; ?>
         <?php if ($canFulfill): ?>
             <form method="post" action="/sales-orders/<?= (int) $so->id ?>/fulfill" data-confirm="Fulfill this order and deduct stock?">
-                <button type="submit" class="btn">Fulfill</button>
+                <button type="submit" class="btn"><?= icon('truck') ?>Fulfill</button>
             </form>
         <?php endif; ?>
         <?php if ($canCancel): ?>
             <form method="post" action="/sales-orders/<?= (int) $so->id ?>/cancel" data-confirm="Cancel this sales order?">
-                <button type="submit" class="btn btn-danger">Cancel</button>
+                <button type="submit" class="btn btn-danger"><?= icon('x') ?>Cancel</button>
             </form>
         <?php endif; ?>
     </div>

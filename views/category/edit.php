@@ -24,8 +24,8 @@ include __DIR__ . '/../partials/header.php';
             <textarea id="description" name="description" rows="3"><?= e($old['description']) ?></textarea>
         </div>
         <div class="btn-row">
-            <button type="submit" class="btn">Save</button>
-            <a class="btn btn-secondary" href="/categories">Cancel</a>
+            <button type="submit" class="btn"><?= icon('save') ?>Save</button>
+            <a class="btn btn-secondary" href="/categories"><?= icon('x') ?>Cancel</a>
         </div>
     </form>
 </div>

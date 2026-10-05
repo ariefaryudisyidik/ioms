@@ -10,9 +10,9 @@ include __DIR__ . '/../partials/header.php';
     <h1><?= e($product->name) ?></h1>
     <div class="btn-row">
         <?php if ($role === 'Admin'): ?>
-            <a class="btn btn-secondary" href="/products/<?= (int) $product->id ?>/edit">Edit</a>
+            <a class="btn btn-secondary" href="/products/<?= (int) $product->id ?>/edit"><?= icon('pencil') ?>Edit</a>
         <?php endif; ?>
-        <a class="btn btn-secondary" href="/products">Back to list</a>
+        <a class="btn btn-secondary" href="/products"><?= icon('arrow-left') ?>Back to list</a>
     </div>
 </div>
 
@@ -33,7 +33,7 @@ include __DIR__ . '/../partials/header.php';
 <div class="panel">
     <h2>Stock per Warehouse</h2>
     <?php if (empty($stocks)): ?>
-        <div class="empty-state"><div class="empty-icon">&#128230;</div><p>Belum ada data stok untuk produk ini.</p></div>
+        <div class="empty-state"><div class="empty-icon"><?= icon('package') ?></div><p>Belum ada data stok untuk produk ini.</p></div>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table">

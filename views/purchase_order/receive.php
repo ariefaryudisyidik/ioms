@@ -32,8 +32,8 @@ include __DIR__ . '/../partials/header.php';
             </table>
         </div>
         <div class="btn-row" style="margin-top:16px;">
-            <button type="submit" class="btn">Confirm Receipt</button>
-            <a class="btn btn-secondary" href="/purchase-orders/<?= (int) $po->id ?>">Cancel</a>
+            <button type="submit" class="btn"><?= icon('package-check') ?>Confirm Receipt</button>
+            <a class="btn btn-secondary" href="/purchase-orders/<?= (int) $po->id ?>"><?= icon('x') ?>Cancel</a>
         </div>
     </form>
 </div>

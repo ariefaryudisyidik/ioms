@@ -9,31 +9,31 @@ $isActive = static function (string $prefix) use ($currentPath): string {
 ?>
 <nav class="app-nav">
     <ul>
-        <li><a href="/dashboard"<?= $isActive('/dashboard') ?>>Dashboard</a></li>
-        <li><a href="/products"<?= $isActive('/products') ?>>Products</a></li>
+        <li><a href="/dashboard"<?= $isActive('/dashboard') ?>><?= icon('layout-dashboard') ?>Dashboard</a></li>
+        <li><a href="/products"<?= $isActive('/products') ?>><?= icon('package') ?>Products</a></li>
         <?php if ($role === 'Admin'): ?>
-            <li><a href="/categories"<?= $isActive('/categories') ?>>Categories</a></li>
+            <li><a href="/categories"<?= $isActive('/categories') ?>><?= icon('tags') ?>Categories</a></li>
         <?php endif; ?>
         <?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
-            <li><a href="/warehouses"<?= $isActive('/warehouses') ?>>Warehouses</a></li>
+            <li><a href="/warehouses"<?= $isActive('/warehouses') ?>><?= icon('warehouse') ?>Warehouses</a></li>
         <?php endif; ?>
         <?php if ($role === 'Admin'): ?>
-            <li><a href="/suppliers"<?= $isActive('/suppliers') ?>>Suppliers</a></li>
+            <li><a href="/suppliers"<?= $isActive('/suppliers') ?>><?= icon('truck') ?>Suppliers</a></li>
         <?php endif; ?>
         <?php if (in_array($role, ['Admin', 'Sales'], true)): ?>
-            <li><a href="/customers"<?= $isActive('/customers') ?>>Customers</a></li>
+            <li><a href="/customers"<?= $isActive('/customers') ?>><?= icon('contact') ?>Customers</a></li>
         <?php endif; ?>
 
         <li class="nav-section-title">Orders</li>
         <?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
-            <li><a href="/purchase-orders"<?= $isActive('/purchase-orders') ?>>Purchase Orders</a></li>
+            <li><a href="/purchase-orders"<?= $isActive('/purchase-orders') ?>><?= icon('clipboard-list') ?>Purchase Orders</a></li>
         <?php endif; ?>
-        <li><a href="/sales-orders"<?= $isActive('/sales-orders') ?>>Sales Orders</a></li>
+        <li><a href="/sales-orders"<?= $isActive('/sales-orders') ?>><?= icon('shopping-cart') ?>Sales Orders</a></li>
 
         <li class="nav-section-title">System</li>
-        <li><a href="/reports"<?= $isActive('/reports') ?>>Reports</a></li>
+        <li><a href="/reports"<?= $isActive('/reports') ?>><?= icon('chart-column') ?>Reports</a></li>
         <?php if ($role === 'Admin'): ?>
-            <li><a href="/users"<?= $isActive('/users') ?>>Users</a></li>
+            <li><a href="/users"<?= $isActive('/users') ?>><?= icon('user-cog') ?>Users</a></li>
         <?php endif; ?>
     </ul>
 </nav>

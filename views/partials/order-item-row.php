@@ -30,7 +30,7 @@
     </label>
     </div>
     <div class="field">
-        <button type="button" class="btn btn-danger btn-sm js-remove-item-row">Remove</button>
+        <button type="button" class="btn btn-danger btn-sm js-remove-item-row"><?= icon('trash-2') ?>Remove</button>
     </div>
     <div class="availability-box" style="grid-column:1/-1;"></div>
 </div>

@@ -11,30 +11,30 @@ $role = $auth_user['role'] ?? '';
 </div>
 
 <?php
-$card = static fn (string $label, string $value, string $class = ''): string =>
-    '<div class="card' . $class . '"><div class="card-label">' . e($label) . '</div><div class="card-value">' . e($value) . '</div></div>';
+$card = static fn (string $label, string $value, string $class = '', string $icon = 'package'): string =>
+    '<div class="card' . $class . '"><div class="card-label">' . icon($icon) . '<span>' . e($label) . '</span></div><div class="card-value">' . e($value) . '</div></div>';
 $count = static fn (string $key): string => (string) (int) ($summary[$key] ?? 0);
 $mine = $summary['my_so_counts'] ?? [];
 [$danger, $warning, $info, $success] = [' card-danger', ' card-warning', ' card-info', ' card-success'];
 ?>
 <div class="card-grid">
     <?php if ($role === 'Admin'): ?>
-        <?= $card('Inventory Value', number_format((float) ($summary['inventory_value'] ?? 0), 2)) ?>
-        <?= $card('Total Products', $count('total_products')) ?>
-        <?= $card('Low Stock Products', $count('low_stock_count'), $danger) ?>
-        <?= $card('SO Pending Approval', $count('pending_approval_count'), $warning) ?>
-        <?= $card('SO Approved (to fulfill)', $count('so_approved_count'), $success) ?>
-        <?= $card('PO Ordered', $count('po_ordered_count'), $info) ?>
-        <?= $card('PO Partially Received', $count('po_partial_count')) ?>
+        <?= $card('Inventory Value', number_format((float) ($summary['inventory_value'] ?? 0), 2), '', 'wallet') ?>
+        <?= $card('Total Products', $count('total_products'), '', 'package') ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), $danger, 'triangle-alert') ?>
+        <?= $card('SO Pending Approval', $count('pending_approval_count'), $warning, 'hourglass') ?>
+        <?= $card('SO Approved (to fulfill)', $count('so_approved_count'), $success, 'shopping-cart') ?>
+        <?= $card('PO Ordered', $count('po_ordered_count'), $info, 'clipboard-list') ?>
+        <?= $card('PO Partially Received', $count('po_partial_count'), '', 'package-check') ?>
     <?php elseif ($role === 'Sales'): ?>
         <?php foreach (['Draft' => '', 'PendingApproval' => $warning, 'Approved' => $info, 'Fulfilled' => $success, 'Cancelled' => ''] as $status => $class): ?>
-            <?= $card('My orders: ' . $status, (string) (int) ($mine[$status] ?? 0), $class) ?>
+            <?= $card('My orders: ' . $status, (string) (int) ($mine[$status] ?? 0), $class, 'file-text') ?>
         <?php endforeach; ?>
     <?php else: /* WarehouseStaff */ ?>
-        <?= $card('Awaiting goods receipt (PO Ordered)', $count('po_ordered_count'), $info) ?>
-        <?= $card('Awaiting goods receipt (PO Partially Received)', $count('po_partial_count'), $info) ?>
-        <?= $card('Awaiting goods issue (SO Approved)', $count('so_approved_count'), $success) ?>
-        <?= $card('Low Stock Products', $count('low_stock_count'), $danger) ?>
+        <?= $card('Awaiting goods receipt (PO Ordered)', $count('po_ordered_count'), $info, 'clipboard-list') ?>
+        <?= $card('Awaiting goods receipt (PO Partially Received)', $count('po_partial_count'), $info, 'package-check') ?>
+        <?= $card('Awaiting goods issue (SO Approved)', $count('so_approved_count'), $success, 'truck') ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), $danger, 'triangle-alert') ?>
     <?php endif; ?>
 </div>
 
@@ -44,7 +44,7 @@ $mine = $summary['my_so_counts'] ?? [];
     <?php $lowStock = $summary['low_stock_items'] ?? []; ?>
     <?php if (empty($lowStock)): ?>
         <div class="empty-state">
-            <div class="empty-icon">&#9989;</div>
+            <div class="empty-icon"><?= icon('shield-check') ?></div>
             <p>Belum ada data. Semua produk berada di atas titik pemesanan ulang (reorder point).</p>
         </div>
     <?php else: ?>
@@ -72,12 +72,12 @@ $mine = $summary['my_so_counts'] ?? [];
 <div class="panel">
     <h2>Quick Links</h2>
     <div class="btn-row">
-        <a class="btn btn-secondary" href="/products">Products</a>
+        <a class="btn btn-secondary" href="/products"><?= icon('package') ?>Products</a>
         <?php if (in_array($role, ['Admin', 'WarehouseStaff'], true)): ?>
-            <a class="btn btn-secondary" href="/purchase-orders">Purchase Orders</a>
+            <a class="btn btn-secondary" href="/purchase-orders"><?= icon('clipboard-list') ?>Purchase Orders</a>
         <?php endif; ?>
-        <a class="btn btn-secondary" href="/sales-orders">Sales Orders</a>
-        <a class="btn btn-secondary" href="/reports">Reports</a>
+        <a class="btn btn-secondary" href="/sales-orders"><?= icon('shopping-cart') ?>Sales Orders</a>
+        <a class="btn btn-secondary" href="/reports"><?= icon('chart-column') ?>Reports</a>
     </div>
 </div>
 

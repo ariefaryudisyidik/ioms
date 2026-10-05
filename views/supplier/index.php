@@ -6,10 +6,10 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
     <h1>Suppliers</h1>
-    <?php if ($role === 'Admin'): ?><a class="btn" href="/suppliers/create">+ New Supplier</a><?php endif; ?>
+    <?php if ($role === 'Admin'): ?><a class="btn" href="/suppliers/create"><?= icon('plus') ?>New Supplier</a><?php endif; ?>
 </div>
 <?php if (empty($suppliers)): ?>
-    <div class="empty-state"><div class="empty-icon">&#128666;</div><p>Belum ada data supplier.</p></div>
+    <div class="empty-state"><div class="empty-icon"><?= icon('truck') ?></div><p>Belum ada data supplier.</p></div>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
@@ -24,10 +24,10 @@ include __DIR__ . '/../partials/header.php';
                     <?php if ($role === 'Admin'): ?>
                     <td>
                         <div class="btn-row">
-                            <a class="btn btn-secondary btn-sm" href="/suppliers/<?= (int) $s->id ?>/edit">Edit</a>
+                            <a class="btn btn-secondary btn-sm" href="/suppliers/<?= (int) $s->id ?>/edit"><?= icon('pencil') ?>Edit</a>
                             <?php if ($s->isActive): ?>
                             <form method="post" action="/suppliers/<?= (int) $s->id ?>/deactivate" data-confirm="Deactivate this supplier?">
-                                <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                                <button type="submit" class="btn btn-danger btn-sm"><?= icon('ban') ?>Deactivate</button>
                             </form>
                             <?php endif; ?>
                         </div>

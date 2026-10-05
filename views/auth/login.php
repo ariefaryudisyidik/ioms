@@ -3,6 +3,7 @@
 /** @var array{email:string} $old */
 $errors = $errors ?? [];
 $old = $old ?? ['email' => ''];
+require_once __DIR__ . '/../partials/partial.php';
 ?>
 <!doctype html>
 <html lang="en">
@@ -30,7 +31,7 @@ $old = $old ?? ['email' => ''];
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" data-required autocomplete="current-password" required>
             </div>
-            <button type="submit" class="btn">Log In</button>
+            <button type="submit" class="btn"><?= icon('log-in') ?>Log In</button>
         </form>
     </div>
 </div>

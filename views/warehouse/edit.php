@@ -28,8 +28,8 @@ include __DIR__ . '/../partials/header.php';
             <label for="is_active" style="margin:0;">Active</label>
         </div>
         <div class="btn-row">
-            <button type="submit" class="btn">Save</button>
-            <a class="btn btn-secondary" href="/warehouses">Cancel</a>
+            <button type="submit" class="btn"><?= icon('save') ?>Save</button>
+            <a class="btn btn-secondary" href="/warehouses"><?= icon('x') ?>Cancel</a>
         </div>
     </form>
 </div>

@@ -13,7 +13,7 @@ include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
     <h1>Purchase Order <?= e($po->poNumber) ?> <span class="badge badge-<?= strtolower($po->status) ?>"><?= e($po->status) ?></span></h1>
-    <a class="btn btn-secondary" href="/purchase-orders">Back to list</a>
+    <a class="btn btn-secondary" href="/purchase-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
 
 <div class="panel">
@@ -27,15 +27,15 @@ include __DIR__ . '/../partials/header.php';
     <div class="btn-row">
         <?php if ($po->status === 'Draft'): ?>
             <form method="post" action="/purchase-orders/<?= (int) $po->id ?>/order">
-                <button type="submit" class="btn">Mark as Ordered</button>
+                <button type="submit" class="btn"><?= icon('check-check') ?>Mark as Ordered</button>
             </form>
         <?php endif; ?>
         <?php if (in_array($po->status, ['Ordered', 'PartiallyReceived'], true)): ?>
-            <a class="btn" href="/purchase-orders/<?= (int) $po->id ?>/receive">Receive Goods</a>
+            <a class="btn" href="/purchase-orders/<?= (int) $po->id ?>/receive"><?= icon('package-plus') ?>Receive Goods</a>
         <?php endif; ?>
         <?php if (!in_array($po->status, ['Received', 'Cancelled'], true)): ?>
             <form method="post" action="/purchase-orders/<?= (int) $po->id ?>/cancel" data-confirm="Cancel this purchase order?">
-                <button type="submit" class="btn btn-danger">Cancel Order</button>
+                <button type="submit" class="btn btn-danger"><?= icon('circle-x') ?>Cancel Order</button>
             </form>
         <?php endif; ?>
     </div>

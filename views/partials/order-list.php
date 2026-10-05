@@ -34,7 +34,7 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
 <div class="page-head">
     <h1><?= e($title) ?></h1>
     <?php if (in_array($role, $createRoles, true)): ?>
-        <a class="btn" href="<?= e($baseUrl) ?>/create"><?= e($createLabel) ?></a>
+        <a class="btn" href="<?= e($baseUrl) ?>/create"><?= icon('plus') ?><?= e(ltrim(ltrim($createLabel, '+'))) ?></a>
     <?php endif; ?>
 </div>
 
@@ -71,7 +71,7 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
         </select>
     </div>
     <div class="field" style="min-width:auto;">
-        <button type="submit" class="btn">Apply</button>
+        <button type="submit" class="btn"><?= icon('funnel') ?>Apply</button>
     </div>
 </form>
 
@@ -80,7 +80,7 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
 <?php endif; ?>
 
 <?php if ($rows === []): ?>
-    <div class="empty-state"><div class="empty-icon">&#128203;</div><p><?= e($emptyMessage) ?></p></div>
+    <div class="empty-state"><div class="empty-icon"><?= icon('clipboard-list') ?></div><p><?= e($emptyMessage) ?></p></div>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">

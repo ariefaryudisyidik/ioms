@@ -57,8 +57,9 @@
     }
 
     document.addEventListener('click', function (event) {
-      if (event.target.matches('.js-remove-item-row')) {
-        var row = event.target.closest('.js-item-row');
+      var removeBtn = event.target.closest('.js-remove-item-row');
+      if (removeBtn) {
+        var row = removeBtn.closest('.js-item-row');
         if (row) row.remove();
       }
     });

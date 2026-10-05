@@ -17,12 +17,12 @@ require_once __DIR__ . '/partial.php';
 <div class="app-shell">
     <header class="app-header">
         <button type="button" class="hamburger" aria-label="Toggle navigation">&#9776;</button>
-        <div class="brand">IOMS</div>
+        <div class="brand"><?= icon('boxes') ?>IOMS</div>
         <?php if ($auth_user): ?>
             <div class="user-box">
                 <span><?= e($auth_user['name']) ?> &middot; <?= e($auth_user['role']) ?></span>
                 <form method="post" action="/logout" style="margin:0;">
-                    <button type="submit" class="btn btn-secondary btn-sm">Logout</button>
+                    <button type="submit" class="btn btn-secondary btn-sm"><?= icon('log-out') ?>Logout</button>
                 </form>
             </div>
         <?php endif; ?>
