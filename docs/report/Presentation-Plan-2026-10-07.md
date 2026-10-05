@@ -9,7 +9,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 **H-1 (Selasa):**
 - [ ] `git push origin master`; buka repo di jendela incognito, pastikan terakhir ter-push dan bisa diakses.
 - [ ] Clone ke folder baru, `cp .env.example .env`, `docker compose up --build`, login: pastikan README benar-benar jalan.
-- [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml -p ioms-sonar up -d`, buka `http://localhost:9001` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
+- [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml up -d`, buka `http://localhost:9001` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
 - [ ] `composer coverage` sekali lagi; buka `build/coverage/html/index.html` (laporan coverage per file).
 - [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (252 tests, 903 assertions), `docker compose ps`, demo PO→SO.
 - [ ] Latihan dengan timer. Target selesai di 9:30.
@@ -71,9 +71,9 @@ Data seed: password semua akun `Password123!`. Admin `admin@ioms.test`, Sales `s
 
 ```bash
 # Ledger terbaru
-docker compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ioms -e "SELECT id,product_id,warehouse_id,movement_type,quantity,reference_type,reference_id FROM stock_ledger ORDER BY id DESC LIMIT 5"'
+docker compose exec mysql sh -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "SELECT id,product_id,warehouse_id,movement_type,quantity,reference_type,reference_id FROM stock_ledger ORDER BY id DESC LIMIT 5"'
 # Stok satu produk
-docker compose exec mysql sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" ioms -e "SELECT p.sku,ps.warehouse_id,ps.quantity FROM product_stocks ps JOIN products p ON p.id=ps.product_id WHERE p.sku=\"SKU-0005\""'
+docker compose exec mysql sh -c 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "SELECT p.sku,ps.warehouse_id,ps.quantity FROM product_stocks ps JOIN products p ON p.id=ps.product_id WHERE p.sku=\"SKU-0005\""'
 # API
 curl -i http://localhost:8080/api/products/SKU-0001/availability   # 401 tanpa session
 

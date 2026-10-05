@@ -90,14 +90,14 @@ Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PH
 SonarQube Community lokal dijalankan lewat `docker-compose.sonar.yml` (dashboard di http://localhost:9001, login awal `admin`/`admin`).
 
 ```bash
-docker compose -f docker-compose.sonar.yml -p ioms-sonar up -d sonarqube   # tunggu status UP
+docker compose -f docker-compose.sonar.yml up -d sonarqube   # tunggu status UP
 # buat token: My Account > Security, lalu export SONAR_TOKEN=<token>
 
 # 1. Coverage gabungan Unit + Integration + E2E (path sudah dipetakan ke /usr/src untuk scanner)
 composer coverage
 
 # 2. Scan
-docker compose -f docker-compose.sonar.yml -p ioms-sonar run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
+docker compose -f docker-compose.sonar.yml run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
 ```
 
 Konfigurasi analisis ada di `sonar-project.properties`. Hasil dan penjelasan temuan: `docs/quality/sonarqube-report.md`.
@@ -122,6 +122,10 @@ Produksi: pasang TLS di depan aplikasi (reverse proxy), ganti semua kredensial d
 - Kualitas kode: `docs/quality/` (refactor log, audit SRP, tech debt, critique, laporan static analysis, laporan SonarQube, tinjauan keamanan)
 - Testing: `docs/testing/` (skenario test, known bugs)
 - Disclosure penggunaan AI: `ai-usage-log.md`
+
+## Asset Pihak Ketiga
+
+- Ikon: [Lucide](https://lucide.dev) (`lucide-static` v1.52.0, lisensi ISC). File SVG disalin ke `public/assets/icons/` (lisensi di `public/assets/icons/LICENSE`) dan di-inline lewat helper `icon()`; tidak ada library JS atau CDN saat runtime.
 
 ## Known Limitations (Jujur)
 

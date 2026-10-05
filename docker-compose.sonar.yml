@@ -1,6 +1,8 @@
 # SonarQube lokal untuk analisis kualitas kode (terpisah dari stack aplikasi).
 #   docker compose -f docker-compose.sonar.yml up -d sonarqube
 #   docker compose -f docker-compose.sonar.yml run --rm scanner
+name: ioms
+
 services:
   sonarqube:
     image: sonarqube:community
@@ -24,7 +26,11 @@ services:
     volumes:
       - ./:/usr/src
 
+# Nama volume dipatok ke nama lama (project ioms-sonar) agar hasil analisis tidak hilang.
 volumes:
   sonar_data:
+    name: ioms-sonar_sonar_data
   sonar_extensions:
+    name: ioms-sonar_sonar_extensions
   sonar_logs:
+    name: ioms-sonar_sonar_logs
