@@ -38,7 +38,7 @@
 
   /**
    * Validates a form generically based on data attributes:
-   *   data-required, data-type="number|date|email", data-min="0"
+   *   data-required, data-type="number|date|email", data-min="0", data-max="10"
    * Returns true if valid.
    */
   function validateForm(form) {
@@ -71,6 +71,12 @@
           valid = false;
           return;
         }
+        var max = field.getAttribute('data-max');
+        if (max !== null && num > Number(max)) {
+          showError(field, 'Must be at most ' + max + '.');
+          valid = false;
+          return;
+        }
       } else if (type === 'date') {
         if (!isValidDate(value)) {
           showError(field, 'Enter a valid date (YYYY-MM-DD).');
@@ -85,6 +91,17 @@
         }
       }
     });
+
+    // data-any-positive="<selector>": at least one matching input must be greater than zero.
+    var anySelector = form.getAttribute('data-any-positive');
+    if (valid && anySelector) {
+      var group = Array.prototype.filter.call(form.querySelectorAll(anySelector), function (el) { return !el.disabled; });
+      var anyPositive = group.some(function (el) { return Number(el.value) > 0; });
+      if (group.length > 0 && !anyPositive) {
+        showError(group[0], 'Enter a quantity to receive for at least one item.');
+        valid = false;
+      }
+    }
 
     return valid;
   }

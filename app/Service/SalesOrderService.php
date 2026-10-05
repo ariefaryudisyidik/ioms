@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\SalesOrder;
 use App\Entity\SalesOrderItem;
 use App\Entity\StockLedger;
+use App\Repository\ProductRepositoryInterface;
 use App\Repository\ProductStockRepositoryInterface;
 use App\Repository\SalesOrderRepositoryInterface;
 use App\Repository\StockLedgerRepositoryInterface;
@@ -33,22 +34,19 @@ final class SalesOrderService
         private ProductStockRepositoryInterface $stocks,
         private StockLedgerRepositoryInterface $ledger,
         private TransactionManagerInterface $transactions,
+        private ProductRepositoryInterface $products,
     ) {
     }
 
     /**
+     * The SO number is generated (SO-<order year>-<id>) and each item takes its
+     * selling price from the product at the time of ordering.
+     *
      * @param array<string,mixed> $data raw input from request, keys not guaranteed present
      */
     public function create(array $data, int $userId): SalesOrder
     {
         $errors = [];
-
-        $soNumber = trim((string) ($data['so_number'] ?? ''));
-        if ($soNumber === '') {
-            $errors['so_number'] = 'SO number is required.';
-        } elseif ($this->salesOrders->soNumberExists($soNumber)) {
-            $errors['so_number'] = 'This SO number already exists.';
-        }
 
         if (empty($data['customer_id'])) {
             $errors['customer_id'] = 'Customer is required.';
@@ -64,7 +62,7 @@ final class SalesOrderService
         }
 
         $items = $data['items'] ?? [];
-        $errors += OrderItemValidator::validate($items, 'qty', 'selling_price');
+        $errors += OrderItemValidator::validate($items, 'qty');
 
         if (!$errors) {
             $errors = $this->salesOrders->invalidReferences(
@@ -78,25 +76,37 @@ final class SalesOrderService
             throw new ValidationException($errors);
         }
 
-        $so = new SalesOrder(
+        return $this->transactions->run(fn (): SalesOrder => $this->persist($data, $orderDate, $items, $userId));
+    }
+
+    /**
+     * @param array<string,mixed> $data validated input
+     * @param array<int|string,array<string,mixed>> $items validated items
+     */
+    private function persist(array $data, string $orderDate, array $items, int $userId): SalesOrder
+    {
+        // Saved with a unique placeholder first so the final number can be derived from the new id.
+        $so = $this->salesOrders->save(new SalesOrder(
             id: null,
-            soNumber: $soNumber,
+            soNumber: 'PENDING-' . bin2hex(random_bytes(8)),
             customerId: (int) $data['customer_id'],
             warehouseId: (int) $data['warehouse_id'],
             createdBy: $userId,
             approvedBy: null,
             status: SalesOrder::STATUS_DRAFT,
             orderDate: $orderDate,
-        );
-        $so = $this->salesOrders->save($so);
+        ));
+        $so->soNumber = sprintf('SO-%s-%04d', substr($so->orderDate, 0, 4), $so->id);
+        $this->salesOrders->save($so);
 
         foreach ($items as $item) {
+            $product = $this->products->findById((int) $item['product_id']);
             $this->salesOrders->saveItem(new SalesOrderItem(
                 id: null,
                 salesOrderId: $so->id,
                 productId: (int) $item['product_id'],
                 qty: (int) $item['qty'],
-                sellingPrice: (float) ($item['selling_price'] ?? 0),
+                sellingPrice: $product?->sellingPrice ?? 0.0,
             ));
         }
 

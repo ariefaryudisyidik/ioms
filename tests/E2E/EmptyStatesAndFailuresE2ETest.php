@@ -160,12 +160,12 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
         $this->assertSame(1, (int) $this->value('SELECT COUNT(*) FROM categories WHERE id = 1'));
     }
 
-    public function testReceivingMoreOfAnAlreadyCompleteLineAddsNothing(): void
+    public function testReceivingMoreThanRemainingIsRejectedAndNothingIsSaved(): void
     {
         $client = $this->loginAs(self::ADMIN);
         $client->post('/purchase-orders', [
-            'po_number' => 'PO-E2E-CAP', 'supplier_id' => '1', 'warehouse_id' => '1', 'order_date' => date('Y-m-d'),
-            'items' => [['product_id' => '1', 'qty_ordered' => '5', 'purchase_price' => '1'], ['product_id' => '2', 'qty_ordered' => '5', 'purchase_price' => '1']],
+            'supplier_id' => '1', 'warehouse_id' => '1', 'order_date' => date('Y-m-d'),
+            'items' => [['product_id' => '1', 'qty_ordered' => '5'], ['product_id' => '2', 'qty_ordered' => '5']],
         ]);
         $id = (int) $this->value('SELECT MAX(id) FROM purchase_orders');
         $items = array_column($this->rows('SELECT id FROM purchase_order_items WHERE purchase_order_id = ? ORDER BY id', [$id]), 'id');
@@ -173,9 +173,16 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
 
         $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$items[0] => '5']]);
         $stock = (int) $this->value('SELECT quantity FROM product_stocks WHERE product_id = 1 AND warehouse_id = 1');
-        $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$items[0] => '3']]);
+        $ledgerRows = (int) $this->value('SELECT COUNT(*) FROM stock_ledger');
 
+        // Over-receiving a completed line and an open line (9 > 5) is rejected as a whole.
+        $response = $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$items[0] => '3', $items[1] => '9']]);
+
+        $this->assertStringEndsWith('/purchase-orders/' . $id . '/receive', $response->location);
+        $this->assertStringContainsString('only 0 remaining', $client->get('/purchase-orders/' . $id . '/receive')->body);
         $this->assertSame($stock, (int) $this->value('SELECT quantity FROM product_stocks WHERE product_id = 1 AND warehouse_id = 1'));
+        $this->assertSame($ledgerRows, (int) $this->value('SELECT COUNT(*) FROM stock_ledger'));
+        $this->assertSame('0', (string) $this->value('SELECT qty_received FROM purchase_order_items WHERE id = ?', [$items[1]]));
         $this->assertSame('PartiallyReceived', $this->value('SELECT status FROM purchase_orders WHERE id = ?', [$id]));
     }
 }

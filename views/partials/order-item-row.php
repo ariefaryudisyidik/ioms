@@ -6,8 +6,6 @@
  * @var string $productOptions pre-rendered, escaped <option> markup
  * @var string $qtyName
  * @var string $qtyLabel
- * @var string $priceName
- * @var string $priceLabel
  */
 ?>
 <div class="item-row js-item-row">
@@ -22,11 +20,6 @@
     <div class="field">
         <label><?= e($qtyLabel) ?>
         <input type="number" name="items[<?= e($index) ?>][<?= e($qtyName) ?>]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
-    </label>
-    </div>
-    <div class="field">
-        <label><?= e($priceLabel) ?>
-        <input type="number" name="items[<?= e($index) ?>][<?= e($priceName) ?>]" min="0" step="0.01" data-type="number" data-min="0">
     </label>
     </div>
     <div class="field">

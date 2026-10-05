@@ -17,6 +17,7 @@ final class PurchaseOrderDateValidationTest extends TestCase
             $this->createMock(\App\Repository\ProductStockRepositoryInterface::class),
             $this->createMock(\App\Repository\StockLedgerRepositoryInterface::class),
             new InMemoryTransactionManager(),
+            new \App\Repository\InMemoryProductRepository(),
             $tolerance,
         );
     }

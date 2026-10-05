@@ -26,6 +26,7 @@ final class PurchaseOrderController extends Controller
             new MySqlProductStockRepository($this->pdo()),
             new MySqlStockLedgerRepository($this->pdo()),
             new PdoTransactionManager($this->pdo()),
+            new MySqlProductRepository($this->pdo()),
         );
     }
 

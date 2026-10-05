@@ -1,21 +1,19 @@
 <?php
 /**
- * Create form shared by purchase and sales orders.
+ * Create form shared by purchase and sales orders. The order number and the
+ * item price are not entered: the Service generates the number and takes the
+ * price from the product.
  *
  * @var string $heading
  * @var string $action
  * @var string $listHref
  * @var string $submitLabel
- * @var string|null $hint
- * @var array{id:string,label:string} $numberField
  * @var array{id:string,label:string,placeholder:string,options:list<array{0:int,1:string}>} $partyField
  * @var list<array{0:int,1:string}> $warehouseOptions
  * @var array<string,string> $defaults values used when no old input is flashed
  * @var array<string,string>|null $errors
  * @var \App\Entity\Product[] $products
- * @var string $priceProperty product property exposed as data-price
  * @var array{0:string,1:string} $qtyField [name, label]
- * @var array{0:string,1:string} $priceField [name, label]
  */
 $errors ??= [];
 $old = [];
@@ -24,15 +22,13 @@ foreach ($defaults as $key => $value) {
 }
 $productOptions = '';
 foreach ($products as $p) {
-    $productOptions .= '<option value="' . (int) $p->id . '" data-sku="' . e($p->sku) . '" data-price="' . e((string) $p->{$priceProperty}) . '">'
+    $productOptions .= '<option value="' . (int) $p->id . '" data-sku="' . e($p->sku) . '">'
         . e($p->name) . ' (' . e($p->sku) . ')</option>';
 }
 $rowVars = [
     'productOptions' => $productOptions,
     'qtyName' => $qtyField[0],
     'qtyLabel' => $qtyField[1],
-    'priceName' => $priceField[0],
-    'priceLabel' => $priceField[1],
 ];
 ?>
 <h1><?= e($heading) ?></h1>
@@ -40,7 +36,6 @@ $rowVars = [
 <div class="panel">
     <form method="post" action="<?= e($action) ?>" data-validate novalidate>
         <div class="form-grid">
-            <?php partial('text-field', ['id' => $numberField['id'], 'label' => $numberField['label'], 'type' => 'text', 'value' => $old[$numberField['id']], 'attrs' => 'data-required', 'required' => true, 'errorKey' => $numberField['id'], 'errors' => $errors]); ?>
             <?php partial('select-field', ['id' => $partyField['id'], 'label' => $partyField['label'], 'placeholder' => $partyField['placeholder'], 'selectClass' => '', 'options' => $partyField['options'], 'selected' => (string) $old[$partyField['id']], 'errors' => $errors]); ?>
             <?php partial('select-field', ['id' => 'warehouse_id', 'label' => 'Warehouse', 'placeholder' => 'Select a warehouse', 'selectClass' => 'js-order-warehouse', 'options' => $warehouseOptions, 'selected' => (string) $old['warehouse_id'], 'errors' => $errors]); ?>
             <?php partial('text-field', ['id' => 'order_date', 'label' => 'Order Date', 'type' => 'date', 'value' => $old['order_date'], 'attrs' => 'data-required data-type="date"', 'required' => true, 'errorKey' => 'order_date', 'errors' => $errors]); ?>
@@ -48,7 +43,6 @@ $rowVars = [
 
         <fieldset>
             <legend>Items</legend>
-            <?php if ($hint !== null): ?><p class="hint"><?= e($hint) ?></p><?php endif; ?>
             <?php if (isset($errors['items'])): ?><div class="field-error"><?= e($errors['items']) ?></div><?php endif; ?>
             <div class="js-item-rows">
                 <?php partial('order-item-row', $rowVars + ['index' => '0']); ?>

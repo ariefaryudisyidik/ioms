@@ -33,17 +33,6 @@ final class InMemorySalesOrderRepository implements SalesOrderRepositoryInterfac
         return $so;
     }
 
-    public function soNumberExists(string $soNumber): bool
-    {
-        foreach ($this->orders as $o) {
-            if ($o->soNumber === $soNumber) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function invalidReferences(int $customerId, int $warehouseId, array $productIds): array
     {
         return [];

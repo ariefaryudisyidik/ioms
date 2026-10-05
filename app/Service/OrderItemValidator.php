@@ -6,6 +6,7 @@ namespace App\Service;
 
 /**
  * Shared validation of order line items (purchase and sales orders).
+ * A null $priceKey skips the price check (purchase orders take the price from the product).
  */
 final class OrderItemValidator
 {
@@ -15,7 +16,7 @@ final class OrderItemValidator
     /**
      * @return array<string,string> errors keyed by "items" or "items.<index>"
      */
-    public static function validate(mixed $items, string $qtyKey, string $priceKey): array
+    public static function validate(mixed $items, string $qtyKey, ?string $priceKey = null): array
     {
         if (!is_array($items) || count($items) === 0) {
             return ['items' => 'At least one item is required.'];
@@ -41,11 +42,15 @@ final class OrderItemValidator
         return array_map(static fn ($item): int => (int) $item['product_id'], $items);
     }
 
-    private static function itemError(mixed $item, string $qtyKey, string $priceKey): ?string
+    private static function itemError(mixed $item, string $qtyKey, ?string $priceKey): ?string
     {
         $hasProduct = is_array($item) && self::positiveInt($item['product_id'] ?? null, PHP_INT_MAX) !== null;
         if (!$hasProduct || self::positiveInt($item[$qtyKey] ?? null, self::MAX_QUANTITY) === null) {
             return 'Each item requires a product and a positive quantity.';
+        }
+
+        if ($priceKey === null) {
+            return null;
         }
 
         return self::isValidPrice($item[$priceKey] ?? '') ? null : 'Item price must be a non-negative number.';

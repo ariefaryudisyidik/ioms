@@ -78,6 +78,7 @@ final class OrderRulesTest extends TestCase
             new InMemoryProductStockRepository(),
             $this->createMock(StockLedgerRepositoryInterface::class),
             new InMemoryTransactionManager(),
+            new \App\Repository\InMemoryProductRepository(),
         );
     }
 

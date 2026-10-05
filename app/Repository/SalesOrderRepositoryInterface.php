@@ -13,8 +13,6 @@ interface SalesOrderRepositoryInterface
 
     public function findWithItems(int $id): ?SalesOrder;
 
-    public function soNumberExists(string $soNumber): bool;
-
     /**
      * Validation errors for references that do not exist or are inactive.
      *

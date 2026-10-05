@@ -104,14 +104,13 @@ final class RepositoryIntegrationTest extends IntegrationTestCase
         $pdo = $this->pdo();
         $orders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
-        $service = new PurchaseOrderService($orders, $stocks, new MySqlStockLedgerRepository($pdo), new PdoTransactionManager($pdo));
+        $service = new PurchaseOrderService($orders, $stocks, new MySqlStockLedgerRepository($pdo), new PdoTransactionManager($pdo), new MySqlProductRepository($pdo));
 
         $po = $service->create([
-            'po_number' => 'PO-R-ROLLBACK',
             'supplier_id' => 1,
             'warehouse_id' => 1,
             'order_date' => date('Y-m-d'),
-            'items' => [['product_id' => 1, 'qty_ordered' => 10, 'purchase_price' => 100]],
+            'items' => [['product_id' => 1, 'qty_ordered' => 10]],
         ], 1);
         $service->transitionTo($po->id, PurchaseOrder::STATUS_ORDERED);
         $itemId = $orders->findWithItems($po->id)->items[0]->id;

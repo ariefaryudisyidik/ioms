@@ -8,9 +8,10 @@ foreach ($products as $p) { $productsById[$p->id] = $p; }
 include __DIR__ . '/../partials/header.php';
 ?>
 <h1>Receive Goods &mdash; <?= e($po->poNumber) ?></h1>
+<?php include __DIR__ . '/../partials/form-errors.php'; ?>
 
 <div class="panel">
-    <form method="post" action="/purchase-orders/<?= (int) $po->id ?>/receive" data-validate novalidate>
+    <form method="post" action="/purchase-orders/<?= (int) $po->id ?>/receive" data-validate data-any-positive=".js-receive-qty" novalidate>
         <div class="table-wrap">
             <table class="data-table">
                 <thead><tr><th>Product</th><th>Ordered</th><th>Received</th><th>Remaining</th><th>Receive Now</th></tr></thead>
@@ -23,8 +24,10 @@ include __DIR__ . '/../partials/header.php';
                         <td><?= (int) $item->qtyReceived ?></td>
                         <td><?= (int) $item->remaining() ?></td>
                         <td>
-                            <input type="number" aria-label="Quantity to receive" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
-                                   step="1" value="0" data-type="number" data-min="0" <?= $item->remaining() <= 0 ? 'disabled' : '' ?>>
+                            <div class="field cell-field">
+                                <input type="number" class="js-receive-qty" aria-label="Quantity to receive" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
+                                       step="1" value="0" data-type="number" data-min="0" data-max="<?= (int) $item->remaining() ?>" <?= $item->remaining() <= 0 ? 'disabled' : '' ?>>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>

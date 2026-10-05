@@ -9,8 +9,6 @@ partial('order-form', [
     'action' => '/purchase-orders',
     'listHref' => '/purchase-orders',
     'submitLabel' => 'Save Purchase Order',
-    'hint' => null,
-    'numberField' => ['id' => 'po_number', 'label' => 'PO Number'],
     'partyField' => [
         'id' => 'supplier_id',
         'label' => 'Supplier',
@@ -18,11 +16,9 @@ partial('order-form', [
         'options' => array_map(static fn ($x) => [$x->id, $x->name], $suppliers),
     ],
     'warehouseOptions' => array_map(static fn ($w) => [$w->id, $w->name], $warehouses),
-    'defaults' => ['po_number' => '', 'supplier_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')],
+    'defaults' => ['supplier_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')],
     'errors' => $errors ?? [],
     'products' => $products,
-    'priceProperty' => 'purchasePrice',
     'qtyField' => ['qty_ordered', 'Qty Ordered'],
-    'priceField' => ['purchase_price', 'Purchase Price'],
 ]);
 include __DIR__ . '/../partials/footer.php';

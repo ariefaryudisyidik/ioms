@@ -9,8 +9,6 @@ partial('order-form', [
     'action' => '/sales-orders',
     'listHref' => '/sales-orders',
     'submitLabel' => 'Save Sales Order',
-    'hint' => 'Selecting a product and warehouse checks live stock availability automatically.',
-    'numberField' => ['id' => 'so_number', 'label' => 'SO Number'],
     'partyField' => [
         'id' => 'customer_id',
         'label' => 'Customer',
@@ -18,11 +16,9 @@ partial('order-form', [
         'options' => array_map(static fn ($x) => [$x->id, $x->name], $customers),
     ],
     'warehouseOptions' => array_map(static fn ($w) => [$w->id, $w->name], $warehouses),
-    'defaults' => ['so_number' => '', 'customer_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')],
+    'defaults' => ['customer_id' => '', 'warehouse_id' => '', 'order_date' => date('Y-m-d')],
     'errors' => $errors ?? [],
     'products' => $products,
-    'priceProperty' => 'sellingPrice',
     'qtyField' => ['qty', 'Qty'],
-    'priceField' => ['selling_price', 'Selling Price'],
 ]);
 include __DIR__ . '/../partials/footer.php';

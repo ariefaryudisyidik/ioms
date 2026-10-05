@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use App\Entity\SalesOrder;
+use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlSalesOrderRepository;
@@ -17,15 +18,14 @@ use App\Service\SalesOrderService;
  */
 final class GoodsIssueIntegrationTest extends IntegrationTestCase
 {
-    private function approvedOrder(MySqlSalesOrderRepository $orders, SalesOrderService $service, string $soNumber, int $qty): SalesOrder
+    private function approvedOrder(MySqlSalesOrderRepository $orders, SalesOrderService $service, int $qty): SalesOrder
     {
         $so = $service->create([
-            'so_number' => $soNumber,
             'customer_id' => 1,
             'warehouse_id' => 1,
             'order_date' => date('Y-m-d'),
             'items' => [
-                ['product_id' => 1, 'qty' => $qty, 'selling_price' => 150],
+                ['product_id' => 1, 'qty' => $qty],
             ],
         ], 2); // created by user 2 (not Admin, so approver id 1 differs)
 
@@ -45,14 +45,14 @@ final class GoodsIssueIntegrationTest extends IntegrationTestCase
         $orders = new MySqlSalesOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new SalesOrderService($orders, $stocks, $ledger, new PdoTransactionManager($pdo));
+        $service = new SalesOrderService($orders, $stocks, $ledger, new PdoTransactionManager($pdo), new MySqlProductRepository($pdo));
 
-        $so1 = $this->approvedOrder($orders, $service, 'SO-INT-1', 10);
+        $so1 = $this->approvedOrder($orders, $service, 10);
         $result1 = $service->fulfill($so1->id, 1);
         $this->assertSame(SalesOrder::STATUS_FULFILLED, $result1->status);
         $this->assertSame(0, $stocks->find(1, 1)->quantity);
 
-        $so2 = $this->approvedOrder($orders, $service, 'SO-INT-2', 10);
+        $so2 = $this->approvedOrder($orders, $service, 10);
 
         $this->expectException(InsufficientStockException::class);
         try {

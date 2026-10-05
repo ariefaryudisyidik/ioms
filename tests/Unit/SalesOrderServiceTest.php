@@ -27,7 +27,7 @@ final class SalesOrderServiceTest extends TestCase
 
     private function makeService(InMemorySalesOrderRepository $orders, InMemoryProductStockRepository $stocks): SalesOrderService
     {
-        return new SalesOrderService($orders, $stocks, new FakeStockLedgerRepository(), $this->transactions);
+        return new SalesOrderService($orders, $stocks, new FakeStockLedgerRepository(), $this->transactions, new \App\Repository\InMemoryProductRepository());
     }
 
     private function seedApprovedOrder(InMemorySalesOrderRepository $orders, int $qty = 10): SalesOrder

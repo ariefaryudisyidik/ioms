@@ -98,8 +98,6 @@ final class InMemoryRepositoriesTest extends TestCase
         $this->assertNull($repo->findWithItems(99));
         $this->assertCount(1, $repo->findWithItems($a->id)->items);
         $this->assertCount(1, $repo->itemsFor($a->id));
-        $this->assertTrue($repo->soNumberExists('SO-2'));
-        $this->assertFalse($repo->soNumberExists('SO-9'));
         $this->assertCount(2, $repo->search());
         $this->assertCount(1, $repo->search(['status' => SalesOrder::STATUS_APPROVED]));
         $this->assertSame([], $repo->invalidReferences(1, 1, [1]));

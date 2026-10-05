@@ -69,6 +69,7 @@
     var productSelect = row.querySelector('.js-product-select');
     var warehouseSelect = row.querySelector('.js-warehouse-select') || document.querySelector('.js-order-warehouse');
     var box = row.querySelector('.availability-box');
+
     if (!productSelect || !box) return;
 
     function check() {

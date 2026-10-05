@@ -40,11 +40,6 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
         return $po;
     }
 
-    public function poNumberExists(string $poNumber): bool
-    {
-        return $this->valueExists('purchase_orders', 'po_number', $poNumber);
-    }
-
     public function invalidReferences(int $supplierId, int $warehouseId, array $productIds): array
     {
         $checks = [

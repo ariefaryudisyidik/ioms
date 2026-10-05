@@ -251,19 +251,18 @@ final class SecurityE2ETest extends E2ETestCase
         $today = date('Y-m-d');
 
         $po = static fn (array $over): array => array_merge([
-            'po_number' => 'PO-SEC-1', 'supplier_id' => '1', 'warehouse_id' => '1', 'order_date' => $today,
-            'items' => [['product_id' => '1', 'qty_ordered' => '2', 'purchase_price' => '10']],
+            'supplier_id' => '1', 'warehouse_id' => '1', 'order_date' => $today,
+            'items' => [['product_id' => '1', 'qty_ordered' => '2']],
         ], $over);
         $so = static fn (array $over): array => array_merge([
-            'so_number' => 'SO-SEC-1', 'customer_id' => '1', 'warehouse_id' => '1', 'order_date' => $today,
-            'items' => [['product_id' => '1', 'qty' => '2', 'selling_price' => '10']],
+            'customer_id' => '1', 'warehouse_id' => '1', 'order_date' => $today,
+            'items' => [['product_id' => '1', 'qty' => '2']],
         ], $over);
 
         $badPurchaseOrders = [
             [$po(['supplier_id' => '999']), 'Supplier not found or inactive'],
             [$po(['warehouse_id' => '2']), 'Warehouse not found or inactive'],
             [$po(['items' => [['product_id' => '3', 'qty_ordered' => '2']]]), 'Product not found or inactive'],
-            [$po(['items' => [['product_id' => '1', 'qty_ordered' => '2', 'purchase_price' => '-5']]]), 'price must be a non-negative number'],
             [$po(['items' => [['product_id' => '1', 'qty_ordered' => '99999999']]]), 'positive quantity'],
         ];
         foreach ($badPurchaseOrders as $index => [$data, $message]) {
@@ -275,7 +274,6 @@ final class SecurityE2ETest extends E2ETestCase
             [$so(['customer_id' => '999']), 'Customer not found or inactive'],
             [$so(['warehouse_id' => '2']), 'Warehouse not found or inactive'],
             [$so(['items' => [['product_id' => '3', 'qty' => '2']]]), 'Product not found or inactive'],
-            [$so(['items' => [['product_id' => '1', 'qty' => '2', 'selling_price' => '-1']]]), 'price must be a non-negative number'],
             [$so(['order_date' => '2026-02-31']), 'valid date'],
         ];
         foreach ($badSalesOrders as $index => [$data, $message]) {

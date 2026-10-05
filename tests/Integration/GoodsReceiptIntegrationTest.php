@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use App\Entity\PurchaseOrder;
+use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlPurchaseOrderRepository;
@@ -24,15 +25,14 @@ final class GoodsReceiptIntegrationTest extends IntegrationTestCase
         $purchaseOrders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo));
+        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo), new MySqlProductRepository($pdo));
 
         $po = $service->create([
-            'po_number' => 'PO-INT-1',
             'supplier_id' => 1,
             'warehouse_id' => 1,
             'order_date' => date('Y-m-d'),
             'items' => [
-                ['product_id' => 1, 'qty_ordered' => 20, 'purchase_price' => 100],
+                ['product_id' => 1, 'qty_ordered' => 20],
             ],
         ], 1);
         $service->transitionTo($po->id, PurchaseOrder::STATUS_ORDERED);
@@ -66,15 +66,14 @@ final class GoodsReceiptIntegrationTest extends IntegrationTestCase
         $purchaseOrders = new MySqlPurchaseOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo));
+        $service = new PurchaseOrderService($purchaseOrders, $stocks, $ledger, new PdoTransactionManager($pdo), new MySqlProductRepository($pdo));
 
         $po = $service->create([
-            'po_number' => 'PO-INT-2',
             'supplier_id' => 1,
             'warehouse_id' => 1,
             'order_date' => date('Y-m-d'),
             'items' => [
-                ['product_id' => 1, 'qty_ordered' => 10, 'purchase_price' => 100],
+                ['product_id' => 1, 'qty_ordered' => 10],
             ],
         ], 1);
         $service->transitionTo($po->id, PurchaseOrder::STATUS_ORDERED);

@@ -41,11 +41,6 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
         return $so;
     }
 
-    public function soNumberExists(string $soNumber): bool
-    {
-        return $this->valueExists('sales_orders', 'so_number', $soNumber);
-    }
-
     public function invalidReferences(int $customerId, int $warehouseId, array $productIds): array
     {
         $checks = [

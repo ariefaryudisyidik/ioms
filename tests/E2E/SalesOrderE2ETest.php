@@ -9,11 +9,10 @@ final class SalesOrderE2ETest extends E2ETestCase
     private function newSo(array $overrides = []): array
     {
         return array_merge([
-            'so_number' => 'SO-E2E-0001',
             'customer_id' => '1',
             'warehouse_id' => '1',
             'order_date' => date('Y-m-d'),
-            'items' => [['product_id' => '1', 'qty' => '2', 'selling_price' => '6800000']],
+            'items' => [['product_id' => '1', 'qty' => '2']],
         ], $overrides);
     }
 
@@ -34,6 +33,25 @@ final class SalesOrderE2ETest extends E2ETestCase
     private function stock(int $productId, int $warehouseId): int
     {
         return (int) $this->value('SELECT quantity FROM product_stocks WHERE product_id = ? AND warehouse_id = ?', [$productId, $warehouseId]);
+    }
+
+    public function testSoNumberIsGeneratedAndItemPriceComesFromTheProduct(): void
+    {
+        $sari = $this->loginAs(self::SALES);
+        $productPrice = (float) $this->value('SELECT selling_price FROM products WHERE id = 1');
+
+        // A tampered number or price in the request is ignored.
+        $id = $this->createSo($sari, [
+            'so_number' => 'HACKED',
+            'items' => [['product_id' => '1', 'qty' => '1', 'selling_price' => '1']],
+        ]);
+
+        $this->assertSame(sprintf('SO-%s-%04d', date('Y'), $id), $this->value('SELECT so_number FROM sales_orders WHERE id = ?', [$id]));
+        $this->assertSame($productPrice, (float) $this->value('SELECT selling_price FROM sales_order_items WHERE sales_order_id = ?', [$id]));
+        $this->assertNotSame(
+            $this->value('SELECT so_number FROM sales_orders WHERE id = ?', [$id]),
+            $this->value('SELECT so_number FROM sales_orders WHERE id = ?', [$this->createSo($sari)])
+        );
     }
 
     public function testSalesUsersOnlySeeTheirOwnOrdersWhileAdminSeesAll(): void
@@ -92,8 +110,7 @@ final class SalesOrderE2ETest extends E2ETestCase
         $client = $this->loginAs(self::SALES);
 
         $cases = [
-            'missing fields' => ['so_number' => '', 'customer_id' => '', 'warehouse_id' => '', 'order_date' => ''],
-            'duplicate number' => ['so_number' => 'SO-2026-0001'],
+            'missing fields' => ['customer_id' => '', 'warehouse_id' => '', 'order_date' => ''],
             'no items' => ['items' => []],
             'bad item' => ['items' => [['product_id' => '', 'qty' => '0']]],
         ];
@@ -155,13 +172,13 @@ final class SalesOrderE2ETest extends E2ETestCase
         $sari = $this->loginAs(self::SALES);
         $budi = $this->loginAs(self::SALES_2);
 
-        $adminOrder = $this->createSo($admin, ['so_number' => 'SO-E2E-ADMIN']);
+        $adminOrder = $this->createSo($admin);
         $admin->post('/sales-orders/' . $adminOrder . '/submit');
         $selfApprove = $admin->post('/sales-orders/' . $adminOrder . '/approve');
         $this->assertSame(403, $selfApprove->status);
         $this->assertSame('PendingApproval', $this->orderStatus($adminOrder));
 
-        $sariOrder = $this->createSo($sari, ['so_number' => 'SO-E2E-SARI']);
+        $sariOrder = $this->createSo($sari);
         $this->assertSame(403, $budi->post('/sales-orders/' . $sariOrder . '/submit')->status);
         $this->assertSame('Draft', $this->orderStatus($sariOrder));
 
@@ -179,7 +196,7 @@ final class SalesOrderE2ETest extends E2ETestCase
     {
         $sari = $this->loginAs(self::SALES);
         $admin = $this->loginAs(self::ADMIN);
-        $id = $this->createSo($sari, ['items' => [['product_id' => '1', 'qty' => '1', 'selling_price' => '1'], ['product_id' => '5', 'qty' => '999', 'selling_price' => '1']]]);
+        $id = $this->createSo($sari, ['items' => [['product_id' => '1', 'qty' => '1'], ['product_id' => '5', 'qty' => '999']]]);
         $sari->post('/sales-orders/' . $id . '/submit');
         $admin->post('/sales-orders/' . $id . '/approve');
         $before = $this->stock(1, 1);

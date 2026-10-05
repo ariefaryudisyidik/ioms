@@ -62,14 +62,6 @@ abstract class AbstractMySqlRepository
         return (int) $this->pdo->lastInsertId();
     }
 
-    protected function valueExists(string $table, string $column, string $value): bool
-    {
-        $stmt = $this->pdo->prepare("SELECT id FROM {$table} WHERE {$column} = ?");
-        $stmt->execute([$value]);
-
-        return $stmt->fetch() !== false;
-    }
-
     /**
      * @param array<string,array{0:string,1:int,2:string}> $checks field => [table, id, message];
      *        tables are code constants, never user input

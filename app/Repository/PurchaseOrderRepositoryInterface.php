@@ -13,8 +13,6 @@ interface PurchaseOrderRepositoryInterface
 
     public function findWithItems(int $id): ?PurchaseOrder;
 
-    public function poNumberExists(string $poNumber): bool;
-
     /**
      * Validation errors for references that do not exist or are inactive.
      *

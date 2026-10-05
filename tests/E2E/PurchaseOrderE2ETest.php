@@ -9,11 +9,10 @@ final class PurchaseOrderE2ETest extends E2ETestCase
     private function newPo(array $overrides = []): array
     {
         return array_merge([
-            'po_number' => 'PO-E2E-0001',
             'supplier_id' => '1',
             'warehouse_id' => '1',
             'order_date' => date('Y-m-d'),
-            'items' => [['product_id' => '1', 'qty_ordered' => '10', 'purchase_price' => '5500000']],
+            'items' => [['product_id' => '1', 'qty_ordered' => '10']],
         ], $overrides);
     }
 
@@ -61,7 +60,28 @@ final class PurchaseOrderE2ETest extends E2ETestCase
 
         $this->assertSame('Draft', $this->value('SELECT status FROM purchase_orders WHERE id = ?', [$id]));
         $this->assertSame(1, (int) $this->value('SELECT COUNT(*) FROM purchase_order_items WHERE purchase_order_id = ?', [$id]));
-        $this->assertStringContainsString('PO-E2E-0001', $client->get('/purchase-orders/' . $id)->body);
+        $this->assertStringContainsString(sprintf('PO-%s-%04d', date('Y'), $id), $client->get('/purchase-orders/' . $id)->body);
+    }
+
+    public function testPoNumberIsGeneratedAndItemPriceComesFromTheProduct(): void
+    {
+        $client = $this->loginAs(self::ADMIN);
+        $productPrice = (float) $this->value('SELECT purchase_price FROM products WHERE id = 1');
+
+        // A tampered number or price in the request is ignored.
+        $id = $this->createPo($client, [
+            'po_number' => 'HACKED',
+            'items' => [['product_id' => '1', 'qty_ordered' => '3', 'purchase_price' => '1']],
+        ]);
+
+        $this->assertSame(sprintf('PO-%s-%04d', date('Y'), $id), $this->value('SELECT po_number FROM purchase_orders WHERE id = ?', [$id]));
+        $this->assertSame($productPrice, (float) $this->value('SELECT purchase_price FROM purchase_order_items WHERE purchase_order_id = ?', [$id]));
+
+        $second = $this->createPo($client);
+        $this->assertNotSame(
+            $this->value('SELECT po_number FROM purchase_orders WHERE id = ?', [$id]),
+            $this->value('SELECT po_number FROM purchase_orders WHERE id = ?', [$second])
+        );
     }
 
     public function testCreateValidationRejectsBadInput(): void
@@ -69,10 +89,9 @@ final class PurchaseOrderE2ETest extends E2ETestCase
         $client = $this->loginAs(self::ADMIN);
 
         $cases = [
-            'missing fields' => ['po_number' => '', 'supplier_id' => '', 'warehouse_id' => '', 'order_date' => ''],
+            'missing fields' => ['supplier_id' => '', 'warehouse_id' => '', 'order_date' => ''],
             'future date' => ['order_date' => '2999-01-01'],
             'bad date' => ['order_date' => '31-31-2026'],
-            'duplicate number' => ['po_number' => 'PO-2026-0001'],
             'no items' => ['items' => []],
             'bad item' => ['items' => [['product_id' => '', 'qty_ordered' => '0']]],
         ];
@@ -88,7 +107,7 @@ final class PurchaseOrderE2ETest extends E2ETestCase
     public function testOrderThenPartialThenFullReceiptUpdatesStockLedgerAndStatus(): void
     {
         $client = $this->loginAs(self::WAREHOUSE);
-        $id = $this->createPo($client, ['items' => [['product_id' => '1', 'qty_ordered' => '10', 'purchase_price' => '1'], ['product_id' => '2', 'qty_ordered' => '5', 'purchase_price' => '1']]]);
+        $id = $this->createPo($client, ['items' => [['product_id' => '1', 'qty_ordered' => '10'], ['product_id' => '2', 'qty_ordered' => '5']]]);
         $itemIds = array_column($this->rows('SELECT id FROM purchase_order_items WHERE purchase_order_id = ? ORDER BY id', [$id]), 'id');
         $before = $this->stock(1, 1);
 
@@ -100,7 +119,7 @@ final class PurchaseOrderE2ETest extends E2ETestCase
         $this->assertSame('PartiallyReceived', $this->value('SELECT status FROM purchase_orders WHERE id = ?', [$id]));
         $this->assertSame($before + 4, $this->stock(1, 1));
 
-        $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$itemIds[0] => '50', $itemIds[1] => '5']]);
+        $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$itemIds[0] => '6', $itemIds[1] => '5']]);
         $this->assertSame('Received', $this->value('SELECT status FROM purchase_orders WHERE id = ?', [$id]));
         $this->assertSame($before + 10, $this->stock(1, 1));
         $this->assertSame(2, (int) $this->value("SELECT COUNT(*) FROM stock_ledger WHERE reference_type = 'purchase_order' AND reference_id = ? AND product_id = 1", [$id]));
@@ -109,6 +128,22 @@ final class PurchaseOrderE2ETest extends E2ETestCase
         $this->assertStringEndsWith('/purchase-orders/' . $id . '/receive', $again->location);
         $this->assertStringContainsString('alert-error', $client->get('/purchase-orders/' . $id . '/receive')->body);
         $this->assertSame($before + 10, $this->stock(1, 1));
+    }
+
+    public function testReceiptWithAllZeroQuantitiesIsRejected(): void
+    {
+        $client = $this->loginAs(self::WAREHOUSE);
+        $id = $this->createPo($client, ['items' => [['product_id' => '1', 'qty_ordered' => '3']]]);
+        $itemId = (int) $this->value('SELECT id FROM purchase_order_items WHERE purchase_order_id = ?', [$id]);
+        $client->post('/purchase-orders/' . $id . '/order');
+        $ledgerRows = (int) $this->value('SELECT COUNT(*) FROM stock_ledger');
+
+        $response = $client->post('/purchase-orders/' . $id . '/receive', ['items' => [$itemId => '0']]);
+
+        $this->assertStringEndsWith('/purchase-orders/' . $id . '/receive', $response->location);
+        $this->assertStringContainsString('at least one item', $client->get('/purchase-orders/' . $id . '/receive')->body);
+        $this->assertSame('Ordered', $this->value('SELECT status FROM purchase_orders WHERE id = ?', [$id]));
+        $this->assertSame($ledgerRows, (int) $this->value('SELECT COUNT(*) FROM stock_ledger'));
     }
 
     public function testReceivingOnDraftOrderIsRejected(): void

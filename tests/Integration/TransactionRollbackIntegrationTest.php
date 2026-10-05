@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use App\Entity\SalesOrder;
+use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\PdoTransactionManager;
 use App\Repository\MySqlSalesOrderRepository;
@@ -33,15 +34,14 @@ final class TransactionRollbackIntegrationTest extends IntegrationTestCase
         $orders = new MySqlSalesOrderRepository($pdo);
         $stocks = new MySqlProductStockRepository($pdo);
         $ledger = new MySqlStockLedgerRepository($pdo);
-        $service = new SalesOrderService($orders, $stocks, $ledger, new PdoTransactionManager($pdo));
+        $service = new SalesOrderService($orders, $stocks, $ledger, new PdoTransactionManager($pdo), new MySqlProductRepository($pdo));
 
         $so = $service->create([
-            'so_number' => 'SO-INT-ROLLBACK',
             'customer_id' => 1,
             'warehouse_id' => 1,
             'order_date' => date('Y-m-d'),
             'items' => [
-                ['product_id' => 1, 'qty' => 5, 'selling_price' => 150],
+                ['product_id' => 1, 'qty' => 5],
             ],
         ], 2);
         $service->submitForApproval($so->id, 2);

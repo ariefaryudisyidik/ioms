@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Entity\PurchaseOrder;
 use App\Entity\PurchaseOrderItem;
 use App\Entity\StockLedger;
+use App\Repository\ProductRepositoryInterface;
 use App\Repository\ProductStockRepositoryInterface;
 use App\Repository\PurchaseOrderRepositoryInterface;
 use App\Repository\StockLedgerRepositoryInterface;
@@ -31,6 +32,7 @@ final class PurchaseOrderService
         private ProductStockRepositoryInterface $stocks,
         private StockLedgerRepositoryInterface $ledger,
         private TransactionManagerInterface $transactions,
+        private ProductRepositoryInterface $products,
         /** Tolerance in days for how far in the future an order_date may be. */
         private int $futureDateToleranceDays = 0,
     ) {
@@ -64,18 +66,14 @@ final class PurchaseOrderService
     }
 
     /**
+     * The PO number is generated (PO-<order year>-<id>) and each item takes its
+     * purchase price from the product at the time of ordering.
+     *
      * @param array<string,mixed> $data raw input from request, keys not guaranteed present
      */
     public function create(array $data, int $userId): PurchaseOrder
     {
         $errors = [];
-
-        $poNumber = trim((string) ($data['po_number'] ?? ''));
-        if ($poNumber === '') {
-            $errors['po_number'] = 'PO number is required.';
-        } elseif ($this->purchaseOrders->poNumberExists($poNumber)) {
-            $errors['po_number'] = 'This PO number already exists.';
-        }
 
         if (empty($data['supplier_id'])) {
             $errors['supplier_id'] = 'Supplier is required.';
@@ -90,7 +88,7 @@ final class PurchaseOrderService
         }
 
         $items = $data['items'] ?? [];
-        $errors += OrderItemValidator::validate($items, 'qty_ordered', 'purchase_price');
+        $errors += OrderItemValidator::validate($items, 'qty_ordered');
 
         if (!$errors) {
             $errors = $this->purchaseOrders->invalidReferences(
@@ -104,25 +102,37 @@ final class PurchaseOrderService
             throw new ValidationException($errors);
         }
 
-        $po = new PurchaseOrder(
+        return $this->transactions->run(fn (): PurchaseOrder => $this->persist($data, $items, $userId));
+    }
+
+    /**
+     * @param array<string,mixed> $data validated input
+     * @param array<int|string,array<string,mixed>> $items validated items
+     */
+    private function persist(array $data, array $items, int $userId): PurchaseOrder
+    {
+        // Saved with a unique placeholder first so the final number can be derived from the new id.
+        $po = $this->purchaseOrders->save(new PurchaseOrder(
             id: null,
-            poNumber: $poNumber,
+            poNumber: 'PENDING-' . bin2hex(random_bytes(8)),
             supplierId: (int) $data['supplier_id'],
             warehouseId: (int) $data['warehouse_id'],
             status: PurchaseOrder::STATUS_DRAFT,
             orderDate: $data['order_date'],
             createdBy: $userId,
-        );
-        $po = $this->purchaseOrders->save($po);
+        ));
+        $po->poNumber = sprintf('PO-%s-%04d', substr($po->orderDate, 0, 4), $po->id);
+        $this->purchaseOrders->save($po);
 
         foreach ($items as $item) {
+            $product = $this->products->findById((int) $item['product_id']);
             $this->purchaseOrders->saveItem(new PurchaseOrderItem(
                 id: null,
                 purchaseOrderId: $po->id,
                 productId: (int) $item['product_id'],
                 qtyOrdered: (int) $item['qty_ordered'],
                 qtyReceived: 0,
-                purchasePrice: (float) ($item['purchase_price'] ?? 0),
+                purchasePrice: $product?->purchasePrice ?? 0.0,
             ));
         }
 
@@ -183,6 +193,8 @@ final class PurchaseOrderService
             $itemsById[$poItem->id] = $poItem;
         }
 
+        $this->assertValidQuantities($itemsById, $items);
+
         return $this->transactions->run(function () use ($po, $itemsById, $items, $userId): PurchaseOrder {
             foreach ($items as $received) {
                 $this->receiveLine($po, $itemsById, (int) $received['item_id'], (int) $received['qty'], $userId);
@@ -202,8 +214,47 @@ final class PurchaseOrderService
     }
 
     /**
-     * Applies one received quantity: caps it at what is still outstanding,
-     * then updates the item, writes the Receipt ledger row, and adds stock.
+     * Rejects the whole receipt (nothing is saved) when no line receives anything
+     * or when a line would receive more than is still outstanding.
+     *
+     * @param array<int,PurchaseOrderItem> $itemsById
+     * @param array<int,array{item_id:int,qty:int}> $items
+     */
+    private function assertValidQuantities(array $itemsById, array $items): void
+    {
+        $errors = [];
+        $receivesSomething = false;
+        foreach ($items as $received) {
+            $line = $itemsById[(int) $received['item_id']] ?? null;
+            if ($line === null) {
+                continue;
+            }
+            $receivesSomething = $receivesSomething || (int) $received['qty'] > 0;
+            if ((int) $received['qty'] <= $line->remaining()) {
+                continue;
+            }
+
+            $name = $this->products->findById($line->productId)?->name ?? ('#' . $line->productId);
+            $errors['items.' . $line->id] = sprintf(
+                '%s: cannot receive %d, only %d remaining.',
+                $name,
+                (int) $received['qty'],
+                $line->remaining()
+            );
+        }
+
+        if (!$errors && !$receivesSomething) {
+            $errors['items'] = 'Enter a quantity to receive for at least one item.';
+        }
+
+        if ($errors) {
+            throw new ValidationException($errors);
+        }
+    }
+
+    /**
+     * Applies one received quantity (already validated against the remaining
+     * quantity): updates the item, writes the Receipt ledger row, and adds stock.
      *
      * @param array<int,PurchaseOrderItem> $itemsById
      */
@@ -214,11 +265,7 @@ final class PurchaseOrderService
         }
 
         $poItem = $itemsById[$itemId];
-        $newReceived = min($poItem->qtyOrdered, $poItem->qtyReceived + $qty);
-        $actualAdded = $newReceived - $poItem->qtyReceived;
-        if ($actualAdded <= 0) {
-            return;
-        }
+        $newReceived = $poItem->qtyReceived + $qty;
 
         $this->purchaseOrders->updateItemReceived($itemId, $newReceived);
         $this->ledger->record(new StockLedger(
@@ -226,12 +273,12 @@ final class PurchaseOrderService
             productId: $poItem->productId,
             warehouseId: $po->warehouseId,
             movementType: StockLedger::TYPE_RECEIPT,
-            quantity: $actualAdded,
+            quantity: $qty,
             referenceType: 'purchase_order',
             referenceId: $po->id,
             performedBy: $userId,
         ));
-        $this->stocks->increment($poItem->productId, $po->warehouseId, $actualAdded);
+        $this->stocks->increment($poItem->productId, $po->warehouseId, $qty);
 
         $poItem->qtyReceived = $newReceived;
     }
