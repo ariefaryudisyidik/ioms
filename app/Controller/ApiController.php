@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Repository\MySqlProductRepository;
 use App\Repository\MySqlProductStockRepository;
 use App\Repository\MySqlWarehouseRepository;
+use App\Service\ProductAvailabilityService;
 
 final class ApiController extends Controller
 {
@@ -23,36 +24,20 @@ final class ApiController extends Controller
         $this->handle(function () use ($params) {
             $sku = (string) ($params['sku'] ?? '');
 
-            $products = new MySqlProductRepository($this->pdo());
-            $product = $products->findBySku($sku);
+            $service = new ProductAvailabilityService(
+                new MySqlProductRepository($this->pdo()),
+                new MySqlProductStockRepository($this->pdo()),
+                new MySqlWarehouseRepository($this->pdo()),
+            );
+            $availability = $service->forSku($sku);
 
-            if ($product === null) {
+            if ($availability === null) {
                 $this->json(['error' => 'Not Found'], 404);
 
                 return;
             }
 
-            $stocks = new MySqlProductStockRepository($this->pdo());
-            $warehouses = new MySqlWarehouseRepository($this->pdo());
-            $rows = $stocks->findByProduct((int) $product->id);
-
-            $warehouseList = [];
-            $total = 0;
-            foreach ($rows as $row) {
-                $warehouse = $warehouses->findById($row->warehouseId);
-                $warehouseList[] = [
-                    'warehouse' => $warehouse?->name ?? ('#' . $row->warehouseId),
-                    'quantity' => $row->quantity,
-                ];
-                $total += $row->quantity;
-            }
-
-            $this->json([
-                'sku' => $product->sku,
-                'name' => $product->name,
-                'total' => $total,
-                'warehouses' => $warehouseList,
-            ], 200);
+            $this->json($availability, 200);
         }, true);
     }
 }
