@@ -37,7 +37,7 @@ Sesuai batasan brief, hal-hal berikut **tidak** dibangun/tidak boleh ditambahkan
 - Password disimpan dengan hashing (`password_hash`/bcrypt terlihat dari format `$2y$10$...` pada seed), bukan dienkripsi/plaintext.
 - Upload gambar produk (`image_path`) disimpan di filesystem lokal server (folder `public/uploads`), bukan object storage eksternal (S3, dll).
 - Approval SO mengasumsikan hanya ada satu tingkat approval (Admin), tidak ada multi-level approval chain.
-- Nomor PO/SO (`po_number`/`so_number`) diinput manual/unik, tidak ada auto-generator format nomor otomatis di layer Service (validasi hanya memastikan keunikan).
+- Nomor PO dan SO (`po_number`/`so_number`) dibuat otomatis oleh Service dengan format `PO-<tahun>-<id>` / `SO-<tahun>-<id>`. Harga beli item PO dan harga jual item SO diambil dari harga produk saat order dibuat dan disimpan sebagai snapshot di item.
 - Reviewer memiliki PHP 8.2+, Composer, dan (untuk integration test serta menjalankan aplikasi penuh) Docker + MySQL 8 terpasang.
 
 ## Batasan

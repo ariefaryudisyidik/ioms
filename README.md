@@ -35,6 +35,8 @@ Aplikasi tersedia di http://localhost:8080 dan MySQL di port host 3307. Schema d
 
 Container memakai kode dan `vendor/` dari image (tanpa bind mount), sehingga perubahan kode memerlukan `docker compose up --build`.
 
+Zona waktu: PHP (`Asia/Jakarta`) dan MySQL (`--default-time-zone=+07:00`) memakai WIB (GMT+7). Kolom `TIMESTAMP` tetap tersimpan dalam UTC dan ditampilkan sesuai zona sesi, jadi data lama otomatis tampil dalam WIB tanpa perlu reset.
+
 ### Opsi B — manual tanpa Docker
 
 ```bash
@@ -129,7 +131,6 @@ Produksi: pasang TLS di depan aplikasi (reverse proxy), ganti semua kredensial d
 
 ## Known Limitations (Jujur)
 
-- `ApiController` mengakses tiga `MySql*Repository` secara langsung tanpa lewat Service — penyimpangan kecil dari pola layering di controller lain.
 - Rate limiting hanya untuk login; endpoint API belum dibatasi lajunya.
 - Otentikasi API memakai session cookie yang sama dengan web, bukan token terpisah.
 - Implementasi `InMemory*Repository` (test double) tidak mensimulasikan row-locking MySQL sungguhan — skenario race condition goods-issue divalidasi lewat integration test terhadap MySQL asli di Docker (`tests/Integration/GoodsIssueIntegrationTest.php`), bukan lewat thread/proses paralel sungguhan (sesuai batasan brief — tidak wajib).
@@ -160,7 +161,7 @@ Status berikut sudah diverifikasi ulang secara end-to-end (bukan cuma dibaca kod
 | DB-01 | Skema DB + seed | Done & diverifikasi |
 | JOB-01 | Skrip low-stock via cron OS | Done & diverifikasi (`docker compose exec app php scripts/check-low-stock.php`) |
 | ARCH-01/02 | Layered architecture, concurrency-safe stock | Done (lihat ADR di `docs/architecture/`) |
-| TEST-01/02/03 | Unit, integration, static analysis | Done — 252 test lulus (1216 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
+| TEST-01/02/03 | Unit, integration, static analysis | Done — 278 test lulus (1304 assertion), line coverage 100%, 0 error static analysis, SonarQube 0 isu terbuka dan 0% duplikasi (lihat `docs/quality/sonarqube-report.md`) |
 
 Lihat `docs/planning/backlog.md` untuk rincian lebih lengkap per fitur.
 

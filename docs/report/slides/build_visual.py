@@ -52,7 +52,7 @@ p { margin:0; font-size:18px; line-height:1.5; color:var(--muted); }
 .card.warn { background:var(--warnbg); border-color:transparent; }
 .card.bad { background:var(--badbg); border-color:transparent; }
 .badge-ic { width:48px; height:48px; border-radius:12px; background:var(--soft); color:var(--blue); display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
-.ok .badge-ic { background:#cdeedb; color:var(--ok); } .warn .badge-ic { background:#fde3bd; color:var(--warn); } .bad .badge-ic { background:#f9cccc; color:var(--bad); }
+.soft .badge-ic { background:#dbe7ff; color:var(--blue); } .ok .badge-ic { background:#cdeedb; color:var(--ok); } .warn .badge-ic { background:#fde3bd; color:var(--warn); } .bad .badge-ic { background:#f9cccc; color:var(--bad); }
 .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
 .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
 .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px; font-size:14px; font-weight:600; background:var(--soft); color:var(--blue2); margin:0 6px 8px 0; }
@@ -83,6 +83,9 @@ table { border-collapse:collapse; width:100%; font-size:16px; }
 th { text-align:left; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); padding:8px 12px; border-bottom:2px solid var(--line); }
 td { padding:10px 12px; border-bottom:1px solid var(--line); }
 .after { font-weight:800; color:#166534; }
+.pts { margin:8px 0 0; padding-left:20px; font-size:17px; line-height:1.45; }
+.pts li { margin-bottom:10px; }
+.pts li span { font-size:15px; opacity:.85; }
 .slide.flex { display:flex; flex-direction:column; }
 .fill { flex:1; display:flex; flex-direction:column; justify-content:center; padding-bottom:34px; min-height:0; }
 .card p { font-size:17px !important; }
@@ -170,14 +173,14 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
     sec = [('lock','CSRF','Token per sesi di semua form POST'),('user-cog','Sesi &amp; role','HttpOnly, SameSite, user divalidasi ulang tiap request'),('shield-check','Brute force','Login dibatasi: 5 kali gagal per akun+IP'),('eye','IDOR','Sales hanya bisa melihat SO miliknya'),('database','Injeksi','Prepared statement, output di-escape + CSP'),('container','Container','Non-root, MySQL hanya di 127.0.0.1')]
     cards = ''.join(f'<div class="card"><div class="badge-ic">{ic(i,24)}</div><h3>{t}</h3><p style="font-size:15px">{d}</p></div>' for i,t,d in sec)
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Keamanan: kontrol yang diterapkan</h2><div class="grid3">{cards}</div>
-<p style="margin-top:22px;font-size:15px">Pengembangan berikutnya: TLS lewat reverse proxy, rate limiting API, dan MFA. Rincian: <code>docs/quality/security-review.md</code>, ADR-004.</p>{foot(8)}</section>""")
+<p style="margin-top:22px;font-size:15px">Pengembangan berikutnya: rate limiting API dan MFA. Rincian: <code>docs/quality/security-review.md</code>, ADR-004.</p>{foot(8)}</section>""")
     # 9 dashboard visual
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Dashboard per role dan antarmuka konsisten</h2>
 <div class="row"><div class="grow clip">{browser('dashboard','localhost:8080/dashboard')}</div>
 <div style="width:300px"><ul class="steps"><li><span class="num">1</span><span>Kartu ringkasan berbeda untuk Admin, Sales, dan Warehouse.</span></li><li><span class="num">2</span><span>Daftar <b>Low Stock</b> dihitung dari stok total vs reorder point.</span></li><li><span class="num">3</span><span>Sidebar memuat info user dan Logout; ikon Lucide inline (SVG lokal), tanpa library JS atau CDN.</span></li></ul></div></div>{foot(9)}</section>""")
     # 10 quality
     s.append(f"""<section class="slide"><div class="eyebrow">04 · Bukti kualitas</div><h2>Test dan SonarQube</h2>
-<div class="grid4"><div class="stat"><div class="big">252</div><div class="lbl">test lulus<br>Unit 130 · Integration 9 · E2E 113</div></div>
+<div class="grid4"><div class="stat"><div class="big">278</div><div class="lbl">test lulus<br>Unit 153 · Integration 9 · E2E 116</div></div>
 <div class="stat"><div class="big">100%</div><div class="lbl">line coverage<br>Unit + Integration + E2E (HTTP)</div></div>
 <div class="stat"><div class="big">0</div><div class="lbl">bug, vulnerability,<br>smell, hotspot</div></div>
 <div class="stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div></div>
@@ -186,10 +189,16 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
 <p style="margin-top:14px;font-size:14px">Coverage yang diukur adalah <i>line coverage</i>. PHPStan level 5 dan PHPCS PSR-12: 0 error.</p>{foot(10)}</section>""")
     # 11 refleksi
     s.append(f"""<section class="slide"><div class="eyebrow">05 · Refleksi</div><h2>Kendala, solusi, dan rencana pengembangan</h2>
-<div class="grid3">
-<div class="card soft"><div class="badge-ic">{ic('hourglass',24)}</div><h3>Kendala &amp; solusi</h3><p style="font-size:15px;color:#1e3a8a">Stok konkuren → transaksi + row lock. Verifikasi dari clone bersih menemukan bind mount menimpa <code>vendor/</code> → sudah diperbaiki. Coverage Controller awalnya 0% → ditutup dengan E2E lewat HTTP.</p></div>
-<div class="card warn"><div class="badge-ic">{ic('triangle-alert',24)}</div><h3>Pengembangan lanjutan</h3><p style="font-size:15px;color:#7c4a0a">TLS lewat reverse proxy, rate limiting untuk API, token API, menyambungkan <code>ApiController</code> ke Service, dan CI/CD.</p></div>
-<div class="card ok"><div class="badge-ic">{ic('route',24)}</div><h3>Prioritas</h3><p style="font-size:15px;color:#14532d">1 Rate limiting API · 2 TLS + reverse proxy · 3 Audit log master data · 4 MFA &amp; token API</p></div></div>{foot(11)}</section>""")
+<div class="grid3" style="align-items:stretch">
+<div class="card soft"><div class="badge-ic">{ic('hourglass',24)}</div><h3>Kendala &amp; solusi</h3>
+<ul class="pts" style="color:#1e3a8a">
+<li><b>Waktu tidak sinkron:</b> database dan aplikasi memakai UTC, selisih 7 jam dari jam lokal.<br><span>Solusi: zona waktu PHP dan MySQL diatur ke WIB (GMT+7).</span></li>
+<li><b>Library PHP hilang</b> saat aplikasi dijalankan dari clone baru.<br><span>Solusi: kode dan library diambil dari image Docker.</span></li>
+</ul></div>
+<div class="card warn"><div class="badge-ic">{ic('triangle-alert',24)}</div><h3>Pengembangan lanjutan</h3>
+<ul class="pts" style="color:#7c4a0a"><li>Rate limiting dan token untuk API</li><li>CI/CD</li></ul></div>
+<div class="card ok"><div class="badge-ic">{ic('route',24)}</div><h3>Prioritas</h3>
+<ol class="pts" style="color:#14532d"><li>Rate limiting API</li><li>MFA dan token API</li></ol></div></div>{foot(11)}</section>""")
     # 12 AI
     s.append(f"""<section class="slide"><div class="eyebrow">Transparansi</div><h2>Penggunaan AI</h2>
 <div class="row"><div class="grow"><ul class="steps">

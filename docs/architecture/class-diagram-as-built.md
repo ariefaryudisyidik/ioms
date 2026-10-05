@@ -65,6 +65,7 @@ classDiagram
     class InMemoryUserRepository
     class InMemoryProductRepository
     class InMemoryProductStockRepository
+    class InMemoryWarehouseRepository
     class InMemorySalesOrderRepository
 
     MySqlUserRepository ..|> UserRepositoryInterface
@@ -73,6 +74,7 @@ classDiagram
     InMemoryProductRepository ..|> ProductRepositoryInterface
     MySqlProductStockRepository ..|> ProductStockRepositoryInterface
     InMemoryProductStockRepository ..|> ProductStockRepositoryInterface
+    InMemoryWarehouseRepository ..|> WarehouseRepositoryInterface
     MySqlCategoryRepository ..|> CategoryRepositoryInterface
     MySqlSupplierRepository ..|> SupplierRepositoryInterface
     MySqlCustomerRepository ..|> CustomerRepositoryInterface
@@ -105,6 +107,7 @@ classDiagram
     class OrderItemValidator { +validate(items,qtyKey,priceKey) +productIds() }
     class DateRules { +isValidYmd(value) }
     class DashboardService { +summaryFor(role,userId) }
+    class ProductAvailabilityService { +forSku(sku) }
     class ReportService { +stockLedgerCsv() +orderStatusCsv() }
 
     %% ===== Exception (domain) =====
@@ -127,10 +130,15 @@ classDiagram
     SupplierService --> SupplierRepositoryInterface
     CustomerService --> CustomerRepositoryInterface
     WarehouseService --> WarehouseRepositoryInterface
+    ProductAvailabilityService --> ProductRepositoryInterface
+    ProductAvailabilityService --> ProductStockRepositoryInterface
+    ProductAvailabilityService --> WarehouseRepositoryInterface
     PurchaseOrderService --> PurchaseOrderRepositoryInterface
     PurchaseOrderService --> ProductStockRepositoryInterface
     PurchaseOrderService --> StockLedgerRepositoryInterface
     PurchaseOrderService --> TransactionManagerInterface
+    PurchaseOrderService --> ProductRepositoryInterface
+    SalesOrderService --> ProductRepositoryInterface
     SalesOrderService --> SalesOrderRepositoryInterface
     SalesOrderService --> ProductStockRepositoryInterface
     SalesOrderService --> StockLedgerRepositoryInterface
@@ -190,9 +198,7 @@ classDiagram
     SalesOrderController --> SalesOrderService
     DashboardController --> DashboardService
     ReportController --> ReportService
-    ApiController --> MySqlProductRepository
-    ApiController --> MySqlProductStockRepository
-    ApiController --> MySqlWarehouseRepository
+    ApiController --> ProductAvailabilityService
 
     Router --> Auth
     Auth --> Session
@@ -202,7 +208,9 @@ classDiagram
 
 1. **Implementasi In-Memory ditambahkan** (`InMemoryUserRepository`, `InMemoryProductRepository`, `InMemoryProductStockRepository`, `InMemorySalesOrderRepository`) — tidak ada di draft awal. Ditambahkan agar Service dapat diuji dengan PHPUnit tanpa koneksi MySQL sungguhan, sekaligus membuktikan bahwa interface Repository benar-benar bisa dipertukarkan (Liskov Substitution / Dependency Inversion berjalan, bukan sekadar niat desain).
 2. **Empat kelas Exception domain ditambahkan** (`ValidationException`, `InvalidStatusTransitionException`, `InsufficientStockException`, `AuthorizationException`) — draft awal masih berasumsi error ditangani dengan array biasa. Kelas Exception terpisah dipilih supaya `Controller::handle` bisa memetakan setiap jenis kegagalan domain ke kode HTTP yang tepat (422 untuk validasi, 409/400 untuk transisi status tidak valid, 403 untuk otorisasi) secara konsisten di semua Controller.
-3. **`ApiController` bergantung langsung pada tiga MySql*Repository konkret**, bukan lewat Service — ini penyimpangan kecil dari layering ideal (Controller → Service → Repository) yang ada di draft awal karena endpoint API hanya melakukan agregasi baca sederhana; dicatat sebagai potensi tech debt (lihat `docs/quality/tech-debt.md`).
+3. **`ProductAvailabilityService` ditambahkan** (2026-10-05) untuk endpoint `GET /api/products/{sku}/availability`. Sebelumnya `ApiController` membuat tiga `MySql*Repository` sendiri dan menjumlah stok per gudang di dalam Controller; sekarang agregasinya ada di Service (bergantung pada interface Repository) dan Controller hanya memetakan hasilnya ke JSON (404 bila `forSku()` mengembalikan `null`). `InMemoryWarehouseRepository` ditambahkan untuk unit test Service ini.
+3b. **Nomor PO dibuat otomatis dan harga beli diambil dari produk** (2026-10-05). `PurchaseOrderService::create()` tidak lagi menerima `po_number` maupun `purchase_price` dari form: PO disimpan dulu dengan nomor sementara, lalu nomor akhir dibentuk `PO-<tahun tanggal order>-<id 4 digit>` (unik karena berasal dari id; satu transaksi lewat `TransactionManagerInterface`). Setiap item menyimpan harga beli produk saat PO dibuat (snapshot), sehingga PO-01 (item: produk, qty, harga beli) tetap terpenuhi. Karena itu `PurchaseOrderService` kini juga bergantung pada `ProductRepositoryInterface`, dan `PurchaseOrderRepositoryInterface::poNumberExists()` dihapus.
+3c. **Nomor SO dibuat otomatis dan harga jual diambil dari produk** (2026-10-05), dengan pola yang sama seperti PO: `SO-<tahun tanggal order>-<id 4 digit>`, harga jual disimpan sebagai snapshot di item (SO-item: produk, qty, harga jual tetap terpenuhi), dalam satu transaksi. `SalesOrderService` kini bergantung pada `ProductRepositoryInterface`; `SalesOrderRepositoryInterface::soNumberExists()` dan helper `AbstractMySqlRepository::valueExists()` dihapus karena tidak lagi dipakai.
 4. **`CrudController` (abstract) ditambahkan** untuk lima controller master data (User, Category, Supplier, Customer, Warehouse). Alur index/create/store/edit/update/remove identik di kelima controller (SonarQube CPD melaporkan ≈200 baris duplikat); sekarang alur itu hidup satu kali di `CrudController` (Template Method), dan tiap subclass hanya menyatakan view, URL dasar, role, dan `service()`. `ProductController`, `PurchaseOrderController`, dan `SalesOrderController` tetap berdiri sendiri karena alurnya memang berbeda (upload gambar, state machine order).
 5. **`AbstractMySqlRepository` ditambahkan** sebagai induk `MySqlPurchaseOrderRepository`, `MySqlSalesOrderRepository`, dan `MySqlStockLedgerRepository`: helper query (`fetchRows`, `insert`, `execute`), query builder berbasis aturan (`buildWhere`, `searchRows`, `countRows`), dan pengurutan tanggal. Interface repository dan SQL yang dihasilkan tidak berubah (dibandingkan sebelum/sesudah). Repository lain tetap mandiri.
 6. **Router memetakan argumen handler berdasarkan nama parameter** (`$request`, `$params`) lewat reflection, sehingga handler hanya mendeklarasikan yang dipakai (`index(): void`, `edit(array $params)`, `store(Request $request)`). Ini menghilangkan 43 parameter `$request` yang tidak terpakai.

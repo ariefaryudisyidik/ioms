@@ -37,7 +37,7 @@ Tanggal: 2026-10-03. Cakupan: seluruh kode aplikasi (`app/`, `views/`, `public/`
 ## Cara memverifikasi
 
 ```bash
-composer coverage                                  # 252 test, termasuk SecurityE2ETest (CSRF, header, lockout, sesi, IDOR, CSV, upload, ...)
+composer coverage                                  # 278 test, termasuk SecurityE2ETest (CSRF, header, lockout, sesi, IDOR, CSV, upload, ...)
 curl -sI http://localhost:8080/login               # header keamanan, tanpa X-Powered-By
 curl -s -o /dev/null -w "%{http_code}\n" -d 'email=a&password=b' http://localhost:8080/login   # 403 tanpa token CSRF
 ```
@@ -48,7 +48,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -d 'email=a&password=b' http://localhos
 - **Akun demo** (`Password123!`) ada di seed untuk keperluan demonstrasi; wajib diganti/dihapus di lingkungan nyata.
 - **Throttling hanya untuk login.** Endpoint API belum dibatasi lajunya. Pembatasan berbasis IP memakai `REMOTE_ADDR`; di belakang proxy perlu konfigurasi agar alamat klien yang benar terbaca.
 - **Token CSRF per-sesi, bukan per-request**, dan sesi memakai penyimpanan file bawaan PHP (satu server).
-- **Harga jual di SO diisi Sales** (dengan validasi tidak negatif), karena diskon memang keputusan bisnis; belum ada batas kewenangan diskon atau persetujuan harga.
+- **Harga jual di SO diambil dari harga produk** (2026-10-05) dan disimpan sebagai snapshot di item; Sales tidak lagi mengisi harga, sehingga tidak ada celah diskon bebas. Harga yang dikirim dari form diabaikan server (`SalesOrderE2ETest`). Konsekuensinya: tidak ada mekanisme diskon per order.
 - **Tidak ada MFA, audit log perubahan master data, maupun pemindaian malware untuk upload.** Gambar lama tidak dihapus saat diganti.
 - **Satu pengecualian SonarQube beralasan:** `php:S2092` (flag `Secure` cookie) ditandai `NOSONAR` di `Session::start`, karena flag diaktifkan otomatis di HTTPS dan harus nonaktif untuk demo HTTP lokal.
 - Tinjauan ini bukan pengganti uji penetrasi independen.

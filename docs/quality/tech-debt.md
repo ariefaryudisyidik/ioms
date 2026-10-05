@@ -4,7 +4,7 @@ Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02 
 
 ## Keterbatasan implementasi saat ini
 
-1. **`ApiController` melewati layer Service.** `ApiController::productAvailability()` membuat instance `MySqlProductRepository`, `MySqlProductStockRepository`, `MySqlWarehouseRepository` secara langsung di dalam Controller, alih-alih memanggil sebuah `ProductAvailabilityService`. Ini menyimpang dari pola layering Controller→Service→Repository yang dipakai konsisten di controller lain, dan membuat logic agregasi (menjumlah stok per gudang) tidak reusable/testable secara terpisah dari HTTP layer.
+1. ~~**`ApiController` melewati layer Service.**~~ **Sudah dilunasi 2026-10-05:** endpoint `GET /api/products/{sku}/availability` kini memanggil `ProductAvailabilityService`, yang menggabungkan tiga Repository lewat interface dan diuji dengan repository in-memory (`ProductAvailabilityServiceTest`). Perilaku endpoint tidak berubah (200 / 401 / 404).
 2. **Validasi input masih sederhana (presence/format dasar).** Validasi di Service (mis. `SalesOrderService::create`, `PurchaseOrderService::create`) memeriksa "wajib diisi", "positif", "tanggal valid Y-m-d", dan keunikan nomor — tapi belum ada validasi lintas-field yang lebih kompleks (mis. memastikan `selling_price` SO tidak di bawah `purchase_price` produk, atau validasi format kontak/telepon di Customer/Supplier).
 3. **Rate limiting hanya untuk login.** `AuthController::login` dibatasi lewat `LoginThrottle` (tabel `login_attempts`); endpoint API (`ApiController::productAvailability`) belum dibatasi lajunya, dan pembatasan memakai `REMOTE_ADDR` (di belakang reverse proxy perlu konfigurasi agar IP klien yang benar terbaca).
 4. **Otentikasi API memakai session cookie yang sama dengan web** (`Auth::requireLoginApi`), bukan token terpisah (API key/JWT) — cocok untuk kebutuhan internal saat ini, tapi berarti API tidak bisa dipakai oleh klien non-browser tanpa turut menangani cookie session PHP.
@@ -18,16 +18,15 @@ Daftar ini disusun berdasarkan pembacaan langsung kode di `app/` per 2026-09-02 
 11. **Coverage 100% adalah line coverage.** Setiap baris kode aplikasi dieksekusi oleh Unit/Integration/E2E test (lihat ADR-003), tetapi itu tidak menjamin semua kombinasi input atau cabang logika teruji; asersi belum mencakup uji beban/konkurensi paralel sungguhan.
 12. **Test E2E mengandalkan data seed demo** (`database/seed.sql`): perubahan ID atau isi seed dapat mematahkan beberapa asersi (mis. `SKU-0001` total stok 56, `SO-2026-0001` milik Sari).
 
-13. **Risiko keamanan yang tersisa** (rinci di `docs/quality/security-review.md`): TLS tidak disediakan compose; akun demo di seed; token CSRF per-sesi; tanpa MFA; harga jual SO diisi Sales tanpa batas kewenangan diskon; gambar lama tidak dihapus saat diganti.
+13. **Risiko keamanan yang tersisa** (rinci di `docs/quality/security-review.md`): TLS tidak disediakan compose; akun demo di seed; token CSRF per-sesi; tanpa MFA; harga jual SO kini diambil dari produk (tidak ada diskon per order); gambar lama tidak dihapus saat diganti.
 
 14. ~~**Service bergantung pada `PDO` untuk transaksi.**~~ **Sudah dilunasi 2026-10-03 (ADR-005):** Service kini memakai `TransactionManagerInterface`; catatan lama di bawah dipertahankan sebagai riwayat. Semula: `SalesOrderService` dan `PurchaseOrderService` menerima `PDO` lewat constructor hanya untuk `beginTransaction/commit/rollBack` (dan meneruskannya ke metode repository yang bertipe `PDO`). Constructor injection terpenuhi dan SQL tetap di Repository, tetapi bentuk yang lebih murni adalah antarmuka `TransactionManager` yang menyembunyikan `PDO` dari Service. Ditunda karena perubahan menyentuh seluruh interface repository dan unit test.
 15. **Tidak ada halaman profil sendiri.** Brief menyebut "profil sendiri" pada matriks peran, tetapi tidak ada requirement fungsional untuk halaman profil; user melihat nama dan role di header, dan password hanya diubah oleh Admin.
 
 ## Rencana Perbaikan ke Depan
 
-- Refactor `ApiController` agar memanggil `ProductAvailabilityService` (baru) yang menggabungkan tiga Repository tersebut, konsisten dengan Controller lain.
 - Menambah rule validasi lintas-field pada `SalesOrderService`/`ProductService` (mis. margin harga minimum) jika dibutuhkan proses bisnis.
-- Memperluas rate limiting ke endpoint API dan menambah batas kewenangan diskon harga jual pada SO.
+- Memperluas rate limiting ke endpoint API.
 - Menambah kelas `ProductStockLockSimulator` atau helper test khusus agar `InMemoryProductStockRepository` bisa mensimulasikan kontensi (mis. dengan flag "locked" manual) untuk pengujian race condition tanpa MySQL.
 - Menyediakan panduan setup Docker+MySQL yang jelas di README agar reviewer bisa menjalankan integration test bila mereka mau (di luar cakupan wajib).
 - Menambah audit log sederhana (tabel `audit_log` generik) untuk perubahan master data, jika dibutuhkan kepatuhan/tracing lebih lanjut.

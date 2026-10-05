@@ -1,4 +1,4 @@
-# Hasil test (Unit + Integration + E2E) — 2026-10-03 10:21 WIB
+# Hasil test (Unit + Integration + E2E) — 2026-10-05 21:09 WIB
 # Perintah: composer coverage   (scripts/coverage.sh --testdox)
 
 PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
@@ -6,13 +6,13 @@ PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
 Runtime:       PHP 8.4.8 with Xdebug 3.4.2
 Configuration: /Users/Expiro/Project/ioms/phpunit.xml
 
-...............................................................  63 / 252 ( 25%)
-............................................................... 126 / 252 ( 50%)
-............................................................... 189 / 252 ( 75%)
-............................................................... 252 / 252 (100%)
+...............................................................  63 / 278 ( 22%)
+............................................................... 126 / 278 ( 45%)
+............................................................... 189 / 278 ( 67%)
+............................................................... 252 / 278 ( 90%)
+..........................                                      278 / 278 (100%)
 
-
-Time: 04:11.282, Memory: 25.00 MB
+Time: 04:03.742, Memory: 27.00 MB
 
 Architecture (Tests\Unit\Architecture)
  ✔ Services do not depend on pdo session or superglobals
@@ -121,7 +121,7 @@ Empty States And Failures E2E (Tests\E2E\EmptyStatesAndFailuresE2E)
  ✔ Storing an uploaded image fails gracefully when the upload directory is read only
  ✔ User password rules and password change are enforced
  ✔ Category in use cannot be deleted
- ✔ Receiving more of an already complete line adds nothing
+ ✔ Receiving more than remaining is rejected and nothing is saved
 
 Env (Tests\Unit\Env)
  ✔ Parses plain quoted and spaced values and skips noise
@@ -140,6 +140,12 @@ Goods Issue Integration (Tests\Integration\GoodsIssueIntegration)
 Goods Receipt Integration (Tests\Integration\GoodsReceiptIntegration)
  ✔ Receiving goods increments stock and writes ledger entry
  ✔ Partial then full receipt moves status through partially received to received
+
+Icon Helper (Tests\Unit\IconHelper)
+ ✔ Renders inline svg without fixed size on the root tag
+ ✔ Keeps size attributes of inner shapes
+ ✔ Rejects unsafe or unknown names
+ ✔ Role label splits camel case for display
 
 In Memory Repositories (Tests\Unit\InMemoryRepositories)
  ✔ User repository looks up saves and checks email uniqueness
@@ -188,6 +194,13 @@ Order Rules (Tests\Unit\OrderRules)
  ✔ Product ids are cast to integers keeping keys
  ✔ Only the owner or staff can cancel an order
 
+Product Availability Service (Tests\Unit\ProductAvailabilityService)
+ ✔ Unknown sku returns null
+ ✔ Sums stock across warehouses
+ ✔ Product without stock rows has zero total
+ ✔ Unknown warehouse falls back to id label
+ ✔ Warehouse fake can list only active warehouses
+
 Product E2E (Tests\E2E\ProductE2E)
  ✔ List supports search category status sort and paging
  ✔ Show renders product and missing product is 404
@@ -208,6 +221,13 @@ Product Service (Tests\Unit\ProductService)
  ✔ File with image signature but no real image is rejected
  ✔ Storage failure is reported as a validation error
 
+Purchase Order Creation (Tests\Unit\PurchaseOrderCreation)
+ ✔ Number is generated from order year and id
+ ✔ Item price comes from the product not from the request
+ ✔ Creation runs inside one transaction
+ ✔ Missing supplier warehouse and items are rejected without saving
+ ✔ Unknown references are rejected
+
 Purchase Order Date Validation (Tests\Unit\PurchaseOrderDateValidation)
  ✔ Empty date is rejected
  ✔ Invalid format is rejected
@@ -219,11 +239,19 @@ Purchase Order E2E (Tests\E2E\PurchaseOrderE2E)
  ✔ List supports status supplier sort and paging for every role
  ✔ Every seeded purchase order renders its detail page
  ✔ Create form and successful create as warehouse staff
+ ✔ Po number is generated and item price comes from the product
  ✔ Create validation rejects bad input
  ✔ Order then partial then full receipt updates stock ledger and status
+ ✔ Receipt with all zero quantities is rejected
  ✔ Receiving on draft order is rejected
  ✔ Cancel and invalid transitions are handled
  ✔ Sales role cannot write purchase orders
+
+Purchase Order Receipt Validation (Tests\Unit\PurchaseOrderReceiptValidation)
+ ✔ Receiving more than remaining is rejected and nothing is saved
+ ✔ Receiving exactly the remaining quantity completes the order
+ ✔ Receipt with nothing to receive is rejected
+ ✔ Zero lines are ignored when another line receives something
 
 Reports Api Dashboard E2E (Tests\E2E\ReportsApiDashboardE2E)
  ✔ Dashboard renders for every role
@@ -263,7 +291,15 @@ Router (Tests\Unit\Router)
  ✔ Missing route without custom handler responds with json 404
  ✔ Root route matches empty and slash paths
 
+Sales Order Creation (Tests\Unit\SalesOrderCreation)
+ ✔ Number is generated from order year and id
+ ✔ Item price comes from the product not from the request
+ ✔ Creation runs inside one transaction
+ ✔ Missing fields and invalid dates are rejected without saving
+ ✔ Unknown references are rejected
+
 Sales Order E2E (Tests\E2E\SalesOrderE2E)
+ ✔ So number is generated and item price comes from the product
  ✔ Sales users only see their own orders while admin sees all
  ✔ Seeded sales orders render for staff and only own orders for sales
  ✔ Sales cannot cancel another sales users order
@@ -332,7 +368,7 @@ Transaction Manager (Tests\Unit\TransactionManager)
 Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
  ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
 
-OK (252 tests, 1216 assertions)
+OK (278 tests, 1304 assertions)
 
 
 Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)

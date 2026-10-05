@@ -11,7 +11,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 - [ ] Clone ke folder baru, `cp .env.example .env`, `docker compose up --build`, login: pastikan README benar-benar jalan.
 - [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml up -d`, buka `http://localhost:9001` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
 - [ ] `composer coverage` sekali lagi; buka `build/coverage/html/index.html` (laporan coverage per file).
-- [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (252 tests, 903 assertions), `docker compose ps`, demo PO→SO.
+- [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (278 tests, 1304 assertions), `docker compose ps`, demo PO→SO.
 - [ ] Latihan dengan timer. Target selesai di 9:30.
 
 **30 menit sebelum:**
@@ -27,7 +27,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 | 0:00–1:00 | Pembukaan | Nama, masalah, role, status, kontribusi, pengungkapan AI |
 | 1:00–5:00 | Demo | Alur A: PO → goods receipt → ledger. Alur B: SO → approval → goods issue + oversell ditolak |
 | 5:00–8:00 | Teknis | Layered architecture, transaksi + `FOR UPDATE`, Router/Controller, JSON endpoint, Docker, keamanan |
-| 8:00–9:00 | Bukti kualitas | 252 test, SonarQube, coverage, keamanan |
+| 8:00–9:00 | Bukti kualitas | 278 test, SonarQube, coverage, keamanan |
 | 9:00–10:00 | Refleksi | Kendala, solusi, keterbatasan, prioritas berikutnya |
 
 ### Pembukaan (1 menit): ucapkan kira-kira
@@ -57,15 +57,15 @@ Data seed: password semua akun `Password123!`. Admin `admin@ioms.test`, Sales `s
 6. **Docker:** `docker compose up --build` → app (Apache, **non-root**, healthcheck) + MySQL (schema dan seed otomatis).
 
 ### Bukti kualitas (1 menit)
-- Terminal/slide: **252 test, 1.216 assertion** (Unit 130 · Integration 9 · E2E 113 lewat HTTP). Buka laporan coverage HTML.
+- Terminal/slide: **278 test, 1.304 assertion** (Unit 153 · Integration 9 · E2E 116 lewat HTTP). Buka laporan coverage HTML.
 - SonarQube: **Quality gate Passed · 0 bug/vulnerability/smell/hotspot · coverage 100% · duplikasi 0%**.
 - Cerita perbaikan: awal 192 isu dan duplikasi 8,1% → diperbaiki lewat refactor (`CrudController`, `AbstractMySqlRepository`, partial view). Lihat `docs/quality/sonarqube-report.md` dan `refactor-log.md`.
 
 ### Refleksi (1 menit)
 - **Kendala:** menjaga stok tetap benar saat proses konkuren; clone bersih gagal jalan karena bind mount menimpa `vendor/` (ketahuan saat verifikasi, sudah diperbaiki); coverage Controller/view awalnya 0%.
 - **Solusi:** transaksi + row lock; test E2E lewat HTTP dengan coverage yang digabung (ADR-003).
-- **Keterbatasan (jujur):** TLS tidak disediakan compose (perlu reverse proxy); rate limiting hanya login; API memakai session cookie; `ApiController` mengakses repository langsung; coverage adalah *line coverage*; tidak ada CI/CD.
-- **Prioritas berikutnya:** `ProductAvailabilityService`, rate limiting, audit log master data, token API.
+- **Keterbatasan (jujur):** TLS tidak disediakan compose (perlu reverse proxy); rate limiting hanya login; API memakai session cookie; coverage adalah *line coverage*; tidak ada CI/CD.
+- **Prioritas berikutnya:** rate limiting, audit log master data, token API.
 
 ## 2. Perintah bantu saat demo
 
@@ -105,7 +105,7 @@ curl -i -b /tmp/sales.jar -X POST http://localhost:8080/sales-orders/13/approve 
 | Apa itu IDOR dan apakah ada? | Akses objek milik orang lain lewat ID. Ditemukan di SO (Sales bisa buka/batalkan SO Sales lain), sudah ditutup dan diuji. |
 | Apa itu ADR dan mana saja? | Catatan keputusan arsitektur: 001 repository pattern, 002 stok aman konkurensi, 003 strategi E2E/coverage (`docs/architecture/`). |
 | Bagian mana yang bantuan AI? | Sebagian besar kode, test, dan dokumentasi dibuat dengan Claude Code; saya mereview, memverifikasi (Docker, test, Sonar), dan bisa menjelaskannya. `ai-usage-log.md`. |
-| Apa yang tidak selesai/kurang? | Lihat `docs/quality/tech-debt.md`: rate limiting, token API, audit log, `ApiController` melewati Service, tidak ada CI/CD. |
+| Apa yang tidak selesai/kurang? | Lihat `docs/quality/tech-debt.md`: rate limiting, token API, audit log, tidak ada CI/CD. |
 
 ## 4. Latihan "perubahan kecil" (asesor boleh meminta)
 
