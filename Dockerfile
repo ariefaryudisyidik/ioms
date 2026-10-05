@@ -54,6 +54,10 @@ RUN { \
         echo 'session.cookie_samesite = Lax'; \
     } > /usr/local/etc/php/conf.d/zz-security.ini
 
+# Local time (WIB, GMT+7) for PHP date()/strtotime(); MySQL is set in docker-compose.yml.
+ENV TZ=Asia/Jakarta
+RUN echo 'date.timezone = Asia/Jakarta' > /usr/local/etc/php/conf.d/zz-timezone.ini
+
 WORKDIR /var/www/html
 
 # Application source, then the production-only vendor/ built in stage 1.

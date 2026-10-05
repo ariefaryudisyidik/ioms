@@ -27,6 +27,8 @@ services:
   mysql:
     image: mysql:8.0
     restart: unless-stopped
+    # Session and NOW() follow local time (WIB, GMT+7); TIMESTAMP columns stay stored in UTC internally.
+    command: --default-time-zone=+07:00
     environment:
       # The app only needs its own user; the root password is random and never used.
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
