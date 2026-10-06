@@ -1,13 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * auto_prepend_file used by scripts/coverage.sh: records line coverage for the
  * current HTTP request or CLI process and writes it to E2E_COVERAGE_DIR as a
  * .cov file that phpcov merges with the in-process PHPUnit coverage.
  * Does nothing unless E2E_COVERAGE_DIR is set.
  */
+
+declare(strict_types=1);
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;

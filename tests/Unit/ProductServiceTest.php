@@ -113,11 +113,13 @@ final class ProductServiceTest extends TestCase
         [$service, , $tmp] = $this->serviceWithFreshUploadDir();
         file_put_contents($tmp, 'not an image');
 
-        foreach ([
+        foreach (
+            [
             ['error' => UPLOAD_ERR_INI_SIZE, 'size' => 1, 'tmp_name' => $tmp],
             ['error' => UPLOAD_ERR_OK, 'size' => 3 * 1024 * 1024, 'tmp_name' => $tmp],
             ['error' => UPLOAD_ERR_OK, 'size' => 10, 'tmp_name' => $tmp],
-        ] as $file) {
+            ] as $file
+        ) {
             try {
                 $service->create($this->productData(), $file);
                 $this->fail('Expected the upload to be rejected.');

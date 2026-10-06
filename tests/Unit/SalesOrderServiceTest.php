@@ -197,21 +197,3 @@ final class SalesOrderServiceTest extends TestCase
         $service->submitForApproval($so->id, 999);
     }
 }
-
-/**
- * Minimal stock ledger fake sufficient for these unit tests.
- */
-final class FakeStockLedgerRepository implements StockLedgerRepositoryInterface
-{
-    public function record(\App\Entity\StockLedger $entry): \App\Entity\StockLedger
-    {
-        $entry->id = random_int(1, 1000000);
-
-        return $entry;
-    }
-
-    public function search(array $filters = []): array
-    {
-        return [];
-    }
-}
