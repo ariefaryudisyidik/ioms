@@ -16,17 +16,17 @@ include __DIR__ . '/../partials/header.php';
         <div class="form-grid">
             <div class="field<?= isset($errors['name']) ? $hasError : '' ?>">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" data-required value="<?= e($old['name']) ?>" required>
+                <input type="text" id="name" name="name" data-required placeholder="Enter full name" value="<?= e($old['name']) ?>" required>
                 <?php if (isset($errors['name'])): ?><div class="field-error"><?= e($errors['name']) ?></div><?php endif; ?>
             </div>
             <div class="field<?= isset($errors['email']) ? $hasError : '' ?>">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" data-required data-type="email" value="<?= e($old['email']) ?>" required>
+                <input type="email" id="email" name="email" data-required data-type="email" placeholder="name@company.com" value="<?= e($old['email']) ?>" required>
                 <?php if (isset($errors['email'])): ?><div class="field-error"><?= e($errors['email']) ?></div><?php endif; ?>
             </div>
             <div class="field<?= isset($errors['password']) ? $hasError : '' ?>">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" data-required minlength="8" required>
+                <input type="password" id="password" name="password" data-required minlength="8" placeholder="At least 8 characters" required>
                 <div class="hint">At least 8 characters.</div>
                 <?php if (isset($errors['password'])): ?><div class="field-error"><?= e($errors['password']) ?></div><?php endif; ?>
             </div>
@@ -40,11 +40,7 @@ include __DIR__ . '/../partials/header.php';
                 <?php if (isset($errors['role'])): ?><div class="field-error"><?= e($errors['role']) ?></div><?php endif; ?>
             </div>
         </div>
-        <div class="field checkbox-field">
-            <input type="hidden" name="is_active" value="0">
-            <input type="checkbox" id="is_active" name="is_active" value="1" checked>
-            <label for="is_active" style="margin:0;">Active</label>
-        </div>
+        <?php partial('switch-field', ['active' => true]); ?>
         <div class="btn-row">
             <button type="submit" class="btn"><?= icon('save') ?>Save</button>
             <a class="btn btn-secondary" href="/users"><?= icon('x') ?>Cancel</a>

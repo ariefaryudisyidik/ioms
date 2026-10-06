@@ -19,9 +19,9 @@ foreach ($defaults as $key => $value) {
 }
 $numberAttrs = static fn (string $step): string => 'step="' . $step . '" min="0" data-required data-type="number" data-min="0"';
 $numberFields = [
-    ['purchase_price', 'Purchase Price', '0.01'],
-    ['selling_price', 'Selling Price', '0.01'],
-    ['reorder_point', 'Reorder Point', '1'],
+    ['purchase_price', 'Purchase Price', '0.01', 'e.g. 15000'],
+    ['selling_price', 'Selling Price', '0.01', 'e.g. 22000'],
+    ['reorder_point', 'Reorder Point', '1', 'e.g. 10'],
 ];
 ?>
 <h1><?= e($heading) ?></h1>
@@ -33,12 +33,12 @@ $numberFields = [
     <form method="post" action="<?= e($action) ?>" enctype="multipart/form-data" data-validate novalidate>
         <?php if ($isEdit): ?><input type="hidden" name="_method" value="PUT"><?php endif; ?>
         <div class="form-grid">
-            <?php partial('text-field', ['id' => 'sku', 'label' => 'SKU', 'type' => 'text', 'value' => $old['sku'], 'attrs' => 'data-required', 'required' => true, 'errorKey' => 'sku', 'errors' => $errors]); ?>
-            <?php partial('text-field', ['id' => 'name', 'label' => 'Name', 'type' => 'text', 'value' => $old['name'], 'attrs' => 'data-required', 'required' => true, 'errorKey' => 'name', 'errors' => $errors]); ?>
+            <?php partial('text-field', ['id' => 'sku', 'label' => 'SKU', 'type' => 'text', 'placeholder' => 'e.g. SKU-0040', 'value' => $old['sku'], 'attrs' => 'data-required', 'required' => true, 'errorKey' => 'sku', 'errors' => $errors]); ?>
+            <?php partial('text-field', ['id' => 'name', 'label' => 'Name', 'type' => 'text', 'placeholder' => 'Enter product name', 'value' => $old['name'], 'attrs' => 'data-required', 'required' => true, 'errorKey' => 'name', 'errors' => $errors]); ?>
             <?php partial('select-field', ['id' => 'category_id', 'label' => 'Category', 'placeholder' => 'Select a category', 'selectClass' => '', 'options' => $categoryOptions, 'selected' => (string) $old['category_id'], 'errors' => $errors]); ?>
-            <?php partial('text-field', ['id' => 'unit', 'label' => 'Unit', 'type' => 'text', 'value' => $old['unit'], 'attrs' => '', 'required' => false, 'errorKey' => null, 'errors' => $errors]); ?>
-            <?php foreach ($numberFields as [$fieldId, $fieldLabel, $step]): ?>
-                <?php partial('text-field', ['id' => $fieldId, 'label' => $fieldLabel, 'type' => 'number', 'value' => $old[$fieldId], 'attrs' => $numberAttrs($step), 'required' => true, 'errorKey' => $fieldId, 'errors' => $errors]); ?>
+            <?php partial('text-field', ['id' => 'unit', 'label' => 'Unit', 'type' => 'text', 'placeholder' => 'e.g. pcs', 'value' => $old['unit'], 'attrs' => '', 'required' => false, 'errorKey' => null, 'errors' => $errors]); ?>
+            <?php foreach ($numberFields as [$fieldId, $fieldLabel, $step, $fieldPlaceholder]): ?>
+                <?php partial('text-field', ['id' => $fieldId, 'label' => $fieldLabel, 'type' => 'number', 'placeholder' => $fieldPlaceholder, 'value' => $old[$fieldId], 'attrs' => $numberAttrs($step), 'required' => true, 'errorKey' => $fieldId, 'errors' => $errors]); ?>
             <?php endforeach; ?>
             <?php partial('text-field', ['id' => 'image', 'label' => $imageLabel, 'type' => 'file', 'value' => null, 'attrs' => 'accept="image/jpeg,image/png,image/webp"', 'required' => false, 'errorKey' => 'image', 'errors' => $errors]); ?>
         </div>

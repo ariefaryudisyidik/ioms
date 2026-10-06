@@ -25,7 +25,7 @@ require_once __DIR__ . '/../partials/partial.php';
                 <label for="email">Email</label>
                 <div class="input-icon">
                     <?= icon('mail') ?>
-                    <input type="email" id="email" name="email" data-required data-type="email"
+                    <input type="email" id="email" name="email" data-required data-type="email" placeholder="name@company.com"
                            value="<?= e($old['email'] ?? '') ?>" autocomplete="username" required>
                 </div>
                 <?php if (isset($errors['email'])): ?><div class="field-error"><?= e($errors['email']) ?></div><?php endif; ?>
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../partials/partial.php';
                 <label for="password">Password</label>
                 <div class="input-icon">
                     <?= icon('lock') ?>
-                    <input type="password" id="password" name="password" data-required autocomplete="current-password" required>
+                    <input type="password" id="password" name="password" data-required placeholder="Enter your password" autocomplete="current-password" required>
                 </div>
             </div>
             <button type="submit" class="btn"><?= icon('log-in') ?>Log In</button>

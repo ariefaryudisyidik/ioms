@@ -25,7 +25,7 @@ include __DIR__ . '/../partials/header.php';
                         <td><?= (int) $item->remaining() ?></td>
                         <td>
                             <div class="field cell-field">
-                                <input type="number" class="js-receive-qty" aria-label="Quantity to receive" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
+                                <input type="number" class="js-receive-qty" placeholder="0" aria-label="Quantity to receive" name="items[<?= (int) $item->id ?>]" min="0" max="<?= (int) $item->remaining() ?>"
                                        step="1" value="0" data-type="number" data-min="0" data-max="<?= (int) $item->remaining() ?>" <?= $item->remaining() <= 0 ? 'disabled' : '' ?>>
                             </div>
                         </td>

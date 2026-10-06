@@ -19,7 +19,7 @@
     </div>
     <div class="field">
         <label><?= e($qtyLabel) ?>
-        <input type="number" name="items[<?= e($index) ?>][<?= e($qtyName) ?>]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
+        <input type="number" name="items[<?= e($index) ?>][<?= e($qtyName) ?>]" class="js-qty-input" placeholder="Enter quantity" min="1" step="1" data-required data-type="number" data-min="1" required>
     </label>
     </div>
     <div class="field field-action">

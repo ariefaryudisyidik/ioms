@@ -52,6 +52,7 @@
         });
         nextIndex += 1;
         container.appendChild(clone);
+        if (window.IOMS_COMBOBOX) window.IOMS_COMBOBOX.enhanceAll(clone);
         wireRow(clone);
       });
     }

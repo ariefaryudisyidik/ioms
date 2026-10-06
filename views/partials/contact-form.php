@@ -25,10 +25,10 @@ foreach ($defaults as $key => $value) {
     <form method="post" action="<?= e($action) ?>" data-validate novalidate>
         <?php if ($isEdit): ?><input type="hidden" name="_method" value="PUT"><?php endif; ?>
         <?php partial('text-field', ['id' => 'name', 'label' => 'Name', 'type' => 'text', 'value' => $old['name'], 'attrs' => 'data-required', 'required' => true, 'errorKey' => 'name', 'errors' => $errors]); ?>
-        <?php partial('text-field', ['id' => 'contact', 'label' => 'Contact', 'type' => 'text', 'value' => $old['contact'], 'attrs' => '', 'required' => false, 'errorKey' => null, 'errors' => $errors]); ?>
+        <?php partial('text-field', ['id' => 'contact', 'label' => 'Contact', 'type' => 'text', 'placeholder' => 'Phone or email', 'value' => $old['contact'], 'attrs' => '', 'required' => false, 'errorKey' => null, 'errors' => $errors]); ?>
         <div class="field">
             <label for="address">Address</label>
-            <textarea id="address" name="address" rows="3"><?= e($old['address']) ?></textarea>
+            <textarea id="address" name="address" rows="3" placeholder="Enter address"><?= e($old['address']) ?></textarea>
         </div>
         <?php partial('form-footer', ['active' => $active, 'cancelHref' => $cancelHref]); ?>
     </form>

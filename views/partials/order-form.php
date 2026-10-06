@@ -38,8 +38,8 @@ $rowVars = [
 <div class="panel">
     <form method="post" action="<?= e($action) ?>" data-validate novalidate<?= $warnOnExceed ? ' data-warn-exceed' : '' ?>>
         <div class="form-grid">
-            <?php partial('select-field', ['id' => $partyField['id'], 'label' => $partyField['label'], 'placeholder' => $partyField['placeholder'], 'selectClass' => '', 'options' => $partyField['options'], 'selected' => (string) $old[$partyField['id']], 'errors' => $errors]); ?>
-            <?php partial('select-field', ['id' => 'warehouse_id', 'label' => 'Warehouse', 'placeholder' => 'Select a warehouse', 'selectClass' => 'js-order-warehouse', 'options' => $warehouseOptions, 'selected' => (string) $old['warehouse_id'], 'errors' => $errors]); ?>
+            <?php partial('select-field', ['id' => $partyField['id'], 'label' => $partyField['label'], 'placeholder' => $partyField['placeholder'], 'selectClass' => 'js-combobox', 'options' => $partyField['options'], 'selected' => (string) $old[$partyField['id']], 'errors' => $errors]); ?>
+            <?php partial('select-field', ['id' => 'warehouse_id', 'label' => 'Warehouse', 'placeholder' => 'Select a warehouse', 'selectClass' => 'js-order-warehouse js-combobox', 'options' => $warehouseOptions, 'selected' => (string) $old['warehouse_id'], 'errors' => $errors]); ?>
             <?php partial('text-field', ['id' => 'order_date', 'label' => 'Order Date', 'type' => 'date', 'value' => $old['order_date'], 'attrs' => 'data-required data-type="date"', 'required' => true, 'errorKey' => 'order_date', 'errors' => $errors]); ?>
         </div>
 
