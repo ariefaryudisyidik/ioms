@@ -89,16 +89,20 @@ Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PH
 
 ## SonarQube
 
-SonarQube Community lokal dijalankan lewat `docker-compose.sonar.yml` (dashboard di http://localhost:9001, login awal `admin`/`admin`).
+SonarQube Community lokal dijalankan lewat `docker-compose.sonar.yml` (dashboard di http://localhost:9000, login awal `admin`/`admin`).
 
 ```bash
 docker compose -f docker-compose.sonar.yml up -d sonarqube   # tunggu status UP
 # buat token: My Account > Security, lalu export SONAR_TOKEN=<token>
 
-# 1. Coverage gabungan Unit + Integration + E2E (path sudah dipetakan ke /usr/src untuk scanner)
-composer coverage
+# Satu perintah: coverage gabungan Unit + Integration + E2E, lalu scan
+composer sonar
+```
 
-# 2. Scan
+`composer sonar` sama dengan menjalankan dua langkah berikut berurutan (scan membaca `build/coverage/clover.xml`, jadi coverage harus dibuat dulu):
+
+```bash
+composer coverage
 docker compose -f docker-compose.sonar.yml run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true
 ```
 
