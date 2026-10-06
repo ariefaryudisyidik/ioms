@@ -48,3 +48,50 @@ if (!function_exists('roleLabel')) {
         return (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $role);
     }
 }
+
+if (!function_exists('sortDirection')) {
+    /**
+     * Direction ("asc" or "desc") a list is sorted in for one column, or "" when the column is not the sorted one.
+     * A sort value is "<column>_<asc|desc>", e.g. "purchase_price_desc".
+     */
+    function sortDirection(string $sort, string $column): string
+    {
+        foreach (['asc', 'desc'] as $direction) {
+            if ($sort === $column . '_' . $direction) {
+                return $direction;
+            }
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('sortUrl')) {
+    /**
+     * Link of a sortable column header: sorts ascending first, then flips direction on every click.
+     * Other filters stay, the page resets to 1.
+     *
+     * @param array<string,mixed> $query current filters (search, status, ...)
+     */
+    function sortUrl(string $baseUrl, array $query, string $column, string $sort): string
+    {
+        $next = sortDirection($sort, $column) === 'asc' ? 'desc' : 'asc';
+        $params = array_filter(
+            array_merge($query, ['sort' => $column . '_' . $next]),
+            static fn ($value) => $value !== '' && $value !== null
+        );
+
+        return $baseUrl . '?' . http_build_query($params);
+    }
+}
+
+if (!function_exists('statusLabel')) {
+    /**
+     * Display text of an order status ("PartiallyReceived" -> "Partially Received", "PendingApproval" ->
+     * "Pending Approval"); the stored value and the CSS class stay unchanged.
+     */
+    function statusLabel(string $status): string
+    {
+        return (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $status);
+    }
+}

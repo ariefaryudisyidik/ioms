@@ -9,12 +9,27 @@ include __DIR__ . '/../partials/header.php';
     <h1>Customers</h1>
     <?php if ($canEdit): ?><a class="btn" href="/customers/create"><?= icon('plus') ?>New Customer</a><?php endif; ?>
 </div>
+<?php
+$filters ??= ['search' => '', 'status' => '', 'sort' => ''];
+$baseUrl = '/customers';
+$sort = $filters['sort'] ?: 'name_asc';
+$query = ['search' => $filters['search'] ?? '', 'status' => $filters['status'] ?? ''];
+$filtered = $query['search'] !== '' || $query['status'] !== '';
+partial('master-filter', ['baseUrl' => $baseUrl, 'placeholder' => 'Name, contact or address', 'withStatus' => true, 'filters' => $filters]);
+?>
 <?php if (empty($customers)): ?>
-    <div class="empty-state"><div class="empty-icon">&#128100;</div><p>Belum ada data pelanggan.</p></div>
+    <?php if ($filtered): ?>
+        <?php partial('empty-state', ['icon' => 'search', 'title' => 'No results found', 'text' => 'No customers match your filters.']); ?>
+    <?php else: ?>
+        <?php partial('empty-state', ['icon' => 'contact', 'title' => 'No customers yet', 'text' => 'Add a customer to start creating sales orders.', 'action' => $canEdit ? ['href' => '/customers/create', 'label' => 'New Customer', 'icon' => 'plus'] : null]); ?>
+    <?php endif; ?>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
-            <thead><tr><th>Name</th><th>Contact</th><th>Address</th><th>Status</th><?php if ($canEdit): ?><th>Actions</th><?php endif; ?></tr></thead>
+            <thead><tr>
+                <?php foreach (['name' => 'Name', 'contact' => 'Contact', 'address' => 'Address', 'status' => 'Status'] as $column => $label) { partial('sort-th', ['label' => $label, 'column' => $column, 'sort' => $sort, 'baseUrl' => $baseUrl, 'query' => $query]); } ?>
+                <?php if ($canEdit): ?><th>Actions</th><?php endif; ?>
+            </tr></thead>
             <tbody>
             <?php foreach ($customers as $c): ?>
                 <tr>

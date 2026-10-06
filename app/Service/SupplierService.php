@@ -6,10 +6,13 @@ namespace App\Service;
 
 use App\Entity\Supplier;
 use App\Repository\SupplierRepositoryInterface;
+use App\Service\Concerns\ListsEntities;
 use App\Service\Exception\ValidationException;
 
 final class SupplierService
 {
+    use ListsEntities;
+
     public function __construct(private SupplierRepositoryInterface $suppliers)
     {
     }
@@ -17,6 +20,28 @@ final class SupplierService
     public function all(bool $onlyActive = false): array
     {
         return $this->suppliers->all($onlyActive);
+    }
+
+    /** @return array<string, callable(object):mixed> */
+    protected function listColumns(): array
+    {
+        return [
+            'name' => static fn (Supplier $e): string => $e->name,
+            'contact' => static fn (Supplier $e): string => (string) $e->contact,
+            'address' => static fn (Supplier $e): string => (string) $e->address,
+            'status' => static fn (Supplier $e): bool => $e->isActive,
+        ];
+    }
+
+    /** @return list<string> */
+    protected function searchColumns(): array
+    {
+        return ['name', 'contact', 'address'];
+    }
+
+    protected function statusColumn(): ?string
+    {
+        return 'status';
     }
 
     public function find(int $id): ?Supplier

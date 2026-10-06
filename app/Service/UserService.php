@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Repository\UserRepositoryInterface;
+use App\Service\Concerns\ListsEntities;
 use App\Service\Exception\ValidationException;
 
 /**
@@ -14,6 +15,8 @@ use App\Service\Exception\ValidationException;
  */
 final class UserService
 {
+    use ListsEntities;
+
     private const ROLES = ['Admin', 'Sales', 'WarehouseStaff'];
 
     public function __construct(private UserRepositoryInterface $users)
@@ -23,6 +26,28 @@ final class UserService
     public function all(): array
     {
         return $this->users->all();
+    }
+
+    /** @return array<string, callable(object):mixed> */
+    protected function listColumns(): array
+    {
+        return [
+            'name' => static fn (User $e): string => $e->name,
+            'email' => static fn (User $e): string => $e->email,
+            'role' => static fn (User $e): string => $e->role,
+            'status' => static fn (User $e): bool => $e->isActive,
+        ];
+    }
+
+    /** @return list<string> */
+    protected function searchColumns(): array
+    {
+        return ['name', 'email', 'role'];
+    }
+
+    protected function statusColumn(): ?string
+    {
+        return 'status';
     }
 
     public function find(int $id): ?User

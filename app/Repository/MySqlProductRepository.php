@@ -90,9 +90,20 @@ final class MySqlProductRepository implements ProductRepositoryInterface
             $sql .= ' WHERE ' . implode(' AND ', $where);
         }
 
-        $sort = $filters['sort'] ?? 'name_asc';
-        $sql .= match ($sort) {
+        $sql .= match ($filters['sort'] ?? 'name_asc') {
             'name_desc' => ' ORDER BY p.name DESC',
+            'unit_asc' => ' ORDER BY p.unit ASC, p.name ASC',
+            'unit_desc' => ' ORDER BY p.unit DESC, p.name ASC',
+            'status_asc' => ' ORDER BY p.is_active ASC, p.name ASC',
+            'status_desc' => ' ORDER BY p.is_active DESC, p.name ASC',
+            'sku_asc' => ' ORDER BY p.sku ASC',
+            'sku_desc' => ' ORDER BY p.sku DESC',
+            'purchase_price_asc' => ' ORDER BY p.purchase_price ASC, p.name ASC',
+            'purchase_price_desc' => ' ORDER BY p.purchase_price DESC, p.name ASC',
+            'selling_price_asc' => ' ORDER BY p.selling_price ASC, p.name ASC',
+            'selling_price_desc' => ' ORDER BY p.selling_price DESC, p.name ASC',
+            'reorder_point_asc' => ' ORDER BY p.reorder_point ASC, p.name ASC',
+            'reorder_point_desc' => ' ORDER BY p.reorder_point DESC, p.name ASC',
             default => ' ORDER BY p.name ASC',
         };
 

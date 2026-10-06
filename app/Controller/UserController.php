@@ -24,12 +24,12 @@ final class UserController extends CrudController
         return new UserService(new MySqlUserRepository($this->pdo()));
     }
 
-    public function index(): void
+    public function index(Request $request): void
     {
         if ($this->denyIndex()) {
             return;
         }
-        $this->handle(fn () => $this->renderIndex(), false, self::BASE_URL);
+        $this->handle(fn () => $this->renderIndex($request), false, self::BASE_URL);
     }
 
     public function update(Request $request, array $params): void

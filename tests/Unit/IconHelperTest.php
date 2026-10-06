@@ -37,6 +37,9 @@ final class IconHelperTest extends TestCase
     public function testRoleLabelSplitsCamelCaseForDisplay(): void
     {
         $this->assertSame('Warehouse Staff', roleLabel('WarehouseStaff'));
+        $this->assertSame('Partially Received', statusLabel('PartiallyReceived'));
+        $this->assertSame('Pending Approval', statusLabel('PendingApproval'));
+        $this->assertSame('Draft', statusLabel('Draft'));
         $this->assertSame('Admin', roleLabel('Admin'));
         $this->assertSame('Sales', roleLabel('Sales'));
     }

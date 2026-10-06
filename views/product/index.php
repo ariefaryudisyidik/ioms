@@ -7,6 +7,13 @@ $role = $auth_user['role'] ?? '';
 $canManage = $role === 'Admin';
 include __DIR__ . '/../partials/header.php';
 
+$baseUrl = '/products';
+$sort = ($filters['sort'] ?? '') !== '' ? $filters['sort'] : 'name_asc';
+$sortQuery = [
+    'search' => $filters['search'] ?? '',
+    'category_id' => $filters['category_id'] ?? '',
+    'status' => $filters['status'] ?? '',
+];
 $buildUrl = static function (array $overrides) use ($filters) {
     $params = array_merge([
         'search' => $filters['search'] ?? '',
@@ -25,10 +32,7 @@ $buildUrl = static function (array $overrides) use ($filters) {
 </div>
 
 <form class="filter-bar" method="get" action="/products">
-    <div class="field field-search">
-        <label for="search">Search</label>
-        <input type="text" id="search" name="search" value="<?= e($filters['search'] ?? '') ?>" placeholder="SKU or name">
-    </div>
+    <?php partial('search-field', ['placeholder' => 'SKU or name', 'value' => (string) ($filters['search'] ?? '')]); ?>
     <div class="field">
         <label for="category_id">Category</label>
         <select id="category_id" name="category_id">
@@ -46,25 +50,24 @@ $buildUrl = static function (array $overrides) use ($filters) {
             <option value="normal" <?= ($filters['status'] ?? '') === 'normal' ? 'selected' : '' ?>>Normal</option>
         </select>
     </div>
-    <div class="field">
-        <label for="sort">Sort</label>
-        <select id="sort" name="sort">
-            <option value="name_asc" <?= ($filters['sort'] ?? '') === 'name_asc' ? 'selected' : '' ?>>Name A-Z</option>
-            <option value="name_desc" <?= ($filters['sort'] ?? '') === 'name_desc' ? 'selected' : '' ?>>Name Z-A</option>
-        </select>
-    </div>
-    <div class="field" style="min-width:auto;">
-        <button type="submit" class="btn"><?= icon('funnel') ?>Apply</button>
-    </div>
+    <input type="hidden" name="sort" value="<?= e($sort) ?>">
+    <?php partial('filter-actions', ['baseUrl' => $baseUrl, 'active' => ($filters['search'] ?? '') !== '' || ($filters['category_id'] ?? '') !== '' || ($filters['status'] ?? '') !== '']); ?>
 </form>
 
 <?php if (empty($result['items'])): ?>
-    <div class="empty-state"><div class="empty-icon"><?= icon('package') ?></div><p>Belum ada data produk yang cocok dengan filter ini.</p></div>
+    <?php if (($filters['search'] ?? '') !== '' || ($filters['category_id'] ?? '') !== '' || ($filters['status'] ?? '') !== ''): ?>
+        <?php partial('empty-state', ['icon' => 'search', 'title' => 'No results found', 'text' => 'No products match your filters.']); ?>
+    <?php else: ?>
+        <?php partial('empty-state', ['icon' => 'package', 'title' => 'No products yet', 'text' => 'Add your first product to start tracking stock.', 'action' => $canManage ? ['href' => '/products/create', 'label' => 'New Product', 'icon' => 'plus'] : null]); ?>
+    <?php endif; ?>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
             <thead>
-                <tr><th>SKU</th><th>Name</th><th>Unit</th><th>Purchase Price</th><th>Selling Price</th><th>Reorder Point</th><th>Status</th><?php if ($canManage): ?><th>Actions</th><?php endif; ?></tr>
+                <tr>
+                    <?php foreach (['sku' => 'SKU', 'name' => 'Name', 'unit' => 'Unit', 'purchase_price' => 'Purchase Price', 'selling_price' => 'Selling Price', 'reorder_point' => 'Reorder Point', 'status' => 'Status'] as $column => $label) { partial('sort-th', ['label' => $label, 'column' => $column, 'sort' => $sort, 'baseUrl' => $baseUrl, 'query' => $sortQuery]); } ?>
+                    <?php if ($canManage): ?><th>Actions</th><?php endif; ?>
+                </tr>
             </thead>
             <tbody>
             <?php foreach ($result['items'] as $p): ?>

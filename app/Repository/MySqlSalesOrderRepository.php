@@ -62,7 +62,7 @@ final class MySqlSalesOrderRepository extends AbstractMySqlRepository implements
              FROM ' . self::SEARCH_FROM,
             $filters,
             self::RULES,
-            $this->dateOrder($filters, 'so.'),
+            $this->orderListSort($filters, 'so.', 'so.so_number', 'c.name'),
             10
         );
 

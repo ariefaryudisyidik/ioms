@@ -23,7 +23,7 @@ include __DIR__ . '/../partials/header.php';
 <?php endif; ?>
 
 <div class="page-head">
-    <h1>Sales Order <?= e($so->soNumber) ?> <span class="badge badge-<?= strtolower($so->status) ?>"><?= e($so->status) ?></span></h1>
+    <h1>Sales Order <?= e($so->soNumber) ?> <span class="badge badge-<?= strtolower($so->status) ?>"><?= e(statusLabel($so->status)) ?></span></h1>
     <a class="btn btn-secondary" href="/sales-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
 
@@ -66,7 +66,7 @@ include __DIR__ . '/../partials/header.php';
 <div class="panel">
     <h2>Items</h2>
     <?php if (empty($so->items)): ?>
-        <div class="empty-state"><p>Belum ada item.</p></div>
+        <?php partial('empty-state', ['compact' => true, 'icon' => 'shopping-cart', 'title' => 'No items', 'text' => 'This sales order has no items.']); ?>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table">

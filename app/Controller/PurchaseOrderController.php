@@ -14,6 +14,7 @@ use App\Repository\MySqlSupplierRepository;
 use App\Repository\MySqlWarehouseRepository;
 use App\Repository\PdoTransactionManager;
 use App\Service\PurchaseOrderService;
+use App\Service\ListQuery;
 
 final class PurchaseOrderController extends Controller
 {
@@ -42,7 +43,7 @@ final class PurchaseOrderController extends Controller
                 'status' => $request->query('status', ''),
                 'search' => trim((string) $request->query('search', '')),
                 'supplier_id' => (int) $request->query('supplier_id', 0) ?: null,
-                'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
+                'sort' => ListQuery::normalizeOrderSort((string) $request->query('sort', '')),
                 'limit' => 10,
                 'offset' => (max(1, (int) $request->query('page', 1)) - 1) * 10,
             ];

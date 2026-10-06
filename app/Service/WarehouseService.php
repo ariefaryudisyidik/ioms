@@ -6,10 +6,13 @@ namespace App\Service;
 
 use App\Entity\Warehouse;
 use App\Repository\WarehouseRepositoryInterface;
+use App\Service\Concerns\ListsEntities;
 use App\Service\Exception\ValidationException;
 
 final class WarehouseService
 {
+    use ListsEntities;
+
     public function __construct(private WarehouseRepositoryInterface $warehouses)
     {
     }
@@ -17,6 +20,27 @@ final class WarehouseService
     public function all(bool $onlyActive = false): array
     {
         return $this->warehouses->all($onlyActive);
+    }
+
+    /** @return array<string, callable(object):mixed> */
+    protected function listColumns(): array
+    {
+        return [
+            'name' => static fn (Warehouse $e): string => $e->name,
+            'location' => static fn (Warehouse $e): string => $e->location,
+            'status' => static fn (Warehouse $e): bool => $e->isActive,
+        ];
+    }
+
+    /** @return list<string> */
+    protected function searchColumns(): array
+    {
+        return ['name', 'location'];
+    }
+
+    protected function statusColumn(): ?string
+    {
+        return 'status';
     }
 
     public function find(int $id): ?Warehouse

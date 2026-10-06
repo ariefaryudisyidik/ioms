@@ -7,12 +7,23 @@ include __DIR__ . '/../partials/header.php';
     <h1>Users</h1>
     <a class="btn" href="/users/create"><?= icon('plus') ?>New User</a>
 </div>
+<?php
+$filters ??= ['search' => '', 'status' => '', 'sort' => ''];
+$baseUrl = '/users';
+$sort = $filters['sort'] ?: 'name_asc';
+$query = ['search' => $filters['search'] ?? '', 'status' => $filters['status'] ?? ''];
+$filtered = $query['search'] !== '' || $query['status'] !== '';
+partial('master-filter', ['baseUrl' => $baseUrl, 'placeholder' => 'Name, email or role', 'withStatus' => true, 'filters' => $filters]);
+?>
 <?php if (empty($users)): ?>
-    <div class="empty-state"><div class="empty-icon"><?= icon('users') ?></div><p>Belum ada data pengguna.</p></div>
+    <?php partial('empty-state', ['icon' => 'search', 'title' => 'No results found', 'text' => 'No users match your filters.']); ?>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
-            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr>
+                <?php foreach (['name' => 'Name', 'email' => 'Email', 'role' => 'Role', 'status' => 'Status'] as $column => $label) { partial('sort-th', ['label' => $label, 'column' => $column, 'sort' => $sort, 'baseUrl' => $baseUrl, 'query' => $query]); } ?>
+                <th>Actions</th>
+            </tr></thead>
             <tbody>
             <?php foreach ($users as $u): ?>
                 <tr>

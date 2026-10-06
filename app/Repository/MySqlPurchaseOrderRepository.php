@@ -61,7 +61,7 @@ final class MySqlPurchaseOrderRepository extends AbstractMySqlRepository impleme
              FROM ' . self::SEARCH_FROM,
             $filters,
             self::RULES,
-            $this->dateOrder($filters, 'po.'),
+            $this->orderListSort($filters, 'po.', 'po.po_number', 's.name'),
             10
         );
 

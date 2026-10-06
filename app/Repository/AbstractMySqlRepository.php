@@ -164,11 +164,32 @@ abstract class AbstractMySqlRepository
         return (int) $stmt->fetchColumn();
     }
 
-    /** @param array<string, mixed> $filters */
-    protected function dateOrder(array $filters, string $prefix = ''): string
+    /**
+     * ORDER BY for order lists. The sort filter is "<column>_<asc|desc>" with column number, party, date or
+     * status; the legacy "asc"/"desc" sorts by date. Only whitelisted SQL is ever returned.
+     *
+     * @param array<string, mixed> $filters
+     */
+    protected function orderListSort(array $filters, string $prefix, string $numberColumn, string $partyColumn): string
     {
-        $direction = ($filters['sort'] ?? 'desc') === 'asc' ? 'ASC' : 'DESC';
+        $sort = (string) ($filters['sort'] ?? '');
+        $sort = in_array($sort, ['asc', 'desc'], true) ? 'date_' . $sort : $sort;
+        $columns = [
+            'number' => $numberColumn,
+            'party' => $partyColumn,
+            'status' => "{$prefix}status",
+            'date' => "{$prefix}order_date",
+        ];
+        $cut = (int) strrpos($sort, '_');
+        $column = substr($sort, 0, $cut);
+        $direction = substr($sort, $cut + 1) === 'asc' ? 'ASC' : 'DESC';
+        if (!isset($columns[$column])) {
+            $column = 'date';
+        }
+        $primary = "{$columns[$column]} {$direction}";
 
-        return "{$prefix}order_date {$direction}, {$prefix}created_at {$direction}";
+        return $column === 'date'
+            ? "{$primary}, {$prefix}created_at {$direction}"
+            : "{$primary}, {$prefix}order_date DESC, {$prefix}created_at DESC";
     }
 }

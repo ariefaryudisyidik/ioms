@@ -10,13 +10,28 @@ include __DIR__ . '/../partials/header.php';
         <a class="btn" href="/categories/create"><?= icon('plus') ?>New Category</a>
     <?php endif; ?>
 </div>
+<?php
+$filters ??= ['search' => '', 'status' => '', 'sort' => ''];
+$baseUrl = '/categories';
+$sort = $filters['sort'] ?: 'name_asc';
+$query = ['search' => $filters['search'] ?? '', 'status' => $filters['status'] ?? ''];
+$filtered = $query['search'] !== '' || $query['status'] !== '';
+partial('master-filter', ['baseUrl' => $baseUrl, 'placeholder' => 'Name or description', 'withStatus' => false, 'filters' => $filters]);
+?>
 
 <?php if (empty($categories)): ?>
-    <div class="empty-state"><div class="empty-icon"><?= icon('tags') ?></div><p>Belum ada data kategori.</p></div>
+    <?php if ($filtered): ?>
+        <?php partial('empty-state', ['icon' => 'search', 'title' => 'No results found', 'text' => 'No categories match your filters.']); ?>
+    <?php else: ?>
+        <?php partial('empty-state', ['icon' => 'tags', 'title' => 'No categories yet', 'text' => 'Create your first category to organise products.', 'action' => $role === 'Admin' ? ['href' => '/categories/create', 'label' => 'New Category', 'icon' => 'plus'] : null]); ?>
+    <?php endif; ?>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
-            <thead><tr><th>Name</th><th>Description</th><?php if ($role === 'Admin'): ?><th>Actions</th><?php endif; ?></tr></thead>
+            <thead><tr>
+                <?php foreach (['name' => 'Name', 'description' => 'Description'] as $column => $label) { partial('sort-th', ['label' => $label, 'column' => $column, 'sort' => $sort, 'baseUrl' => $baseUrl, 'query' => $query]); } ?>
+                <?php if ($role === 'Admin'): ?><th>Actions</th><?php endif; ?>
+            </tr></thead>
             <tbody>
             <?php foreach ($categories as $category): ?>
                 <tr>

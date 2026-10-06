@@ -29,6 +29,47 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
         $this->assertStringContainsString('empty-state', $admin->get('/products?search=zzz-no-match')->body);
     }
 
+    public function testEmptyStatesAreEnglishWithAnIconAndASuggestedAction(): void
+    {
+        $admin = $this->loginAs(self::ADMIN);
+        $cases = [
+            'categories' => ['/categories', 'No categories yet', 'New Category'],
+            'warehouses' => ['/warehouses', 'No warehouses yet', 'New Warehouse'],
+            'suppliers' => ['/suppliers', 'No suppliers yet', 'New Supplier'],
+            'customers' => ['/customers', 'No customers yet', 'New Customer'],
+            'products' => ['/products', 'No products yet', 'New Product'],
+            'purchase_orders' => ['/purchase-orders', 'No purchase orders yet', 'New Purchase Order'],
+            'sales_orders' => ['/sales-orders', 'No sales orders yet', 'New Sales Order'],
+        ];
+        foreach ($cases as $table => [$path, $title, $action]) {
+            $this->clearTable($table);
+            $body = $admin->get($path)->body;
+
+            $this->assertStringContainsString('<p class="empty-title">' . $title . '</p>', $body, $path);
+            $this->assertStringContainsString($action, $body, $path);
+            $this->assertStringContainsString('<div class="empty-icon"><svg', $body, $path);
+            $this->assertDoesNotMatchRegularExpression('/Belum ada|Tidak ada|&#\d{5,};/', $body, $path);
+        }
+
+        $filtered = $admin->get('/purchase-orders?search=zzz-no-match')->body;
+        $this->assertStringContainsString('No results found', $filtered);
+        $this->assertStringNotContainsString('Reset filters', $filtered);
+        $this->assertStringNotContainsString('No purchase orders yet', $filtered);
+    }
+
+    public function testFilteredListsExplainTheFilterAndKeepResetInTheFilterBar(): void
+    {
+        $admin = $this->loginAs(self::ADMIN);
+        $paths = ['/categories', '/warehouses', '/suppliers', '/customers', '/users', '/products', '/sales-orders'];
+        foreach ($paths as $path) {
+            $body = $admin->get($path . '?search=zzz-no-match')->body;
+
+            $this->assertStringContainsString('<p class="empty-title">No results found</p>', $body, $path);
+            $this->assertStringContainsString('<a class="btn btn-secondary" href="' . $path . '">', $body, $path);
+            $this->assertStringNotContainsString('Reset filters', $body, $path);
+        }
+    }
+
     public function testProductListShowsManageActionsAndPagerEdges(): void
     {
         $admin = $this->loginAs(self::ADMIN);
@@ -51,13 +92,13 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
 
         $this->clearTable('purchase_order_items');
         $this->clearTable('sales_order_items');
-        $this->assertStringContainsString('Belum ada item', $admin->get('/purchase-orders/1')->body);
-        $this->assertStringContainsString('Belum ada item', $admin->get('/sales-orders/1')->body);
+        $this->assertStringContainsString('No items', $admin->get('/purchase-orders/1')->body);
+        $this->assertStringContainsString('No items', $admin->get('/sales-orders/1')->body);
 
         $this->clearTable('product_stocks');
         $this->db()->exec("UPDATE products SET image_path = 'sample.png' WHERE id = 1");
         $product = $admin->get('/products/1')->body;
-        $this->assertStringContainsString('Belum ada data stok', $product);
+        $this->assertStringContainsString('No stock recorded', $product);
         $this->assertStringContainsString('/uploads/sample.png', $product);
     }
 
@@ -67,7 +108,7 @@ final class EmptyStatesAndFailuresE2ETest extends E2ETestCase
 
         $body = $this->loginAs(self::ADMIN)->get('/dashboard')->body;
 
-        $this->assertStringContainsString('Semua produk berada di atas titik pemesanan ulang', $body);
+        $this->assertStringContainsString('Every product is above its reorder point', $body);
     }
 
     public function testDatabaseFailuresNeverLeakDetailsAndReturnGenericErrors(): void

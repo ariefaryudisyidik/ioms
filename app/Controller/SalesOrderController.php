@@ -15,6 +15,7 @@ use App\Repository\MySqlWarehouseRepository;
 use App\Repository\PdoTransactionManager;
 use App\Service\Exception\AuthorizationException;
 use App\Service\SalesOrderService;
+use App\Service\ListQuery;
 
 final class SalesOrderController extends Controller
 {
@@ -43,7 +44,7 @@ final class SalesOrderController extends Controller
                 'status' => $request->query('status', ''),
                 'search' => trim((string) $request->query('search', '')),
                 'customer_id' => (int) $request->query('customer_id', 0) ?: null,
-                'sort' => $request->query('sort', 'desc') === 'asc' ? 'asc' : 'desc',
+                'sort' => ListQuery::normalizeOrderSort((string) $request->query('sort', '')),
                 'limit' => 10,
                 'offset' => (max(1, (int) $request->query('page', 1)) - 1) * 10,
             ];

@@ -6,10 +6,13 @@ namespace App\Service;
 
 use App\Entity\Category;
 use App\Repository\CategoryRepositoryInterface;
+use App\Service\Concerns\ListsEntities;
 use App\Service\Exception\ValidationException;
 
 final class CategoryService
 {
+    use ListsEntities;
+
     public function __construct(private CategoryRepositoryInterface $categories)
     {
     }
@@ -17,6 +20,21 @@ final class CategoryService
     public function all(): array
     {
         return $this->categories->all();
+    }
+
+    /** @return array<string, callable(object):mixed> */
+    protected function listColumns(): array
+    {
+        return [
+            'name' => static fn (Category $e): string => $e->name,
+            'description' => static fn (Category $e): string => (string) $e->description,
+        ];
+    }
+
+    /** @return list<string> */
+    protected function searchColumns(): array
+    {
+        return ['name', 'description'];
     }
 
     public function find(int $id): ?Category

@@ -42,17 +42,26 @@ abstract class CrudController extends Controller
         return Auth::requireRole(...static::INDEX_ROLES);
     }
 
-    protected function renderIndex(): void
+    protected function renderIndex(Request $request): void
     {
-        $this->render(static::VIEW . '.index', [static::LIST_KEY => $this->call('all')]);
+        $status = (string) $request->query('status', '');
+        $filters = [
+            'search' => mb_substr(trim((string) $request->query('search', '')), 0, 100),
+            'status' => in_array($status, ['active', 'inactive'], true) ? $status : '',
+            'sort' => $this->call('normalizeSort', (string) $request->query('sort', '')),
+        ];
+        $this->render(static::VIEW . '.index', [
+            static::LIST_KEY => $this->call('list', $filters),
+            'filters' => $filters,
+        ]);
     }
 
-    public function index(): void
+    public function index(Request $request): void
     {
         if ($this->denyIndex()) {
             return;
         }
-        $this->renderIndex();
+        $this->renderIndex($request);
     }
 
     public function create(): void

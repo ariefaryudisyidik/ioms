@@ -10,34 +10,33 @@ $role = $auth_user['role'] ?? '';
 </div>
 
 <?php
-$card = static fn (string $label, string $value, string $class = '', string $icon = 'package'): string =>
-    '<div class="card' . $class . '"><div class="card-label">' . icon($icon) . '<span>' . e($label) . '</span></div><div class="card-value">' . e($value) . '</div></div>';
+$card = static fn (string $label, string $value, string $icon = 'package'): string =>
+    '<div class="card"><div class="card-label">' . icon($icon) . '<span>' . e($label) . '</span></div><div class="card-value">' . e($value) . '</div></div>';
 $count = static fn (string $key): string => (string) (int) ($summary[$key] ?? 0);
 $mine = $summary['my_so_counts'] ?? [];
-[$danger, $warning, $info, $success] = [' card-danger', ' card-warning', ' card-info', ' card-success'];
 ?>
 <?php if ($role === 'Admin'): ?>
 <?php $awaitingReceipt = (string) ((int) ($summary['po_ordered_count'] ?? 0) + (int) ($summary['po_partial_count'] ?? 0)); ?>
 <div class="card-grid card-grid-3">
-    <?= $card('Inventory Value', rupiah((float) ($summary['inventory_value'] ?? 0)), '', 'wallet') ?>
-    <?= $card('Potential Revenue', rupiah((float) ($summary['potential_revenue'] ?? 0)), $success, 'trending-up') ?>
-    <?= $card('Potential Margin', rupiah((float) ($summary['potential_margin'] ?? 0)), $info, 'chart-column') ?>
+    <?= $card('Inventory Value', rupiah((float) ($summary['inventory_value'] ?? 0)), 'wallet') ?>
+    <?= $card('Potential Revenue', rupiah((float) ($summary['potential_revenue'] ?? 0)), 'trending-up') ?>
+    <?= $card('Potential Margin', rupiah((float) ($summary['potential_margin'] ?? 0)), 'chart-column') ?>
 </div>
 <?php endif; ?>
 <div class="card-grid<?= $role === 'Admin' ? ' card-grid-3' : '' ?>">
     <?php if ($role === 'Admin'): ?>
-        <?= $card('Low Stock Products', $count('low_stock_count'), $danger, 'triangle-alert') ?>
-        <?= $card('SO Pending Approval', $count('pending_approval_count'), $warning, 'hourglass') ?>
-        <?= $card('PO Awaiting Receipt', $awaitingReceipt, $info, 'clipboard-list') ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), 'triangle-alert') ?>
+        <?= $card('SO Pending Approval', $count('pending_approval_count'), 'hourglass') ?>
+        <?= $card('PO Awaiting Receipt', $awaitingReceipt, 'clipboard-list') ?>
     <?php elseif ($role === 'Sales'): ?>
-        <?php foreach (['Draft' => '', 'PendingApproval' => $warning, 'Approved' => $info, 'Fulfilled' => $success, 'Cancelled' => ''] as $status => $class): ?>
-            <?= $card(trim((string) preg_replace('/(?<!^)(?=[A-Z])/', ' ', $status)), (string) (int) ($mine[$status] ?? 0), $class, 'file-text') ?>
+        <?php foreach (['Draft', 'PendingApproval', 'Approved', 'Fulfilled', 'Cancelled'] as $status): ?>
+            <?= $card(statusLabel($status), (string) (int) ($mine[$status] ?? 0), 'file-text') ?>
         <?php endforeach; ?>
     <?php else: /* WarehouseStaff */ ?>
-        <?= $card('Awaiting goods receipt (PO Ordered)', $count('po_ordered_count'), $info, 'clipboard-list') ?>
-        <?= $card('Awaiting goods receipt (PO Partially Received)', $count('po_partial_count'), $info, 'package-check') ?>
-        <?= $card('Awaiting goods issue (SO Approved)', $count('so_approved_count'), $success, 'truck') ?>
-        <?= $card('Low Stock Products', $count('low_stock_count'), $danger, 'triangle-alert') ?>
+        <?= $card('Awaiting goods receipt (PO Ordered)', $count('po_ordered_count'), 'clipboard-list') ?>
+        <?= $card('Awaiting goods receipt (PO Partially Received)', $count('po_partial_count'), 'package-check') ?>
+        <?= $card('Awaiting goods issue (SO Approved)', $count('so_approved_count'), 'truck') ?>
+        <?= $card('Low Stock Products', $count('low_stock_count'), 'triangle-alert') ?>
     <?php endif; ?>
 </div>
 
@@ -46,10 +45,7 @@ $mine = $summary['my_so_counts'] ?? [];
     <h2>Recent Sales Orders</h2>
     <?php $recent = $summary['my_recent_orders'] ?? []; ?>
     <?php if (empty($recent)): ?>
-        <div class="empty-state">
-            <div class="empty-icon"><?= icon('shopping-cart') ?></div>
-            <p>Belum ada Sales Order. Buat order pertama dari menu Sales Orders.</p>
-        </div>
+        <?php partial('empty-state', ['compact' => true, 'icon' => 'shopping-cart', 'title' => 'No sales orders yet', 'text' => 'Orders you create will show up here.', 'action' => ['href' => '/sales-orders/create', 'label' => 'New Sales Order', 'icon' => 'plus']]); ?>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table table-compact">
@@ -62,7 +58,7 @@ $mine = $summary['my_so_counts'] ?? [];
                             <td><a href="/sales-orders/<?= (int) $order->id ?>"><?= e($order->soNumber) ?></a></td>
                             <td class="wrap"><?= e($order->customerName ?? '-') ?></td>
                             <td class="hide-sm"><?= e($order->orderDate) ?></td>
-                            <td><span class="badge badge-<?= e(strtolower($order->status)) ?>"><?= e(trim((string) preg_replace('/(?<!^)(?=[A-Z])/', ' ', $order->status))) ?></span></td>
+                            <td><span class="badge badge-<?= e(strtolower($order->status)) ?>"><?= e(statusLabel($order->status)) ?></span></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -77,10 +73,7 @@ $mine = $summary['my_so_counts'] ?? [];
     <h2>Low Stock Items</h2>
     <?php $lowStock = $summary['low_stock_items'] ?? []; ?>
     <?php if (empty($lowStock)): ?>
-        <div class="empty-state">
-            <div class="empty-icon"><?= icon('shield-check') ?></div>
-            <p>Belum ada data. Semua produk berada di atas titik pemesanan ulang (reorder point).</p>
-        </div>
+        <?php partial('empty-state', ['compact' => true, 'icon' => 'shield-check', 'title' => 'Stock levels look healthy', 'text' => 'Every product is above its reorder point.']); ?>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table table-compact">

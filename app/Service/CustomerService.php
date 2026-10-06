@@ -6,10 +6,13 @@ namespace App\Service;
 
 use App\Entity\Customer;
 use App\Repository\CustomerRepositoryInterface;
+use App\Service\Concerns\ListsEntities;
 use App\Service\Exception\ValidationException;
 
 final class CustomerService
 {
+    use ListsEntities;
+
     public function __construct(private CustomerRepositoryInterface $customers)
     {
     }
@@ -17,6 +20,28 @@ final class CustomerService
     public function all(bool $onlyActive = false): array
     {
         return $this->customers->all($onlyActive);
+    }
+
+    /** @return array<string, callable(object):mixed> */
+    protected function listColumns(): array
+    {
+        return [
+            'name' => static fn (Customer $e): string => $e->name,
+            'contact' => static fn (Customer $e): string => (string) $e->contact,
+            'address' => static fn (Customer $e): string => (string) $e->address,
+            'status' => static fn (Customer $e): bool => $e->isActive,
+        ];
+    }
+
+    /** @return list<string> */
+    protected function searchColumns(): array
+    {
+        return ['name', 'contact', 'address'];
+    }
+
+    protected function statusColumn(): ?string
+    {
+        return 'status';
     }
 
     public function find(int $id): ?Customer

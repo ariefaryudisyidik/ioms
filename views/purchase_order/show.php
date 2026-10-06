@@ -12,7 +12,7 @@ $canManage = in_array($role, ['Admin', 'WarehouseStaff'], true);
 include __DIR__ . '/../partials/header.php';
 ?>
 <div class="page-head">
-    <h1>Purchase Order <?= e($po->poNumber) ?> <span class="badge badge-<?= strtolower($po->status) ?>"><?= e($po->status) ?></span></h1>
+    <h1>Purchase Order <?= e($po->poNumber) ?> <span class="badge badge-<?= strtolower($po->status) ?>"><?= e(statusLabel($po->status)) ?></span></h1>
     <a class="btn btn-secondary" href="/purchase-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
 
@@ -45,7 +45,7 @@ include __DIR__ . '/../partials/header.php';
 <div class="panel">
     <h2>Items</h2>
     <?php if (empty($po->items)): ?>
-        <div class="empty-state"><p>Belum ada item.</p></div>
+        <?php partial('empty-state', ['compact' => true, 'icon' => 'clipboard-list', 'title' => 'No items', 'text' => 'This purchase order has no items.']); ?>
     <?php else: ?>
         <div class="table-wrap">
             <table class="data-table">

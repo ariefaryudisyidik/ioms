@@ -69,7 +69,7 @@ final class BriefRequirementsE2ETest extends E2ETestCase
         $admin = $this->loginAs(self::ADMIN);
 
         $this->assertStringNotContainsString('PO-2026-0001', $admin->get('/purchase-orders?search=' . urlencode('%'))->body);
-        $this->assertStringContainsString('Belum ada data', $admin->get('/sales-orders?search=' . urlencode('SO_2026'))->body);
+        $this->assertStringContainsString('No results found', $admin->get('/sales-orders?search=' . urlencode('SO_2026'))->body);
 
         $page1 = $admin->get('/purchase-orders?search=PO-2026&sort=asc')->body; // 13 matches, 10 per page
         $this->assertMatchesRegularExpression('#href="[^"]*search=PO-2026[^"]*page=2#', $page1);
@@ -136,7 +136,7 @@ final class BriefRequirementsE2ETest extends E2ETestCase
         $this->db()->exec('UPDATE sales_orders SET created_by = 3 WHERE created_by = 2');
         $body = $this->loginAs(self::SALES)->get('/dashboard')->body;
 
-        $this->assertStringContainsString('Belum ada Sales Order', $body);
+        $this->assertStringContainsString('No sales orders yet', $body);
         $this->assertSame('0', $this->card($body, 'Draft'));
     }
 
@@ -170,5 +170,17 @@ final class BriefRequirementsE2ETest extends E2ETestCase
         $this->assertSame(200, $this->loginAs(self::ADMIN)->get('/purchase-orders/create')->status);
         $this->assertSame(200, $this->loginAs(self::WAREHOUSE)->get('/purchase-orders/create')->status);
         $this->assertSame(403, $this->loginAs(self::SALES)->get('/purchase-orders/create')->status);
+    }
+
+    public function testOrderFormsKeepTheProductSelectAndLoadTheSearchableProductPicker(): void
+    {
+        $admin = $this->loginAs(self::ADMIN);
+
+        foreach (['/purchase-orders/create', '/sales-orders/create'] as $path) {
+            $body = $admin->get($path)->body;
+            $this->assertStringContainsString('/assets/js/combobox.js', $body, $path);
+            $this->assertStringContainsString('class="js-product-select"', $body, $path);
+            $this->assertStringContainsString('<option value="">Select a product</option>', $body, $path);
+        }
     }
 }

@@ -8,12 +8,27 @@ include __DIR__ . '/../partials/header.php';
     <h1>Suppliers</h1>
     <?php if ($role === 'Admin'): ?><a class="btn" href="/suppliers/create"><?= icon('plus') ?>New Supplier</a><?php endif; ?>
 </div>
+<?php
+$filters ??= ['search' => '', 'status' => '', 'sort' => ''];
+$baseUrl = '/suppliers';
+$sort = $filters['sort'] ?: 'name_asc';
+$query = ['search' => $filters['search'] ?? '', 'status' => $filters['status'] ?? ''];
+$filtered = $query['search'] !== '' || $query['status'] !== '';
+partial('master-filter', ['baseUrl' => $baseUrl, 'placeholder' => 'Name, contact or address', 'withStatus' => true, 'filters' => $filters]);
+?>
 <?php if (empty($suppliers)): ?>
-    <div class="empty-state"><div class="empty-icon"><?= icon('truck') ?></div><p>Belum ada data supplier.</p></div>
+    <?php if ($filtered): ?>
+        <?php partial('empty-state', ['icon' => 'search', 'title' => 'No results found', 'text' => 'No suppliers match your filters.']); ?>
+    <?php else: ?>
+        <?php partial('empty-state', ['icon' => 'truck', 'title' => 'No suppliers yet', 'text' => 'Add a supplier to start creating purchase orders.', 'action' => $role === 'Admin' ? ['href' => '/suppliers/create', 'label' => 'New Supplier', 'icon' => 'plus'] : null]); ?>
+    <?php endif; ?>
 <?php else: ?>
     <div class="table-wrap">
         <table class="data-table">
-            <thead><tr><th>Name</th><th>Contact</th><th>Address</th><th>Status</th><?php if ($role === 'Admin'): ?><th>Actions</th><?php endif; ?></tr></thead>
+            <thead><tr>
+                <?php foreach (['name' => 'Name', 'contact' => 'Contact', 'address' => 'Address', 'status' => 'Status'] as $column => $label) { partial('sort-th', ['label' => $label, 'column' => $column, 'sort' => $sort, 'baseUrl' => $baseUrl, 'query' => $query]); } ?>
+                <?php if ($role === 'Admin'): ?><th>Actions</th><?php endif; ?>
+            </tr></thead>
             <tbody>
             <?php foreach ($suppliers as $s): ?>
                 <tr>
