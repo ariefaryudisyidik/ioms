@@ -116,28 +116,7 @@
       });
     });
 
-    // Destructive action confirmations (progressive enhancement: forms
-    // still submit normally if JS is disabled or the user confirms).
-    document.querySelectorAll('[data-confirm]').forEach(function (el) {
-      el.addEventListener('submit', function (event) {
-        var message = el.getAttribute('data-confirm') || 'Are you sure?';
-        if (!window.confirm(message)) {
-          event.preventDefault();
-        }
-      });
-      el.addEventListener('click', function (event) {
-        if (el.tagName !== 'BUTTON' && el.tagName !== 'A') return;
-      });
-    });
-
-    document.querySelectorAll('button[data-confirm], a[data-confirm]').forEach(function (el) {
-      el.addEventListener('click', function (event) {
-        var message = el.getAttribute('data-confirm') || 'Are you sure?';
-        if (!window.confirm(message)) {
-          event.preventDefault();
-        }
-      });
-    });
+    // data-confirm dialogs live in confirm-dialog.js.
   });
 
   global.IOMS_VALIDATION = {
