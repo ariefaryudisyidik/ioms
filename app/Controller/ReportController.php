@@ -7,20 +7,14 @@ namespace App\Controller;
 use App\Core\Auth;
 use App\Core\Request;
 use App\Core\Response;
-use App\Repository\MySqlPurchaseOrderRepository;
-use App\Repository\MySqlSalesOrderRepository;
-use App\Repository\MySqlStockLedgerRepository;
+use App\Repository\MySqlReportRepository;
 use App\Service\ReportService;
 
 final class ReportController extends Controller
 {
     private function service(): ReportService
     {
-        return new ReportService(
-            new MySqlStockLedgerRepository($this->pdo()),
-            new MySqlSalesOrderRepository($this->pdo()),
-            new MySqlPurchaseOrderRepository($this->pdo()),
-        );
+        return new ReportService(new MySqlReportRepository($this->pdo()));
     }
 
     public function index(): void
