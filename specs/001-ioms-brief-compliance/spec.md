@@ -138,7 +138,7 @@ tertinggal; **Verifikasi** = perlu dijalankan ulang sebelum defense.
 | FR-024 | TEST-01/02/03 unit, integration, static analysis, FIRST | Done | 283 test lulus, coverage 100%, PHPStan 0 error, PHPCS 0 error; README, `docs/testing/`, dan laporan Sonar sinkron |
 | FR-025 | §6.2 AI disclosure | Done | `ai-usage-log.md` diperbarui 2026-10-06 (termasuk kesalahan AI yang ditemukan dan diperbaiki) |
 | FR-026 | §4.2 / §8.2 keamanan konfigurasi | Done (keputusan pemilik) | `.claude/settings.json`: daftar `permissions.deny` sengaja dikosongkan agar Claude dapat membaca `.env`; dicatat sebagai D7 di `docs/planning/decisions.md`; `.env` tetap tidak ter-track |
-| FR-027 | §5 Docker bersih + §10 checklist, tag final | Verifikasi | Docker bersih lulus (`docs/testing/docker-clean-run.md`); tag final menunggu T020 |
+| FR-027 | §5 Docker bersih + §10 checklist, tag final | Done | Docker bersih lulus (`docs/testing/docker-clean-run.md`); checklist `docs/quality/submission-checklist.md`; tag `v1.0.1` (lokal) |
 
 - **FR-028**: Sistem dokumentasi MUST memuat satu sumber angka test/coverage yang sama di README, `docs/testing/`, dan `docs/quality/sonarqube-report.md`.
 - **FR-029**: Keputusan atas requirement ambigu MUST dicatat di `docs/planning/` (brief FAQ #12).
