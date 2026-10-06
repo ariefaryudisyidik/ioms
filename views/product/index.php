@@ -72,8 +72,8 @@ $buildUrl = static function (array $overrides) use ($filters) {
                     <td><?= e($p->sku) ?></td>
                     <td class="wrap"><a href="/products/<?= (int) $p->id ?>"><?= e($p->name) ?></a></td>
                     <td><?= e($p->unit) ?></td>
-                    <td><?= number_format($p->purchasePrice, 2) ?></td>
-                    <td><?= number_format($p->sellingPrice, 2) ?></td>
+                    <td><?= rupiah($p->purchasePrice) ?></td>
+                    <td><?= rupiah($p->sellingPrice) ?></td>
                     <td><?= (int) $p->reorderPoint ?></td>
                     <td><span class="badge badge-<?= $p->isActive ? 'active' : 'inactive' ?>"><?= $p->isActive ? 'Active' : 'Inactive' ?></span></td>
                     <?php if ($canManage): ?>

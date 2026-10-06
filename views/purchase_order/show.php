@@ -58,7 +58,7 @@ include __DIR__ . '/../partials/header.php';
                         <td><?= (int) $item->qtyOrdered ?></td>
                         <td><?= (int) $item->qtyReceived ?></td>
                         <td><?= (int) $item->remaining() ?></td>
-                        <td><?= number_format($item->purchasePrice, 2) ?></td>
+                        <td><?= rupiah($item->purchasePrice) ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

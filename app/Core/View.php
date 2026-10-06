@@ -76,4 +76,15 @@ namespace {
             return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
         }
     }
+
+    if (!function_exists('rupiah')) {
+        /** Formats an amount as Indonesian Rupiah without decimals, e.g. "Rp 1.250.000". */
+        function rupiah(float|int|string|null $amount): string
+        {
+            $value = (float) $amount;
+            $formatted = number_format(abs(round($value)), 0, ',', '.');
+
+            return ($value < 0 && round($value) != 0 ? '-' : '') . 'Rp ' . $formatted;
+        }
+    }
 }

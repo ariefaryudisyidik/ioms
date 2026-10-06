@@ -78,13 +78,13 @@ include __DIR__ . '/../partials/header.php';
                     <tr>
                         <td><?= e($product?->name ?? ('#' . $item->productId)) ?></td>
                         <td><?= (int) $item->qty ?></td>
-                        <td><?= number_format($item->sellingPrice, 2) ?></td>
-                        <td><?= number_format($subtotal, 2) ?></td>
+                        <td><?= rupiah($item->sellingPrice) ?></td>
+                        <td><?= rupiah($subtotal) ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
                 <tfoot>
-                    <tr><th colspan="3" scope="row" class="text-right">Total</th><td><strong><?= number_format($grandTotal, 2) ?></strong></td></tr>
+                    <tr><th colspan="3" scope="row" class="text-right">Total</th><td><strong><?= rupiah($grandTotal) ?></strong></td></tr>
                 </tfoot>
             </table>
         </div>

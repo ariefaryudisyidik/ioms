@@ -23,8 +23,8 @@ include __DIR__ . '/../partials/header.php';
     <dl class="detail-grid">
         <div><dt>SKU</dt><dd><?= e($product->sku) ?></dd></div>
         <div><dt>Unit</dt><dd><?= e($product->unit) ?></dd></div>
-        <div><dt>Purchase Price</dt><dd><?= number_format($product->purchasePrice, 2) ?></dd></div>
-        <div><dt>Selling Price</dt><dd><?= number_format($product->sellingPrice, 2) ?></dd></div>
+        <div><dt>Purchase Price</dt><dd><?= rupiah($product->purchasePrice) ?></dd></div>
+        <div><dt>Selling Price</dt><dd><?= rupiah($product->sellingPrice) ?></dd></div>
         <div><dt>Reorder Point</dt><dd><?= (int) $product->reorderPoint ?></dd></div>
         <div><dt>Status</dt><dd><span class="badge badge-<?= $product->isActive ? 'active' : 'inactive' ?>"><?= $product->isActive ? 'Active' : 'Inactive' ?></span></dd></div>
     </dl>
