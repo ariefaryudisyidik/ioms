@@ -40,7 +40,7 @@ Scan ulang setelah perubahan laporan CSV, dashboard per role, format Rupiah, dia
 | Duplikasi | **0,0%** |
 | Lines of code | 6.376 |
 
-Scan akhir dijalankan ulang lewat `composer sonar` pada commit `45b5f68` (coverage dan scan dalam satu perintah, 283 test lulus) dengan hasil yang sama persis: gate Passed, 0 isu, 0 hotspot, coverage 100%, duplikasi 0%. Scan ini yang menjadi dasar tag `v1.0.1`.
+Scan akhir dijalankan ulang lewat `composer sonar` pada commit `45b5f68` (coverage dan scan dalam satu perintah, 283 test lulus) dengan hasil yang sama persis: gate Passed, 0 isu, 0 hotspot, coverage 100%, duplikasi 0%. Scan ini menjadi dasar tag final `v1.0.0`.
 
 Yang terjadi sebelum hasil ini, dicatat apa adanya:
 

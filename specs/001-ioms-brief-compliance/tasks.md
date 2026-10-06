@@ -91,7 +91,7 @@ description: "Task list: kepatuhan IOMS terhadap Project Brief"
 
 - [X] T021 Jalankan `/rudis.analyze` (2026-10-06): 0 CRITICAL, FR 29/29 tercakup; temuan I1, I2, I3, E1, E3 diperbaiki, E2 ditangani di T020, A1 dicatat di `docs/planning/decisions.md` (D1)
 - [X] T022 [P] [NFR-004] [SC-003] [SC-005] Ulangi checklist brief §10 (12 item) di `docs/quality/submission-checklist.md`, termasuk sampel 5 kelas diagram -> kode dan pemeriksaan secret di repo dan history; tandai terpenuhi atau catat keterbatasannya
-- [X] T020 [US3] [FR-027] `composer sonar` diulang pada commit `45b5f68` (gate Passed, 0 isu, coverage 100%), lalu tag final `v1.0.1` dibuat secara lokal; push dan link submission ditangani pemilik
+- [X] T020 [US3] [FR-027] `composer sonar` diulang pada commit `45b5f68` (gate Passed, 0 isu, coverage 100%); tag final cukup satu, `v1.0.0`, dipasang pemilik pada commit akhir; push dan link submission ditangani pemilik
 
 ---
 
