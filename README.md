@@ -77,6 +77,7 @@ Semua skrip bantu dijalankan lewat satu pintu, `composer <perintah>` (daftar den
 | `composer sonar` | Coverage lalu scan SonarQube (butuh `export SONAR_TOKEN=...`) |
 | `composer db:reset` | Reset database dev ke `schema.sql` + `seed.sql` (opsi: `-- --yes`, `-- --uploads`) |
 | `composer demo:api` | Demo API-01: JSON tanpa login (401), dengan login (200), SKU tidak ada (404) |
+| `composer demo:sod` | Demo pemisahan tugas: Sales dan Warehouse Staff mencoba approve SO lewat request manual, server menjawab 403 |
 | `composer low-stock` | Ringkasan produk di bawah reorder point (JOB-01, lewat `docker compose exec`) |
 
 Opsi untuk skrip diberikan setelah `--`, variabel lewat environment, mis. `SKU=SKU-0010 composer demo:api`.

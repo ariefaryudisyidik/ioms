@@ -31,6 +31,7 @@
         ],
         "db:reset": "bash scripts/reset-db.sh",
         "demo:api": "bash scripts/demo-api.sh",
+        "demo:sod": "bash scripts/demo-sod.sh",
         "low-stock": "docker compose exec app php scripts/check-low-stock.php",
         "sonar": [
             "Composer\\Config::disableProcessTimeout",
@@ -48,6 +49,7 @@
         "stan": "Static analysis PHPStan level 5",
         "db:reset": "Reset database dev ke schema.sql + seed.sql (opsi: -- --yes, -- --uploads)",
         "demo:api": "Demo API-01: endpoint JSON tanpa auth (401), dengan auth (200), SKU tidak ada (404)",
+        "demo:sod": "Demo pemisahan tugas: Sales dan Warehouse mencoba approve SO lewat request manual (403)",
         "low-stock": "Ringkasan produk di bawah reorder point (JOB-01, lewat docker compose exec)"
     },
     "config": {
