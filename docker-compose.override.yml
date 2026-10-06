@@ -1,0 +1,9 @@
+# Local development only: mount the source so edits show up without rebuilding the image.
+# vendor/ stays the one baked into the image; uploads keep their named volume.
+services:
+  app:
+    volumes:
+      - ./app:/var/www/html/app:ro
+      - ./views:/var/www/html/views:ro
+      - ./public:/var/www/html/public:ro
+      - uploads_data:/var/www/html/public/uploads
