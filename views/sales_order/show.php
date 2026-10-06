@@ -18,14 +18,14 @@ $canCancel = in_array($role, ['Admin', 'Sales'], true) && !in_array($so->status,
 
 include __DIR__ . '/../partials/header.php';
 ?>
+<?php if ($role !== 'Admin' && $so->status === 'PendingApproval'): ?>
+    <div class="alert alert-warning alert-inline" role="note"><?= icon('triangle-alert') ?>Only an Admin can approve or reject this order.</div>
+<?php endif; ?>
+
 <div class="page-head">
     <h1>Sales Order <?= e($so->soNumber) ?> <span class="badge badge-<?= strtolower($so->status) ?>"><?= e($so->status) ?></span></h1>
     <a class="btn btn-secondary" href="/sales-orders"><?= icon('arrow-left') ?>Back to list</a>
 </div>
-
-<?php if ($role !== 'Admin' && $so->status === 'PendingApproval'): ?>
-    <div class="alert alert-warning alert-inline" role="note"><?= icon('triangle-alert') ?>Only an Admin can approve or reject this order.</div>
-<?php endif; ?>
 
 <div class="panel">
     <dl class="detail-grid">
