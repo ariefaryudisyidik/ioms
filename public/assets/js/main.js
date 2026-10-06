@@ -123,7 +123,8 @@
 
         var qtyInput = row.querySelector('.js-qty-input');
         var lowStock = qtyInThisWarehouse !== null ? qtyInThisWarehouse : data.total;
-        if (qtyInput && Number(qtyInput.value || 0) > lowStock) {
+        var warnOnExceed = !!row.closest('form[data-warn-exceed]');
+        if (warnOnExceed && qtyInput && Number(qtyInput.value || 0) > lowStock) {
           box.className = 'availability-box state-warn';
           box.innerHTML += '<div>Warning: requested quantity may exceed available stock.</div>';
         } else {

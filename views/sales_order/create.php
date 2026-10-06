@@ -20,5 +20,6 @@ partial('order-form', [
     'errors' => $errors ?? [],
     'products' => $products,
     'qtyField' => ['qty', 'Qty'],
+    'warnOnExceed' => true,
 ]);
 include __DIR__ . '/../partials/footer.php';

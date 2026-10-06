@@ -14,8 +14,10 @@
  * @var array<string,string>|null $errors
  * @var \App\Entity\Product[] $products
  * @var array{0:string,1:string} $qtyField [name, label]
+ * @var bool $warnOnExceed warn when qty exceeds stock (sales orders only; a PO adds stock)
  */
 $errors ??= [];
+$warnOnExceed ??= false;
 $old = [];
 foreach ($defaults as $key => $value) {
     $old[$key] = \App\Core\Session::old($key, $value);
@@ -34,7 +36,7 @@ $rowVars = [
 <h1><?= e($heading) ?></h1>
 <?php include __DIR__ . '/form-errors.php'; ?>
 <div class="panel">
-    <form method="post" action="<?= e($action) ?>" data-validate novalidate>
+    <form method="post" action="<?= e($action) ?>" data-validate novalidate<?= $warnOnExceed ? ' data-warn-exceed' : '' ?>>
         <div class="form-grid">
             <?php partial('select-field', ['id' => $partyField['id'], 'label' => $partyField['label'], 'placeholder' => $partyField['placeholder'], 'selectClass' => '', 'options' => $partyField['options'], 'selected' => (string) $old[$partyField['id']], 'errors' => $errors]); ?>
             <?php partial('select-field', ['id' => 'warehouse_id', 'label' => 'Warehouse', 'placeholder' => 'Select a warehouse', 'selectClass' => 'js-order-warehouse', 'options' => $warehouseOptions, 'selected' => (string) $old['warehouse_id'], 'errors' => $errors]); ?>
