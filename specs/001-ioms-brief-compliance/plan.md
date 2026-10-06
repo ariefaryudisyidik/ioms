@@ -17,7 +17,7 @@ menemukan defect.
 **Language/Version**: PHP 8.2+ native (image `php:8.2-apache`; host dev PHP 8.4)
 **Primary Dependencies**: tanpa dependency runtime; Composer hanya autoload. Dev: PHPUnit, PHPStan 1.12 (level 5), PHP_CodeSniffer (PSR-12), phpcov
 **Storage**: MySQL 8.0 (PDO prepared statement, transaksi eksplisit)
-**Testing**: PHPUnit `Unit` (153+), `Integration` (MySQL nyata), `E2E` over HTTP; coverage gabungan via `scripts/coverage.sh`
+**Testing**: PHPUnit `Unit` (157), `Integration` (9, MySQL nyata), `E2E` (117) over HTTP; coverage gabungan via `scripts/coverage.sh`
 **Target Platform**: Docker Compose (service `app` Apache + `mysql`); SonarQube lokal di compose terpisah
 **Project Type**: web (server-rendered, satu aplikasi)
 **Architecture Type**: monolith standalone berlapis Controller -> Service -> Repository; ditentukan dari `docs/architecture/` dan struktur repo
@@ -25,7 +25,7 @@ menemukan defect.
 **Existing Design System**: CSS buatan sendiri dengan design token di `public/assets/css/style.css` (`:root` variabel warna, spacing, radius, shadow); ikon lucide lokal di `public/assets/icons/`; tidak ada library UI
 **Performance Goals**: tidak ada target khusus; CSV dibuat sinkron (batas 100.000 baris, tercatat di tech-debt)
 **Constraints**: tanpa framework/ORM/DI container, Vanilla JS, tanpa library JS/CSS; out of scope: CI/CD, queue, microservices
-**Scale/Scope**: 3 role, 2+ gudang, seed 32 produk dan 27 order
+**Scale/Scope**: 3 role, 2+ gudang, seed 32 produk dan 25 order (13 PO + 12 SO)
 
 ## UI/UX & Screens (carried from spec)
 

@@ -14,7 +14,7 @@ sudah dicek keberadaannya. Run test terbaru: 283 test, 1329 assertion, line cove
 | PO-01 PO & goods receipt | `app/Service/PurchaseOrderService.php` | `tests/Integration/GoodsReceiptIntegrationTest.php`, `tests/Unit/PurchaseOrderReceiptValidationTest.php` | ADR-005 |
 | SO-01 SO, approval, goods issue | `app/Service/SalesOrderService.php` | `tests/Integration/GoodsIssueIntegrationTest.php`, `tests/Unit/SalesOrderServiceTest.php`, `tests/E2E/SalesOrderE2ETest.php` | ADR-002 |
 | VIEW-01 Daftar, detail, empty state | `views/*` | `tests/E2E/EmptyStatesAndFailuresE2ETest.php` | `docs/testing/test-scenarios.md` |
-| FIND-01 Search/filter/sort/pagination | `app/Repository/AbstractMySqlRepository.php` (`buildWhere`, `searchRows`) | `tests/E2E/ProductE2ETest.php`, `tests/E2E/PurchaseOrderE2ETest.php` | `database/seed.sql` (32 produk, 27 order) |
+| FIND-01 Search/filter/sort/pagination | `app/Repository/AbstractMySqlRepository.php` (`buildWhere`, `searchRows`) | `tests/E2E/ProductE2ETest.php`, `tests/E2E/PurchaseOrderE2ETest.php` | `database/seed.sql` (32 produk, 25 order: 13 PO + 12 SO; terverifikasi dari clone bersih) |
 | DASH-01 Dashboard per role | `app/Service/DashboardService.php`, `views/dashboard/index.php` | `tests/E2E/BriefRequirementsE2ETest.php` | `docs/brd/modules/dashboard.md` |
 | REPORT-01 Laporan CSV | `app/Service/ReportService.php`, `app/Repository/MySqlReportRepository.php` | `tests/Unit/ReportServiceTest.php`, `tests/E2E/ReportsApiDashboardE2ETest.php` | `docs/brd/modules/report.md` |
 | API-01 Endpoint JSON | `app/Controller/ApiController.php`, `app/Service/ProductAvailabilityService.php` | `tests/E2E/ReportsApiDashboardE2ETest.php` | `specs/001-ioms-brief-compliance/contracts/api-availability.md` |

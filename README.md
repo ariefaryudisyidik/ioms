@@ -33,7 +33,7 @@ docker compose up --build
 
 Aplikasi tersedia di http://localhost:8080 dan MySQL di port host 3307. Schema dan seed data (`database/schema.sql`, `database/seed.sql`) diimpor otomatis saat volume MySQL pertama kali dibuat. Untuk mengulang dari data bersih: `docker compose down -v && docker compose up --build`.
 
-Container memakai kode dan `vendor/` dari image (tanpa bind mount), sehingga perubahan kode memerlukan `docker compose up --build`.
+Secara default `docker compose up` ikut membaca `docker-compose.override.yml` (khusus pengembangan lokal): `app/`, `views/`, dan `public/` di-mount dari host sehingga edit kode langsung terlihat tanpa rebuild, sementara `vendor/` tetap dari image. Class PHP baru tetap memerlukan `docker compose up -d --build`. Untuk menjalankan persis seperti image (tanpa bind mount kode), pakai `docker compose -f docker-compose.yml up --build`; perubahan kode lalu memerlukan rebuild.
 
 Zona waktu: PHP (`Asia/Jakarta`) dan MySQL (`--default-time-zone=+07:00`) memakai WIB (GMT+7). Kolom `TIMESTAMP` tetap tersimpan dalam UTC dan ditampilkan sesuai zona sesi, jadi data lama otomatis tampil dalam WIB tanpa perlu reset.
 
@@ -94,10 +94,10 @@ Suite **E2E** (`tests/E2E`) menguji aplikasi lewat HTTP (login, CRUD, alur PO/SO
 
 ```bash
 vendor/bin/phpstan analyse --no-progress
-vendor/bin/phpcs --standard=phpcs.xml app/
+vendor/bin/phpcs                     # app + tests, aturan di phpcs.xml
 ```
 
-Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12): **0 error**, sisa 28 warning "line exceeds 120 characters" (kosmetik, tidak memengaruhi fungsi/keterbacaan pada baris terkait array literal yang tetap dijaga tidak dipecah demi keterbacaan array asosiatif).
+Hasil run terakhir tersimpan di `docs/quality/static-analysis-report.txt` — PHPStan level 5: **0 error**. PHPCS (PSR-12, app + tests): **0 error**, sisa 139 warning dengan satu jenis yang sama, "line exceeds 120 characters" (kosmetik; sebagian besar baris array asosiatif dan SQL yang sengaja tidak dipecah demi keterbacaan). Rincian dan riwayat perbaikan ada di laporan tersebut.
 
 ## SonarQube
 

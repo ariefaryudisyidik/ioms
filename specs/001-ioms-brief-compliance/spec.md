@@ -120,25 +120,25 @@ tertinggal; **Verifikasi** = perlu dijalankan ulang sebelum defense.
 | FR-006 | PO-01 PO + goods receipt (parsial) | Done | `PurchaseOrderService`, `GoodsReceiptIntegrationTest` |
 | FR-007 | SO-01 SO, approval, goods issue | Done | `SalesOrderService`, `GoodsIssueIntegrationTest` |
 | FR-008 | VIEW-01 daftar, detail, empty state | Done | `views/*`, E2E empty state |
-| FR-009 | FIND-01 search/filter/sort/pagination, seed >= 30 produk & 25 order | Done | 32 produk, 27 order di seed |
-| FR-010 | DASH-01 dashboard per role dari agregasi | Perlu sinkron | `DashboardService`; `docs/brd/modules/dashboard.md` belum memuat kartu baru |
-| FR-011 | REPORT-01 CSV ledger & status order | Perlu sinkron | `ReportService` + `MySqlReportRepository`; `docs/brd/modules/report.md` masih lama |
+| FR-009 | FIND-01 search/filter/sort/pagination, seed >= 30 produk & 25 order | Done | 32 produk, 25 order di seed (13 PO + 12 SO) |
+| FR-010 | DASH-01 dashboard per role dari agregasi | Done | `DashboardService`; `docs/brd/modules/dashboard.md` diperbarui; E2E `BriefRequirementsE2ETest` (tiga role, nilai dari SQL pembanding) |
+| FR-011 | REPORT-01 CSV ledger & status order | Done | `ReportService` + `MySqlReportRepository`; `docs/brd/modules/report.md` diperbarui; `ReportServiceTest` dan E2E laporan |
 | FR-012 | API-01 JSON endpoint | Done | `GET /api/products/{sku}/availability`, `ApiController` |
 | FR-013 | VAL-01 validasi FE+BE | Done | `validation.js` (live clear error), `OrderItemValidator` |
 | FR-014 | ERR-01 401/403/404 tanpa stack trace | Done | `Auth`, `views/errors`, E2E |
-| FR-015 | UI-01 responsif 360px, label, focus | Verifikasi | dashboard 2x3 kartu dan dialog konfirmasi baru perlu screenshot mobile |
-| FR-016 | DB-01 schema, constraint, index, PDO, transaksi | Perlu sinkron | `schema.sql` (urutan kolom SO diubah); `erd.md` sudah diperbarui |
+| FR-015 | UI-01 responsif 360px, label, focus | Done | `docs/testing/screenshots/` (20 berkas, 360px dan desktop), TS-48; tabel dashboard diperbaiki agar muat di 360px |
+| FR-016 | DB-01 schema, constraint, index, PDO, transaksi | Done | `schema.sql` dan `docs/planning/erd.md` sinkron (urutan kolom `sales_orders`) |
 | FR-017 | JOB-01 script terjadwal | Done | `scripts/check-low-stock.php` (dijalankan via `docker compose exec`) |
 | FR-018 | ARCH-01 layer + interface + 2 implementasi | Done | `*RepositoryInterface`, `MySql*`/`InMemory*`, `ArchitectureTest` |
 | FR-019 | ARCH-02 stok aman konkurensi | Done | `FOR UPDATE` di `MySqlProductStockRepository`, ADR-002 |
-| FR-020 | DESIGN-01 class diagram initial & as-built | Perlu sinkron | as-built belum memuat `ReportRepository` dan perubahan dashboard |
+| FR-020 | DESIGN-01 class diagram initial & as-built | Done | `class-diagram-as-built.md` memuat `ReportRepository`, `totalRetailValue()`, dan catatan perubahan 14-16 |
 | FR-021 | DESIGN-02 ADR (2-3) | Done | `docs/architecture/adr-001..005` |
-| FR-022 | DESIGN-03 refactor log, audit SRP, tech-debt | Perlu sinkron | `refactor-log.md` (7 entri), perlu entri rename `roleLabel`/hapus `notice` |
+| FR-022 | DESIGN-03 refactor log, audit SRP, tech-debt | Done | `refactor-log.md` kini 9 entri (entri 8-9 baru); commit `refactor:` ada di history |
 | FR-023 | DESIGN-04 critique | Done | `docs/quality/critique.md` |
-| FR-024 | TEST-01/02/03 unit, integration, static analysis, FIRST | Perlu sinkron | 283 test lulus, coverage 100%, PHPStan 0, PHPCS 0 error; README/`docs/testing/` masih menyebut 278 |
-| FR-025 | §6.2 AI disclosure | Perlu sinkron | `ai-usage-log.md` belum memuat perubahan sesi ini |
+| FR-024 | TEST-01/02/03 unit, integration, static analysis, FIRST | Done | 283 test lulus, coverage 100%, PHPStan 0 error, PHPCS 0 error; README, `docs/testing/`, dan laporan Sonar sinkron |
+| FR-025 | §6.2 AI disclosure | Done | `ai-usage-log.md` diperbarui 2026-10-06 (termasuk kesalahan AI yang ditemukan dan diperbaiki) |
 | FR-026 | §4.2 / §8.2 keamanan konfigurasi | Done (keputusan pemilik) | `.claude/settings.json`: daftar `permissions.deny` sengaja dikosongkan agar Claude dapat membaca `.env`; dicatat sebagai D7 di `docs/planning/decisions.md`; `.env` tetap tidak ter-track |
-| FR-027 | §5 Docker bersih + §10 checklist, tag final | Verifikasi | tag `v1.0.0` ada; perlu uji clone bersih dan tag baru setelah sinkron |
+| FR-027 | §5 Docker bersih + §10 checklist, tag final | Verifikasi | Docker bersih lulus (`docs/testing/docker-clean-run.md`); tag final menunggu T020 |
 
 - **FR-028**: Sistem dokumentasi MUST memuat satu sumber angka test/coverage yang sama di README, `docs/testing/`, dan `docs/quality/sonarqube-report.md`.
 - **FR-029**: Keputusan atas requirement ambigu MUST dicatat di `docs/planning/` (brief FAQ #12).
