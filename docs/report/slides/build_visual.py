@@ -185,7 +185,7 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
 <div class="stat"><div class="big">0</div><div class="lbl">bug, vulnerability,<br>smell, hotspot</div></div>
 <div class="stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div></div>
 <table style="margin-top:30px;max-width:760px"><tr><th>Metrik</th><th>Scan awal</th><th>Akhir</th></tr>
-<tr><td>Isu terbuka</td><td>192</td><td class="after">0</td></tr><tr><td>Coverage</td><td>21,1%</td><td class="after">100%</td></tr><tr><td>Duplikasi</td><td>8,1%</td><td class="after">0%</td></tr></table>
+<tr><td>Open Issues</td><td>192</td><td class="after">0</td></tr><tr><td>Coverage</td><td>21,1%</td><td class="after">100%</td></tr><tr><td>Duplications</td><td>8,1%</td><td class="after">0%</td></tr></table>
 <p style="margin-top:14px;font-size:14px">Coverage yang diukur adalah <i>line coverage</i>. PHPStan level 5 dan PHPCS PSR-12: 0 error.</p>{foot(10)}</section>""")
     # 11 refleksi
     s.append(f"""<section class="slide"><div class="eyebrow">05 · Refleksi</div><h2>Kendala, solusi, dan rencana pengembangan</h2>
@@ -202,7 +202,7 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
     # 12 QA
     s.append(f"""<section class="slide dark"><div style="position:absolute;right:70px;top:120px;width:470px;transform:rotate(2deg)">{browser('login','localhost:8080/login')}</div>
 <div style="margin-top:170px"><h1 style="font-size:96px">Terima kasih</h1>
-<div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0;white-space:nowrap"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:19px">PT Neuronworks Indonesia</b></div></div></div></section>""")
+<div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0;white-space:nowrap"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div></div></div></section>""")
     return s
 
 
