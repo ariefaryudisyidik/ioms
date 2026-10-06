@@ -64,6 +64,18 @@ Seluruh akun demo memakai password: **`Password123!`**
 | WarehouseStaff | Rudi Hartono | rudi.warehouse@ioms.test |
 | WarehouseStaff | Maya Putri | maya.warehouse@ioms.test |
 
+## Reset Database Lokal
+
+Mengembalikan database dev ke data `database/schema.sql` + `database/seed.sql` (semua PO, SO, stok, dan user yang dibuat lewat aplikasi hilang):
+
+```bash
+composer db:reset                 # atau: scripts/reset-db.sh
+scripts/reset-db.sh --yes         # tanpa konfirmasi
+scripts/reset-db.sh --uploads     # sekalian hapus gambar produk yang diunggah
+```
+
+Script menghapus volume `db_data` lalu menyalakan ulang stack, karena MySQL hanya memuat schema dan seed saat volumenya kosong. SonarQube tidak terpengaruh.
+
 ## Menjalankan Test
 
 ```bash
