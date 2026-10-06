@@ -118,10 +118,10 @@ erDiagram
         varchar so_number UK
         bigint customer_id FK
         bigint warehouse_id FK
-        bigint created_by FK
-        bigint approved_by FK
         enum status "Draft|PendingApproval|Approved|Fulfilled|Cancelled"
         date order_date
+        bigint created_by FK
+        bigint approved_by FK
         timestamp created_at
         timestamp updated_at
     }
