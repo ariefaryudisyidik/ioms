@@ -39,11 +39,11 @@ if (!function_exists('icon')) {
     }
 }
 
-if (!function_exists('role_label')) {
+if (!function_exists('roleLabel')) {
     /**
      * Display name of a role ("WarehouseStaff" -> "Warehouse Staff"); the stored value is unchanged.
      */
-    function role_label(string $role): string
+    function roleLabel(string $role): string
     {
         return (string) preg_replace('/(?<=[a-z])(?=[A-Z])/', ' ', $role);
     }

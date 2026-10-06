@@ -20,7 +20,6 @@ partial('order-list', [
         'label' => 'Supplier',
         'options' => array_map(static fn ($sup) => [$sup->id, $sup->name], $suppliers),
     ],
-    'notice' => null,
     'emptyMessage' => 'Belum ada data purchase order.',
     'headers' => ['PO Number', 'Supplier', 'Order Date', 'Status', ''],
     'rows' => array_map(static fn ($o) => [

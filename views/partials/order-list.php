@@ -10,7 +10,6 @@
  * @var list<string> $statuses
  * @var array<string,mixed> $filters
  * @var array{id:string,label:string,options:list<array{0:int,1:string}>}|null $extraFilter
- * @var string|null $notice
  * @var string $emptyMessage
  * @var list<string> $headers
  * @var list<list<string>> $rows pre-escaped cell markup
@@ -74,10 +73,6 @@ $buildUrl = static function (array $overrides) use ($filters, $extraFilter, $bas
         <button type="submit" class="btn"><?= icon('funnel') ?>Apply</button>
     </div>
 </form>
-
-<?php if ($notice !== null): ?>
-    <p class="text-muted"><?= e($notice) ?></p>
-<?php endif; ?>
 
 <?php if ($rows === []): ?>
     <div class="empty-state"><div class="empty-icon"><?= icon('clipboard-list') ?></div><p><?= e($emptyMessage) ?></p></div>
