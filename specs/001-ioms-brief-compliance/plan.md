@@ -5,7 +5,7 @@
 
 ## Summary
 
-IOMS sudah memenuhi hampir seluruh requirement brief (283 test lulus, coverage 100%, PHPStan 0
+IOMS sudah memenuhi hampir seluruh requirement brief (316 test lulus, coverage 100%, PHPStan 0
 error). Rencana ini tidak menambah modul; ia (1) menyinkronkan dokumen bukti dengan kode terbaru,
 (2) memverifikasi ulang item yang berubah (UI-01, Docker bersih, SonarQube), dan (3) menutup higiene
 proses (konfigurasi keamanan, AI disclosure, tag final) sebelum technical defense 2026-10-07.
@@ -43,7 +43,7 @@ menemukan defect.
 | II. Integritas stok & transaksi | PASS | `FOR UPDATE` + satu transaksi (ADR-002, ADR-005); soft delete produk/supplier/customer |
 | III. Otorisasi server & SoD | PASS | `Auth::requireRole`, 403 sungguhan, Sales tidak bisa approve |
 | IV. Keamanan minimum | PASS | `permissions.deny` Claude Code sengaja dikosongkan pemilik (D7 di `docs/planning/decisions.md`); itu alat bantu dev, bukan kode aplikasi, dan `.env` tetap tidak ter-track |
-| V. Test terisolasi + static analysis | PASS | 283 test, coverage 100%, PHPStan 0, PHPCS 0 error |
+| V. Test terisolasi + static analysis | PASS | 316 test, coverage 100%, PHPStan 0, PHPCS 0 error |
 | Frontend/API/UX | PASS | Vanilla JS, `<dialog>` native, JSON API 200/401/404; UI-01 diverifikasi ulang di Phase 2 |
 | Environment, data, delivery | WATCH | dokumen as-built dan angka test tertinggal; tag final belum diperbarui |
 

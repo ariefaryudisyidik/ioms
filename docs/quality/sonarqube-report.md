@@ -42,6 +42,8 @@ Scan ulang setelah perubahan laporan CSV, dashboard per role, format Rupiah, dia
 
 Scan akhir dijalankan ulang lewat `composer sonar` pada commit `45b5f68` (coverage dan scan dalam satu perintah, 283 test lulus) dengan hasil yang sama persis: gate Passed, 0 isu, 0 hotspot, coverage 100%, duplikasi 0%. Scan ini menjadi dasar tag final `v1.0.0`.
 
+Scan terakhir, setelah combobox, filter dan sort header, empty state, switch, dan badge status berspasi (2026-10-06 12:14 UTC): 316 test lulus (1.883 assertion), gate Passed, coverage 100% (0 baris tidak ter-cover), 0 isu, 0 hotspot, duplikasi 0%. Dua run sebelumnya sempat gagal gate: satu karena cabang filter belum ter-test dan literal URL berulang, satu karena `role="switch"` tanpa `aria-checked` (Web:S6807); keduanya diperbaiki.
+
 Yang terjadi sebelum hasil ini, dicatat apa adanya:
 
 - **Gate sempat gagal pada scan pertama** setelah perubahan: coverage kode baru 0% untuk `MySqlReportRepository` karena `build/coverage/clover.xml` belum dibuat ulang sebelum scan (scanner hanya membaca laporan yang sudah ada), dan satu isu maintainability `php:S100` pada fungsi `role_label()`.

@@ -1,8 +1,8 @@
 # Rencana Presentasi Final Project: IOMS (Intermediate)
 
 **Rabu, 7 Oktober 2026 · 10 menit presentasi + demo, lalu 10 menit tanya jawab asesor.**
-Slide: [`IOMS-Presentation-2026-10-07.pdf`](IOMS-Presentation-2026-10-07.pdf) (12 slide; dibuat ulang dengan `python3 docs/report/slides/build_slides.py`).
-Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`, format 12–15 menit tanpa SonarQube/E2E) yang angkanya sudah basi.
+Slide: [`IOMS-Presentation.pdf`](IOMS-Presentation.pdf) (12 slide; dibuat ulang dengan `python3 docs/report/slides/build_visual.py`).
+Dokumen ini menggantikan skrip lama (`Demo-Script.pdf` dan versi lama `IOMS-Presentation.pdf`, format 12–15 menit tanpa SonarQube/E2E) yang angkanya sudah basi. `IOMS-Presentation.pdf` sekarang adalah deck visual 12 slide hasil `docs/report/slides/build_visual.py`.
 
 ## 0. Persiapan (jangan dilewati)
 

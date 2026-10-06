@@ -1,7 +1,7 @@
 # Keterlacakan Requirement Brief -> Kode, Test, Dokumen
 
 Diperbarui 2026-10-06. Sumber: `docs/report/Project Brief - Programmer.pdf`. Semua berkas pada tabel
-sudah dicek keberadaannya. Run test terbaru: 283 test, 1329 assertion, line coverage 100%
+sudah dicek keberadaannya. Run test terbaru: 316 test, 1883 assertion, line coverage 100%
 (`composer coverage`); PHPStan level 5 nol error; PHPCS PSR-12 nol error.
 
 | ID brief | Kode utama | Test | Dokumen |
@@ -29,7 +29,7 @@ sudah dicek keberadaannya. Run test terbaru: 283 test, 1329 assertion, line cove
 | DESIGN-02 ADR | - | - | `docs/architecture/adr-001` .. `adr-005` |
 | DESIGN-03 Refactor log, SRP, tech debt | - | - | `docs/quality/refactor-log.md` (9 entri), `audit-srp.md`, `tech-debt.md` |
 | DESIGN-04 Critique | - | - | `docs/quality/critique.md` |
-| TEST-01/02/03 | `tests/Unit`, `tests/Integration` | 157 unit, 9 integration, 117 E2E | `docs/quality/static-analysis-report.txt`, `docs/testing/test-run-output.txt` |
+| TEST-01/02/03 | `tests/Unit`, `tests/Integration` | 170 unit, 9 integration, 137 E2E | `docs/quality/static-analysis-report.txt`, `docs/testing/test-run-output.txt` |
 
 ## Catatan verifikasi
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds docs/report/IOMS-Presentation-Visual-2026-10-07.pdf (16:9) from HTML via headless Chrome.
+"""Builds docs/report/IOMS-Presentation.pdf (16:9) from HTML via headless Chrome.
 
     python3 docs/report/slides/build_visual.py
 
@@ -9,7 +9,7 @@ import re, subprocess, sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE.parent / 'IOMS-Presentation-Visual-2026-10-07.pdf'
+OUT = HERE.parent / 'IOMS-Presentation.pdf'
 CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 
@@ -126,7 +126,7 @@ def slides():
     s.append(f"""<section class="slide"><div class="eyebrow">02 · Demo A</div><h2>Purchase Order → penerimaan barang</h2>
 <div class="row"><div style="width:470px">
 <div class="stepper"><span class="step d">Draft</span><span class="arr">›</span><span class="step o">Ordered</span><span class="arr">›</span><span class="step p">Partially</span><span class="arr">›</span><span class="step r">Received</span></div>
-<ul class="steps"><li><span class="num">1</span><span>Warehouse membuat PO (SKU-0001, qty 10) lalu klik <b>Order</b>.</span></li>
+<ul class="steps"><li><span class="num">1</span><span>Warehouse membuat PO (SKU-0010, qty 10) lalu klik <b>Order</b>.</span></li>
 <li><span class="num">2</span><span><b>Receive</b> sebagian (4) → status PartiallyReceived.</span></li>
 <li><span class="num">3</span><span>Stok produk naik 4 dan muncul baris <code>stock_ledger</code> tipe Receipt, semuanya dalam <b>satu transaksi</b>.</span></li></ul>
 <div class="card soft" style="margin-top:6px"><p style="font-size:15px;color:#1e3a8a">Perubahan data ditampilkan langsung dari database.</p></div></div>
@@ -180,7 +180,7 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
 <div style="width:300px"><ul class="steps"><li><span class="num">1</span><span>Kartu ringkasan berbeda untuk Admin, Sales, dan Warehouse.</span></li><li><span class="num">2</span><span>Daftar <b>Low Stock</b> dihitung dari stok total vs reorder point.</span></li><li><span class="num">3</span><span>Sidebar memuat info user dan Logout; ikon Lucide inline (SVG lokal), tanpa library JS atau CDN.</span></li></ul></div></div>{foot(9)}</section>""")
     # 10 quality
     s.append(f"""<section class="slide"><div class="eyebrow">04 · Bukti kualitas</div><h2>Test dan SonarQube</h2>
-<div class="grid4"><div class="stat"><div class="big">283</div><div class="lbl">test lulus<br>Unit 153 · Integration 9 · E2E 116</div></div>
+<div class="grid4"><div class="stat"><div class="big">316</div><div class="lbl">test lulus<br>Unit 170 · Integration 9 · E2E 137</div></div>
 <div class="stat"><div class="big">100%</div><div class="lbl">line coverage<br>Unit + Integration + E2E (HTTP)</div></div>
 <div class="stat"><div class="big">0</div><div class="lbl">bug, vulnerability,<br>smell, hotspot</div></div>
 <div class="stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div></div>

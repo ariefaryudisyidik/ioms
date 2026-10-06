@@ -1,4 +1,4 @@
-# Hasil test (Unit + Integration + E2E) — 2026-10-06 13:38 WIB
+# Hasil test (Unit + Integration + E2E) — 2026-10-06 19:30 WIB
 # Perintah: composer coverage   (scripts/coverage.sh --testdox)
 
 PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
@@ -6,13 +6,14 @@ PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
 Runtime:       PHP 8.4.8 with Xdebug 3.4.2
 Configuration: /Users/Expiro/Project/ioms/phpunit.xml
 
-...............................................................  63 / 283 ( 22%)
-............................................................... 126 / 283 ( 44%)
-............................................................... 189 / 283 ( 66%)
-............................................................... 252 / 283 ( 89%)
-...............................                                 283 / 283 (100%)
+...............................................................  63 / 316 ( 19%)
+............................................................... 126 / 316 ( 39%)
+............................................................... 189 / 316 ( 59%)
+............................................................... 252 / 316 ( 79%)
+............................................................... 315 / 316 ( 99%)
+.                                                               316 / 316 (100%)
 
-Time: 04:20.313, Memory: 27.00 MB
+Time: 05:58.839, Memory: 27.00 MB
 
 Architecture (Tests\Unit\Architecture)
  ✔ Services do not depend on pdo session or superglobals
@@ -47,6 +48,7 @@ Brief Requirements E2E (Tests\E2E\BriefRequirementsE2E)
  ✔ Warehouse dashboard shows receipt and issue queues and low stock
  ✔ Master data is read only for sales and warehouse staff
  ✔ Purchase orders are created by admin or warehouse staff only
+ ✔ Order forms keep the product select and load the searchable product picker
 
 Controller Error Handling (Tests\Unit\ControllerErrorHandling)
  ✔ Api failures return json with the mapped status with data set "validation"
@@ -115,6 +117,8 @@ Csrf (Tests\Unit\Csrf)
 
 Empty States And Failures E2E (Tests\E2E\EmptyStatesAndFailuresE2E)
  ✔ List pages show empty state when there are no rows
+ ✔ Empty states are english with an icon and a suggested action
+ ✔ Filtered lists explain the filter and keep reset in the filter bar
  ✔ Product list shows manage actions and pager edges
  ✔ Detail pages handle missing items stock and product image
  ✔ Dashboard shows empty low stock state when everything is above reorder point
@@ -153,6 +157,37 @@ In Memory Repositories (Tests\Unit\InMemoryRepositories)
  ✔ Product repository lookups and filters
  ✔ Stock repository tracks quantities per product and warehouse
  ✔ Sales order repository stores searches and updates orders
+
+List Filter Sort E2E (Tests\E2E\ListFilterSortE2E)
+ ✔ Master lists are sorted by name and every header sorts by link
+ ✔ Sorting by a header reorders the rows
+ ✔ Search filters every master list
+ ✔ Status filter keeps active or inactive rows
+ ✔ Every filter bar has the same search box with clear button and apply reset
+ ✔ Reset is only shown while a filter is on
+ ✔ Clear button is hidden until there is search text
+ ✔ Filter form keeps the sort and reset goes back to the full list
+ ✔ Unknown filter and sort values fall back to the defaults
+ ✔ Empty result explains the filter instead of the empty database
+ ✔ Product headers sort by column and the sort dropdown is gone
+ ✔ Order lists sort by every column in both directions
+ ✔ Product unit and status headers sort too
+ ✔ Active flag is a switch on every form that has it
+ ✔ Product detail shows summary information and pricing panels
+ ✔ Order status badges are spaced in lists and details
+ ✔ Order lists sort by the date header and keep it when paging
+
+List Query (Tests\Unit\ListQuery)
+ ✔ Default sort is name ascending ignoring case
+ ✔ Search matches any configured column case insensitively
+ ✔ Null columns are searched as empty text
+ ✔ Status filter keeps active or inactive and ignores unknown values
+ ✔ Status is ignored when the list has no status column
+ ✔ Sorts ascending and descending by column
+ ✔ Numbers sort numerically and text naturally
+ ✔ Unknown column or direction falls back to the default sort
+ ✔ Order sort accepts every order column and the legacy date values
+ ✔ Parse sort splits at the last underscore
 
 Login Throttle (Tests\Unit\LoginThrottle)
  ✔ Account is locked after too many failures from one address
@@ -369,6 +404,11 @@ Session Hardening (Tests\Unit\SessionHardening)
  ✔ Refresh signs out deactivated and deleted users
  ✔ Refresh applies role changes immediately
 
+Sort Helpers (Tests\Unit\SortHelpers)
+ ✔ Direction is only reported for the sorted column
+ ✔ First click sorts ascending and each click flips the direction
+ ✔ Filters stay in the link and empty ones are dropped
+
 Transaction Manager (Tests\Unit\TransactionManager)
  ✔ Pdo manager commits when the work succeeds and returns its result
  ✔ Pdo manager rolls back everything and rethrows when the work fails
@@ -377,7 +417,7 @@ Transaction Manager (Tests\Unit\TransactionManager)
 Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
  ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
 
-OK (283 tests, 1329 assertions)
+OK (316 tests, 1883 assertions)
 
 
 Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)

@@ -4,7 +4,7 @@ Diperiksa 2026-10-06. "Terpenuhi" berarti ada bukti yang bisa ditelusuri; keterb
 
 | # | Item brief §10 | Status | Bukti / catatan |
 |---|---|---|---|
-| 1 | Seluruh requirement wajib (§2) diuji pada release/tag final | Terpenuhi | 283 test lulus (157 unit, 9 integration, 117 E2E), `docs/testing/test-run-output.txt`; peta di `docs/testing/requirement-traceability.md`; tag final tunggal `v1.0.0` dipasang pemilik pada commit akhir (scan Sonar ulang sudah lulus) |
+| 1 | Seluruh requirement wajib (§2) diuji pada release/tag final | Terpenuhi | 316 test lulus (170 unit, 9 integration, 137 E2E), `docs/testing/test-run-output.txt`; peta di `docs/testing/requirement-traceability.md`; tag final tunggal `v1.0.0` dipasang pemilik pada commit akhir (scan Sonar ulang sudah lulus) |
 | 2 | Aplikasi dan database berjalan lewat Docker dari folder bersih | Terpenuhi | `docs/testing/docker-clean-run.md`: clone bersih, `docker compose up --build`, login tiga role |
 | 3 | Unit dan integration test berjalan dengan satu perintah dan lulus | Terpenuhi | `composer coverage` (MySQL sementara di Docker, 283 lulus). `composer test:unit` untuk unit saja. Catatan: `composer test` tanpa MySQL menjalankan integration yang butuh database |
 | 4 | Laporan static analysis nol critical error | Terpenuhi | `docs/quality/static-analysis-report.txt`: PHPStan 0 error, PHPCS 0 error, 139 warning "line length > 120" dijelaskan |

@@ -50,7 +50,7 @@ dan coverage di dokumen dengan output `composer coverage`.
 1. **Given** `ReportRepositoryInterface`/`MySqlReportRepository` ada di kode, **When** membuka
    `docs/architecture/class-diagram-as-built.md`, **Then** keduanya tampil dengan dependency ke
    interface ditandai.
-2. **Given** run coverage terbaru (283 test, coverage 100%), **When** membaca README dan
+2. **Given** run coverage terbaru (316 test, coverage 100%), **When** membaca README dan
    `docs/testing/`, **Then** angkanya sama.
 
 ---
@@ -135,7 +135,7 @@ tertinggal; **Verifikasi** = perlu dijalankan ulang sebelum defense.
 | FR-021 | DESIGN-02 ADR (2-3) | Done | `docs/architecture/adr-001..005` |
 | FR-022 | DESIGN-03 refactor log, audit SRP, tech-debt | Done | `refactor-log.md` kini 9 entri (entri 8-9 baru); commit `refactor:` ada di history |
 | FR-023 | DESIGN-04 critique | Done | `docs/quality/critique.md` |
-| FR-024 | TEST-01/02/03 unit, integration, static analysis, FIRST | Done | 283 test lulus, coverage 100%, PHPStan 0 error, PHPCS 0 error; README, `docs/testing/`, dan laporan Sonar sinkron |
+| FR-024 | TEST-01/02/03 unit, integration, static analysis, FIRST | Done | 316 test lulus, coverage 100%, PHPStan 0 error, PHPCS 0 error; README, `docs/testing/`, dan laporan Sonar sinkron |
 | FR-025 | §6.2 AI disclosure | Done | `ai-usage-log.md` diperbarui 2026-10-06 (termasuk kesalahan AI yang ditemukan dan diperbaiki) |
 | FR-026 | §4.2 / §8.2 keamanan konfigurasi | Done (keputusan pemilik) | `.claude/settings.json`: daftar `permissions.deny` sengaja dikosongkan agar Claude dapat membaca `.env`; dicatat sebagai D7 di `docs/planning/decisions.md`; `.env` tetap tidak ter-track |
 | FR-027 | §5 Docker bersih + §10 checklist, tag final | Done | Docker bersih lulus (`docs/testing/docker-clean-run.md`); checklist `docs/quality/submission-checklist.md`; tag tunggal `v1.0.0` (dipasang pemilik pada commit akhir) |
@@ -191,7 +191,7 @@ Fitur ini tidak menambah layar. Layar yang diverifikasi ulang terhadap UI-01 (36
 
 ### Per-Screen Key States
 
-- **Dashboard Sales**: empty = pesan "Belum ada Sales Order" pada Recent Sales Orders; populated = 5 kartu dan tabel.
+- **Dashboard Sales**: empty = "No sales orders yet" dengan tombol New Sales Order pada Recent Sales Orders; populated = 5 kartu dan tabel.
 - **Dialog konfirmasi**: fokus awal pada "Go back"; Esc dan klik backdrop membatalkan; tombol aksi merah untuk aksi destruktif.
 
 ### Primary Interactions & Flows
