@@ -104,7 +104,7 @@ def slides():
 <div style="width:600px;margin-top:70px"><div class="eyebrow">{ic('boxes',18)} Intermediate Programmer · Final Project</div>
 <h1>Inventory &amp; Order Management System</h1>
 <p style="font-size:21px">Stok multi-gudang yang konsisten, termasuk saat ada proses yang berjalan bersamaan.</p>
-<div style="margin-top:46px;display:flex;gap:44px;font-size:15px;color:#c7d6f5"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:18px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:18px">PT Neuronworks Indonesia</b></div><div>SESI<br><b style="color:#fff;font-size:18px">Rabu, 7 Oktober 2026</b></div></div></div></section>""")
+<div style="margin-top:46px;display:flex;gap:30px;font-size:14px;color:#c7d6f5;white-space:nowrap"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:16px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:16px">PT Neuronworks Indonesia</b></div><div>SESI<br><b style="color:#fff;font-size:16px">Rabu, 7 Oktober 2026</b></div></div></div></section>""")
     # 2 problem + roles
     s.append(f"""<section class="slide"><div class="eyebrow">01 · Pembukaan</div><h2>Satu sistem, tiga peran, stok tercatat konsisten</h2>
 <p style="max-width:900px;margin-bottom:28px">Tim gudang dan sales mencatat pembelian, penjualan, dan stok di beberapa gudang. Angka stoknya perlu tetap konsisten, termasuk saat dua proses berjalan bersamaan.</p>
@@ -173,14 +173,14 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
     sec = [('lock','CSRF','Token per sesi di semua form POST'),('user-cog','Sesi &amp; role','HttpOnly, SameSite, user divalidasi ulang tiap request'),('shield-check','Brute force','Login dibatasi: 5 kali gagal per akun+IP'),('eye','IDOR','Sales hanya bisa melihat SO miliknya'),('database','Injeksi','Prepared statement, output di-escape + CSP'),('container','Container','Non-root, MySQL hanya di 127.0.0.1')]
     cards = ''.join(f'<div class="card"><div class="badge-ic">{ic(i,24)}</div><h3>{t}</h3><p style="font-size:15px">{d}</p></div>' for i,t,d in sec)
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Keamanan: kontrol yang diterapkan</h2><div class="grid3">{cards}</div>
-<p style="margin-top:22px;font-size:15px">Pengembangan berikutnya: rate limiting API dan MFA. Rincian: <code>docs/quality/security-review.md</code>, ADR-004.</p>{foot(8)}</section>""")
+<p style="margin-top:22px;font-size:15px">Pengembangan berikutnya: rate limiting API dan MFA. Rincian: <code>docs/quality/security-review.md</code>.</p>{foot(8)}</section>""")
     # 9 dashboard visual
     s.append(f"""<section class="slide"><div class="eyebrow">03 · Implementasi teknis</div><h2>Dashboard per role dan antarmuka konsisten</h2>
 <div class="row"><div class="grow clip">{browser('dashboard','localhost:8080/dashboard')}</div>
 <div style="width:300px"><ul class="steps"><li><span class="num">1</span><span>Kartu ringkasan berbeda untuk Admin, Sales, dan Warehouse.</span></li><li><span class="num">2</span><span>Daftar <b>Low Stock</b> dihitung dari stok total vs reorder point.</span></li><li><span class="num">3</span><span>Sidebar memuat info user dan Logout; ikon Lucide inline (SVG lokal), tanpa library JS atau CDN.</span></li></ul></div></div>{foot(9)}</section>""")
     # 10 quality
     s.append(f"""<section class="slide"><div class="eyebrow">04 · Bukti kualitas</div><h2>Test dan SonarQube</h2>
-<div class="grid4"><div class="stat"><div class="big">278</div><div class="lbl">test lulus<br>Unit 153 · Integration 9 · E2E 116</div></div>
+<div class="grid4"><div class="stat"><div class="big">283</div><div class="lbl">test lulus<br>Unit 153 · Integration 9 · E2E 116</div></div>
 <div class="stat"><div class="big">100%</div><div class="lbl">line coverage<br>Unit + Integration + E2E (HTTP)</div></div>
 <div class="stat"><div class="big">0</div><div class="lbl">bug, vulnerability,<br>smell, hotspot</div></div>
 <div class="stat"><div class="big">0%</div><div class="lbl">duplikasi kode<br>quality gate: Passed</div></div></div>
@@ -202,7 +202,7 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
     # 12 QA
     s.append(f"""<section class="slide dark"><div style="position:absolute;right:70px;top:120px;width:470px;transform:rotate(2deg)">{browser('login','localhost:8080/login')}</div>
 <div style="margin-top:170px"><h1 style="font-size:96px">Terima kasih</h1>
-<div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:19px">PT Neuronworks Indonesia</b></div></div></div></section>""")
+<div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0;white-space:nowrap"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:19px">PT Neuronworks Indonesia</b></div></div></div></section>""")
     return s
 
 
