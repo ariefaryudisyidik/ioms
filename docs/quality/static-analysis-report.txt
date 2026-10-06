@@ -1,146 +1,507 @@
-=== PHPStan level 5 (composer stan) — 2026-10-03 10:26 WIB ===
+RINGKASAN (2026-10-06)
+- PHPStan level 5: 0 error.
+- PHPCS PSR-12 (app + tests, 138 file): 0 error, 139 warning. Seluruh warning bertipe sama,
+  "Line length too long" (> 120 karakter), tidak memengaruhi perilaku. Sebagian besar baris
+  array asosiatif dan SQL yang sengaja tidak dipecah demi keterbacaan.
+- Sejak laporan 2026-10-03: 6 error PSR-12 di tests/ diperbaiki (satu kelas per berkas untuk
+  RouterFixtureController dan FakeStockLedgerRepository, format struktur kontrol multi-baris di
+  ProductServiceTest, penempatan docblock di tests/support/coverage-prepend.php).
+
+=== PHPStan level 5 (composer stan) — 2026-10-06 13:29 WIB ===
  [OK] No errors                                                                 
 
-=== PHPCS PSR-12 (phpcs.xml) — 2026-10-03 10:26 WIB ===
-.......[33mW[0m.[33mW[0m...[33mW[0m.[33mW[0m..[33mW[0m..[33mW[0m......[33mW[0m.....[33mW[0m.[33mW[0m....................... 60 / 86 (70%)
-.......[33mW[0m[33mW[0m.....[33mW[0m...[33mW[0m[33mW[0m[33mW[0m.....                                   86 / 86 (100%)
-
-
-
-[1mFILE: app/Repository/MySqlCustomerRepository.php[0m
----------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
----------------------------------------------------------------------------
- 46 | [33mWARNING[0m | Line exceeds 120 characters; contains 124 characters
----------------------------------------------------------------------------
-
-
-[1mFILE: app/Repository/MySqlSupplierRepository.php[0m
----------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
----------------------------------------------------------------------------
- 46 | [33mWARNING[0m | Line exceeds 120 characters; contains 124 characters
----------------------------------------------------------------------------
-
-
-[1mFILE: ...Users/Expiro/Project/ioms/app/Repository/SalesOrderRepositoryInterface.php[0m
+=== PHPCS PSR-12 (phpcs.xml: app + tests) — 2026-10-06 13:29 WIB ===
+FILE: /Users/Expiro/Project/ioms/app/Repository/MySqlCustomerRepository.php
 --------------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
 --------------------------------------------------------------------------------
- 27 | [33mWARNING[0m | Line exceeds 120 characters; contains 165 characters
+ 46 | WARNING | Line exceeds 120 characters; contains 124 characters
+    |         | (Generic.Files.LineLength.TooLong)
 --------------------------------------------------------------------------------
-
-
-[1mFILE: app/Repository/ProductRepositoryInterface.php[0m
-------------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-------------------------------------------------------------------------------
- 18 | [33mWARNING[0m | Line exceeds 120 characters; contains 128 characters
-------------------------------------------------------------------------------
-
-
-[1mFILE: app/Repository/MySqlProductRepository.php[0m
---------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 7 WARNINGS AFFECTING 7 LINES[0m
---------------------------------------------------------------------------
-  19 | [33mWARNING[0m | Line exceeds 120 characters; contains 121 characters
-  31 | [33mWARNING[0m | Line exceeds 120 characters; contains 121 characters
-  74 | [33mWARNING[0m | Line exceeds 120 characters; contains 135 characters
-  76 | [33mWARNING[0m | Line exceeds 120 characters; contains 136 characters
- 124 | [33mWARNING[0m | Line exceeds 120 characters; contains 124 characters
- 136 | [33mWARNING[0m | Line exceeds 120 characters; contains 137 characters
- 150 | [33mWARNING[0m | Line exceeds 120 characters; contains 160 characters
---------------------------------------------------------------------------
-
-
-[1mFILE: ...rs/Expiro/Project/ioms/app/Repository/PurchaseOrderRepositoryInterface.php[0m
+FILE: /Users/Expiro/Project/ioms/app/Repository/MySqlSupplierRepository.php
 --------------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
 --------------------------------------------------------------------------------
- 27 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
+ 46 | WARNING | Line exceeds 120 characters; contains 124 characters
+    |         | (Generic.Files.LineLength.TooLong)
 --------------------------------------------------------------------------------
-
-
-[1mFILE: ...sers/Expiro/Project/ioms/app/Repository/StockLedgerRepositoryInterface.php[0m
+FILE: ...Users/Expiro/Project/ioms/app/Repository/SalesOrderRepositoryInterface.php
 --------------------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
 --------------------------------------------------------------------------------
- 14 | [33mWARNING[0m | Line exceeds 120 characters; contains 142 characters
+ 25 | WARNING | Line exceeds 120 characters; contains 165 characters
+    |         | (Generic.Files.LineLength.TooLong)
 --------------------------------------------------------------------------------
-
-
-[1mFILE: app/Core/Session.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 102 | [33mWARNING[0m | Line exceeds 120 characters; contains 134 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Core/Csrf.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 52 | [33mWARNING[0m | Line exceeds 120 characters; contains 137 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/SalesOrderService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 25 | [33mWARNING[0m | Line exceeds 120 characters; contains 133 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/WarehouseService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 34 | [33mWARNING[0m | Line exceeds 120 characters; contains 141 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/SupplierService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 34 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/CustomerService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 34 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/ReportService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 8 WARNINGS AFFECTING 8 LINES[0m
-----------------------------------------------------------------------
- 35 | [33mWARNING[0m | Line exceeds 120 characters; contains 173 characters
- 37 | [33mWARNING[0m | Line exceeds 120 characters; contains 177 characters
- 49 | [33mWARNING[0m | Line exceeds 120 characters; contains 123 characters
- 54 | [33mWARNING[0m | Line exceeds 120 characters; contains 136 characters
- 55 | [33mWARNING[0m | Line exceeds 120 characters; contains 121 characters
- 57 | [33mWARNING[0m | Line exceeds 120 characters; contains 138 characters
- 60 | [33mWARNING[0m | Line exceeds 120 characters; contains 151 characters
- 67 | [33mWARNING[0m | Line exceeds 120 characters; contains 154 characters
-----------------------------------------------------------------------
-
-
-[1mFILE: app/Service/PurchaseOrderService.php[0m
-----------------------------------------------------------------------
-[1mFOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE[0m
-----------------------------------------------------------------------
- 23 | [33mWARNING[0m | Line exceeds 120 characters; contains 149 characters
-----------------------------------------------------------------------
-
-Time: 2.84 secs; Memory: 10MB
-
-
-=== SonarQube (lihat docs/quality/sonarqube-report.md) ===
-Quality gate: Passed | Bugs 0 | Vulnerabilities 0 | Code smells 0 | Hotspots 0 | Coverage 100% | Duplikasi 0%
+FILE: /Users/Expiro/Project/ioms/app/Repository/ProductRepositoryInterface.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 18 | WARNING | Line exceeds 120 characters; contains 128 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Repository/MySqlProductRepository.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 7 WARNINGS AFFECTING 7 LINES
+--------------------------------------------------------------------------------
+  19 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  31 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  74 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  76 | WARNING | Line exceeds 120 characters; contains 136 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 124 | WARNING | Line exceeds 120 characters; contains 124 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 136 | WARNING | Line exceeds 120 characters; contains 137 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 150 | WARNING | Line exceeds 120 characters; contains 160 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: ...rs/Expiro/Project/ioms/app/Repository/PurchaseOrderRepositoryInterface.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 25 | WARNING | Line exceeds 120 characters; contains 149 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: ...sers/Expiro/Project/ioms/app/Repository/StockLedgerRepositoryInterface.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 14 | WARNING | Line exceeds 120 characters; contains 142 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Core/Session.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 102 | WARNING | Line exceeds 120 characters; contains 134 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Core/Csrf.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 52 | WARNING | Line exceeds 120 characters; contains 137 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Service/SalesOrderService.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 26 | WARNING | Line exceeds 120 characters; contains 133 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Service/WarehouseService.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 34 | WARNING | Line exceeds 120 characters; contains 141 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Service/SupplierService.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 34 | WARNING | Line exceeds 120 characters; contains 149 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Service/CustomerService.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 34 | WARNING | Line exceeds 120 characters; contains 149 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/app/Service/PurchaseOrderService.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 24 | WARNING | Line exceeds 120 characters; contains 149 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/ReportServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 19 | WARNING | Line exceeds 120 characters; contains 121 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/SalesOrderCreationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+  73 | WARNING | Line exceeds 120 characters; contains 124 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 100 | WARNING | Line exceeds 120 characters; contains 123 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/EnvTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 25 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/ResponseTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 36 | WARNING | Line exceeds 120 characters; contains 132 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 38 | WARNING | Line exceeds 120 characters; contains 125 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/OrderRulesTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 9 WARNINGS AFFECTING 9 LINES
+--------------------------------------------------------------------------------
+ 52 | WARNING | Line exceeds 120 characters; contains 122 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 53 | WARNING | Line exceeds 120 characters; contains 140 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 54 | WARNING | Line exceeds 120 characters; contains 148 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 55 | WARNING | Line exceeds 120 characters; contains 184 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 56 | WARNING | Line exceeds 120 characters; contains 140 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 57 | WARNING | Line exceeds 120 characters; contains 138 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 58 | WARNING | Line exceeds 120 characters; contains 138 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 59 | WARNING | Line exceeds 120 characters; contains 149 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 71 | WARNING | Line exceeds 120 characters; contains 132 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/CsrfTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 61 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/SalesOrderServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 6 WARNINGS AFFECTING 6 LINES
+--------------------------------------------------------------------------------
+  28 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  30 | WARNING | Line exceeds 120 characters; contains 158 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  94 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 106 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 118 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 130 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/LoginThrottleTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 80 | WARNING | Line exceeds 120 characters; contains 125 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/PurchaseOrderCreationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 74 | WARNING | Line exceeds 120 characters; contains 124 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 80 | WARNING | Line exceeds 120 characters; contains 129 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/InMemoryRepositoriesTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 112 | WARNING | Line exceeds 120 characters; contains 122 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/CoreSupportTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 83 | WARNING | Line exceeds 120 characters; contains 145 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/ArchitectureTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 4 WARNINGS AFFECTING 4 LINES
+--------------------------------------------------------------------------------
+ 15 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 26 | WARNING | Line exceeds 120 characters; contains 150 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 47 | WARNING | Line exceeds 120 characters; contains 195 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 64 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Unit/ProductServiceTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 4 WARNINGS AFFECTING 4 LINES
+--------------------------------------------------------------------------------
+  97 | WARNING | Line exceeds 120 characters; contains 145 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 103 | WARNING | Line exceeds 120 characters; contains 156 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 105 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 150 | WARNING | Line exceeds 120 characters; contains 156 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: ...sers/Expiro/Project/ioms/tests/Integration/GoodsReceiptIntegrationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 28 | WARNING | Line exceeds 120 characters; contains 146 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 69 | WARNING | Line exceeds 120 characters; contains 146 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Integration/RepositoryIntegrationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+  91 | WARNING | Line exceeds 120 characters; contains 140 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 107 | WARNING | Line exceeds 120 characters; contains 167 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: ...piro/Project/ioms/tests/Integration/TransactionRollbackIntegrationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 31 | WARNING | Line exceeds 120 characters; contains 138 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 37 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Integration/GoodsIssueIntegrationTest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+ 42 | WARNING | Line exceeds 120 characters; contains 138 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 48 | WARNING | Line exceeds 120 characters; contains 135 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/Integration/IntegrationTestCase.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 4 WARNINGS AFFECTING 4 LINES
+--------------------------------------------------------------------------------
+  36 | WARNING | Line exceeds 120 characters; contains 131 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  97 | WARNING | Line exceeds 120 characters; contains 219 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 111 | WARNING | Line exceeds 120 characters; contains 133 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 116 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/E2ETestCase.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 108 | WARNING | Line exceeds 120 characters; contains 194 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/ReportsApiDashboardE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 3 WARNINGS AFFECTING 3 LINES
+--------------------------------------------------------------------------------
+ 28 | WARNING | Line exceeds 120 characters; contains 122 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 30 | WARNING | Line exceeds 120 characters; contains 155 characters
+    |         | (Generic.Files.LineLength.TooLong)
+ 63 | WARNING | Line exceeds 120 characters; contains 190 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/BriefRequirementsE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 6 WARNINGS AFFECTING 6 LINES
+--------------------------------------------------------------------------------
+  20 | WARNING | Line exceeds 120 characters; contains 175 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  71 | WARNING | Line exceeds 120 characters; contains 125 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  72 | WARNING | Line exceeds 120 characters; contains 127 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  97 | WARNING | Line exceeds 120 characters; contains 145 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 106 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 160 | WARNING | Line exceeds 120 characters; contains 149 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/HttpResponse.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
+--------------------------------------------------------------------------------
+ 20 | WARNING | Line exceeds 120 characters; contains 126 characters
+    |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/SalesOrderE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 10 WARNINGS AFFECTING 10 LINES
+--------------------------------------------------------------------------------
+  35 | WARNING | Line exceeds 120 characters; contains 143 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  49 | WARNING | Line exceeds 120 characters; contains 137 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  50 | WARNING | Line exceeds 120 characters; contains 142 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 120 | WARNING | Line exceeds 120 characters; contains 131 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 143 | WARNING | Line exceeds 120 characters; contains 179 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 185 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 186 | WARNING | Line exceeds 120 characters; contains 134 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 187 | WARNING | Line exceeds 120 characters; contains 160 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 199 | WARNING | Line exceeds 120 characters; contains 128 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 209 | WARNING | Line exceeds 120 characters; contains 151 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/HttpClient.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 2 WARNINGS AFFECTING 2 LINES
+--------------------------------------------------------------------------------
+  99 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 127 | WARNING | Line exceeds 120 characters; contains 130 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/SecurityE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 10 WARNINGS AFFECTING 10 LINES
+--------------------------------------------------------------------------------
+  17 | WARNING | Line exceeds 120 characters; contains 131 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  18 | WARNING | Line exceeds 120 characters; contains 149 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 101 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 173 | WARNING | Line exceeds 120 characters; contains 146 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 176 | WARNING | Line exceeds 120 characters; contains 147 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 183 | WARNING | Line exceeds 120 characters; contains 172 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 242 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 269 | WARNING | Line exceeds 120 characters; contains 138 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 270 | WARNING | Line exceeds 120 characters; contains 122 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 280 | WARNING | Line exceeds 120 characters; contains 132 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/EmptyStatesAndFailuresE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 8 WARNINGS AFFECTING 8 LINES
+--------------------------------------------------------------------------------
+ 111 | WARNING | Line exceeds 120 characters; contains 124 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 149 | WARNING | Line exceeds 120 characters; contains 148 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 150 | WARNING | Line exceeds 120 characters; contains 151 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 171 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 179 | WARNING | Line exceeds 120 characters; contains 125 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 182 | WARNING | Line exceeds 120 characters; contains 122 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 183 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 185 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/PurchaseOrderE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 12 WARNINGS AFFECTING 12 LINES
+--------------------------------------------------------------------------------
+  30 | WARNING | Line exceeds 120 characters; contains 143 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  62 | WARNING | Line exceeds 120 characters; contains 129 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  63 | WARNING | Line exceeds 120 characters; contains 128 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  77 | WARNING | Line exceeds 120 characters; contains 140 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  78 | WARNING | Line exceeds 120 characters; contains 149 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 102 | WARNING | Line exceeds 120 characters; contains 134 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 110 | WARNING | Line exceeds 120 characters; contains 145 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 111 | WARNING | Line exceeds 120 characters; contains 137 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 114 | WARNING | Line exceeds 120 characters; contains 126 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 118 | WARNING | Line exceeds 120 characters; contains 131 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 125 | WARNING | Line exceeds 120 characters; contains 173 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 144 | WARNING | Line exceeds 120 characters; contains 123 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/CrudResourcesE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 11 WARNINGS AFFECTING 11 LINES
+--------------------------------------------------------------------------------
+  32 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  36 | WARNING | Line exceeds 120 characters; contains 135 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  41 | WARNING | Line exceeds 120 characters; contains 139 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  49 | WARNING | Line exceeds 120 characters; contains 153 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  64 | WARNING | Line exceeds 120 characters; contains 137 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  78 | WARNING | Line exceeds 120 characters; contains 141 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  95 | WARNING | Line exceeds 120 characters; contains 145 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 101 | WARNING | Line exceeds 120 characters; contains 121 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 117 | WARNING | Line exceeds 120 characters; contains 218 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 137 | WARNING | Line exceeds 120 characters; contains 210 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 145 | WARNING | Line exceeds 120 characters; contains 133 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+FILE: /Users/Expiro/Project/ioms/tests/E2E/ProductE2ETest.php
+--------------------------------------------------------------------------------
+FOUND 0 ERRORS AND 8 WARNINGS AFFECTING 8 LINES
+--------------------------------------------------------------------------------
+  58 | WARNING | Line exceeds 120 characters; contains 137 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  69 | WARNING | Line exceeds 120 characters; contains 134 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  73 | WARNING | Line exceeds 120 characters; contains 146 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  77 | WARNING | Line exceeds 120 characters; contains 147 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  89 | WARNING | Line exceeds 120 characters; contains 139 characters
+     |         | (Generic.Files.LineLength.TooLong)
+  93 | WARNING | Line exceeds 120 characters; contains 141 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 107 | WARNING | Line exceeds 120 characters; contains 197 characters
+     |         | (Generic.Files.LineLength.TooLong)
+ 134 | WARNING | Line exceeds 120 characters; contains 131 characters
+     |         | (Generic.Files.LineLength.TooLong)
+--------------------------------------------------------------------------------
+Time: 5.37 secs; Memory: 12MB

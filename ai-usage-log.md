@@ -50,6 +50,18 @@ Pengguna tetap bertanggung jawab memahami dan menjelaskan seluruh kode di atas, 
 - Verifikasi: 237 test (termasuk `SecurityE2ETest`), scan SonarQube 0 isu/0 hotspot, dan pengujian terhadap container Apache sungguhan (header, cookie, PHP di folder upload ditolak, tanpa tool dev).
 - Dokumentasi: `docs/quality/security-review.md`, ADR-004. Risiko yang tersisa dicatat jujur di sana; tinjauan ini bukan pengganti uji penetrasi independen.
 
+## Pembaruan 2026-10-06 — UX, laporan, dashboard, SonarQube, dan artefak Rudis
+
+Sesi Claude Code berikutnya (atas instruksi pengguna yang sama) mengubah dan menambahkan:
+
+- **UX form dan detail**: banner "may exceed stock" hanya di Sales Order (PO menambah stok), error validasi hilang saat field valid, layout baris item tetap rapi saat ada error, posisi alert konsisten di atas judul, dan dialog konfirmasi in-page memakai `<dialog>` native (Vanilla JS, tanpa library; sesuai brief §4).
+- **Laporan CSV informatif**: `ReportRepositoryInterface`/`MySqlReportRepository` mengganti ID mentah dengan nama dan nomor order, menambah total qty dan nilai, Date & Time di kolom terakhir (REPORT-01, DESIGN-01).
+- **Dashboard per role**: kartu Potential Revenue/Margin, Admin 2x3 kartu, Recent Sales Orders untuk Sales, nominal dalam Rupiah (`rupiah()`), dan urutan kolom `sales_orders` disamakan dengan `purchase_orders` (DASH-01, DB-01).
+- **Kualitas dan tooling**: rename `role_label` -> `roleLabel` (php:S100), perbaikan 6 error PSR-12 di `tests/`, line coverage kembali 100% (283 test), port SonarQube ke 9000, script `composer sonar` dan `composer db:reset`.
+- **Rudis**: constitution v1.0.0 dari brief, serta `specs/001-ioms-brief-compliance/` (spec, plan, tasks).
+
+Kesalahan AI yang ditemukan lalu diperbaiki di sesi ini (dicatat jujur): (1) script reset database memakai `--remove-orphans` sehingga container SonarQube ikut terhapus (data aman di volume; dinyalakan lagi dan opsi dihapus); (2) dua test E2E dashboard gagal setelah format Rupiah dan label kartu berubah, lalu disesuaikan; (3) klaim "PHPCS 0 error" ternyata hanya berlaku untuk sebagian berkas; pemindaian penuh menemukan 6 error di `tests/` yang kemudian diperbaiki; (4) test `RupiahHelperTest` awalnya hanya lulus dalam suite penuh karena helper belum dimuat. Seluruh perubahan diverifikasi dengan `composer coverage`, PHPStan, dan PHPCS.
+
 ## Rincian per penggunaan (format brief §6.2)
 
 Prompt sudah disanitasi: tidak ada kredensial, data klien, atau PII yang dikirim ke layanan AI; seluruh data adalah data demo.
@@ -64,5 +76,6 @@ Prompt sudah disanitasi: tidak ada kredensial, data klien, atau PII yang dikirim
 | Claude Code | Menyelaraskan aplikasi dengan brief | "Cek final project brief dan perbaiki yang belum sesuai" | Dipakai: matriks peran, pencarian order, dashboard sesuai DASH-01, total stok, dokumen DB. Dicatat jujur sebagai tech debt: Service masih menerima `PDO` untuk transaksi | `BriefRequirementsE2ETest`, ulang `composer coverage` |
 | Claude Code | Refactor `TransactionManager` (menghapus PDO dari Service) | "Hapus ketergantungan Service pada PDO tanpa mengubah perilaku transaksi" | Dipakai: `TransactionManagerInterface` + implementasi PDO/in-memory, penghapusan parameter `PDO` di repository, `ArchitectureTest`. Ditolak: Unit-of-Work/ORM penuh dan transaksi di dalam repository (ADR-005) | Seluruh test integration ke MySQL asli (rollback, oversell) tetap lulus; 252 test, coverage 100%; scan SonarQube |
 | Claude Code | Menyederhanakan form PO dan SO (nomor otomatis, harga dari produk) dan validasi penerimaan barang | "Nomor PO/SO dibuat otomatis, harga beli/jual tidak diinput karena diambil dari harga produk, jumlah penerimaan tidak boleh melebihi sisa atau nol" | Dipakai: nomor `PO-<tahun>-<id>` / `SO-<tahun>-<id>` yang dibentuk dari id dalam satu transaksi; harga disimpan sebagai snapshot di item (tetap memenuhi item: produk, qty, harga di brief); penolakan penerimaan melebihi sisa atau semua nol (sebelumnya jumlah dipotong diam-diam). Keputusan saya sendiri: harga jual tidak lagi diisi Sales (membalik keputusan awal soal diskon) | `PurchaseOrderCreationTest`, `SalesOrderCreationTest`, `PurchaseOrderReceiptValidationTest`, test E2E PO/SO, `composer coverage` |
+| Claude Code | UX, laporan CSV, dashboard per role, dialog konfirmasi, tooling SonarQube, dan artefak Rudis (constitution, spec, plan, tasks) | "Perbaiki UX form, buat CSV informatif, ringkas dashboard per role, pakai dialog native, kejar Sonar 0 isu dan coverage 100%, sesuaikan Rudis dengan brief" | Dipakai: `ReportRepository`, `rupiah()`, dashboard 2x3, `<dialog>` native, `composer sonar`. Ditolak/diubah: `--remove-orphans` di script reset (menghapus container Sonar), format Rupiah yang membungkus baris (diberi `nowrap`), klaim PHPCS 0 error yang tidak lengkap | 283 test hijau, coverage 100%, PHPStan 0 error, PHPCS 0 error, verifikasi manual via login tiga role dan curl terhadap container |
 
 Seluruh keputusan arsitektur dapat saya jelaskan sendiri (lihat ADR-001 sampai ADR-005); AI dipakai sebagai asisten yang hasilnya saya review, verifikasi dengan test, dan ubah bila perlu.

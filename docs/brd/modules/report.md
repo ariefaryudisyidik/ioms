@@ -1,6 +1,6 @@
 # Modul: Report (`report`)
 
-**Kembali ke**: [00-overview.md](../00-overview.md) · **Terakhir Diperbarui**: 2026-09-04
+**Kembali ke**: [00-overview.md](../00-overview.md) · **Terakhir Diperbarui**: 2026-10-06
 
 ## Ringkasan
 
@@ -13,7 +13,13 @@ Ekspor CSV sinkron untuk pergerakan stock ledger dan status order, dapat difilte
 
 ## Entitas & Aturan Kunci
 
-- Tidak ada entitas sendiri — membaca data `inventory` (`stock_ledger`), `purchase-order`, dan `sales-order` apa adanya ke baris CSV.
+- Tidak ada entitas sendiri — membaca data `inventory` (`stock_ledger`), `purchase-order`, dan `sales-order` lewat `ReportRepositoryInterface`, yang sudah me-resolve ID menjadi nama dan nomor order (CSV tidak lagi berisi ID mentah).
+- Kolom CSV:
+  - **Stock Ledger**: SKU, Product, Warehouse, Movement Type, Quantity, Reference (Purchase Order/Sales Order), Reference Number, Performed By, Date & Time (kolom terakhir, urut terbaru ke terlama).
+  - **Purchase Orders**: PO Number, Supplier, Warehouse, Status, Order Date, Total Qty Ordered, Total Qty Received, Total Value, Created By.
+  - **Sales Orders**: SO Number, Customer, Warehouse, Status, Order Date, Total Qty, Total Value, Created By, Approved By.
+- Status ditulis dengan spasi (`Partially Received`); Total Value = jumlah qty x harga item, angka murni agar bisa dijumlahkan di spreadsheet.
+- Hak akses sesuai brief §1.2: Stock Ledger untuk Admin dan Warehouse Staff, PO hanya Admin, SO untuk Admin dan Sales (Sales hanya order miliknya).
 
 ## API Surface
 
@@ -27,21 +33,19 @@ Ekspor CSV sinkron untuk pergerakan stock ledger dan status order, dapat difilte
 
 **Konsumsi**:
 
-- `inventory` — `StockLedgerRepositoryInterface::search`
-- `purchase-order` — `PurchaseOrderRepositoryInterface::search`
-- `sales-order` — `SalesOrderRepositoryInterface::search` (difilter berdasarkan `created_by` untuk pemanggil non-Admin/dibatasi)
+- `ReportRepositoryInterface::stockLedgerRows`, `purchaseOrderRows`, `salesOrderRows` (implementasi `MySqlReportRepository`; `salesOrderRows` difilter `created_by` untuk Sales)
 
 ## Alur Data
 
-- Request route `.csv` dengan `date_from`/`date_to` (dan `type=sales|purchase` untuk order) → `ReportService` melakukan query ke repository yang relevan (dibatasi maksimum 100.000 baris) → streaming CSV lewat `php://temp`.
+- Request route `.csv` dengan `date_from`/`date_to` (dan `type=sales|purchase` untuk order) → `ReportService` meminta baris dari `ReportRepositoryInterface` → memformat label dan urutan kolom → menulis CSV lewat `php://temp` (sel teks yang diawali `= + - @` diberi apostrof untuk mencegah formula injection).
 
 ## Dependensi
 
-- **Modul lain**: `inventory`, `purchase-order`, `sales-order`
+- **Modul lain**: `inventory`, `purchase-order`, `sales-order` (hanya sebagai sumber data tabel; tidak memanggil repository modul tersebut)
 
 ## Cakupan Test
 
-- Tidak ditemukan file test khusus `ReportService` di `tests/`.
+- `tests/Unit/ReportServiceTest.php` menguji format CSV dengan mock `ReportRepositoryInterface` (tanpa database); jalur MySQL tercakup oleh `ReportsApiDashboardE2ETest` lewat HTTP (ledger, PO, SO, pembatasan Sales). Line coverage 100%.
 
 ## Gap / Risiko yang Diketahui
 
@@ -50,3 +54,4 @@ Ekspor CSV sinkron untuk pergerakan stock ledger dan status order, dapat difilte
 ## Change Log
 
 - **2026-09-04**: Versi awal dibuat dari hasil survei kodebase.
+- **2026-10-06**: CSV memakai nama dan nomor order (bukan ID), menambah total qty dan nilai, memindahkan Date & Time ke kolom terakhir; query dipindah ke `ReportRepositoryInterface`/`MySqlReportRepository`; menambah `ReportServiceTest`.

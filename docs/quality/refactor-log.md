@@ -178,3 +178,41 @@ return $this->transactions->run(function () use ($so, $userId): SalesOrder {
 ```
 
 **Validasi:** seluruh test integration terhadap MySQL asli (rollback saat gagal, goods issue kedua ditolak, partial/full receipt) tetap lulus; unit test kini membuktikan commit/rollback lewat `InMemoryTransactionManager` tanpa database; `ArchitectureTest` mencegah `PDO`, session, atau superglobal masuk ke `app/Service`. 252 test, coverage 100%.
+
+## 8. `validateForm()` satu fungsi besar dan dua handler konfirmasi yang tumpang tindih (Extract Function + Remove Dead Code)
+
+**Code smell:** di `public/assets/js/validation.js`, `validateForm()` memegang seluruh aturan satu field (required, number, min/max, date, email) di dalam satu loop berlapis sehingga aturan itu tidak bisa dipakai ulang untuk validasi per field. Di file yang sama, konfirmasi aksi destruktif didaftarkan dua kali (`[data-confirm]` untuk `submit` dan `button/a[data-confirm]` untuk `click`) plus handler `click` yang tidak melakukan apa pun (kode mati), semuanya memakai `window.confirm`.
+
+**Teknik:** Extract Function (`fieldError(field)` mengembalikan pesan atau `null`; `validateForm()` dan listener `input`/`change` memakainya), serta Remove Dead Code + Replace dengan satu delegated listener di `public/assets/js/confirm-dialog.js` (elemen `<dialog>` native, Vanilla JS).
+
+**Sebelum (ringkas):**
+```js
+fields.forEach(function (field) {
+  var value = (field.value || '').trim();
+  if (field.hasAttribute('data-required') && value === '') { showError(field, 'This field is required.'); valid = false; return; }
+  // ... number / min / max / date / email dengan pola yang sama ...
+});
+// dan:
+el.addEventListener('click', function (event) {
+  if (el.tagName !== 'BUTTON' && el.tagName !== 'A') return;   // tidak melakukan apa pun
+});
+```
+
+**Sesudah:**
+```js
+form.querySelectorAll('[data-required], [data-type]').forEach(function (field) {
+  var message = fieldError(field);
+  if (message) { showError(field, message); valid = false; }
+});
+// satu listener konfirmasi: document.addEventListener('submit', ...) di confirm-dialog.js
+```
+
+**Hasil:** error validasi kini hilang begitu field diisi benar (`revalidateField`), dan konfirmasi memakai dialog in-page yang responsif dan dapat difokus, tanpa library. Perilaku server tidak berubah. Commit `0a776f5` dan `7ec8253`.
+
+## 9. Nama fungsi melanggar konvensi dan fitur `notice` yang tidak terpakai (Rename Function + Remove Dead Code)
+
+**Code smell:** SonarQube `php:S100` melaporkan `role_label()` (snake_case) tidak sesuai pola `^[a-z][a-zA-Z0-9]*$`. Setelah teks "Showing only sales orders you created." dihapus, opsi `notice` pada `views/partials/order-list.php` tidak dipakai view mana pun (cabang `if ($notice !== null)` tidak pernah dijalankan, sehingga coverage 99,92%).
+
+**Teknik:** Rename Function (`role_label` -> `roleLabel`, termasuk pemanggil di `views/partials/nav.php`, tiga halaman user, dan `IconHelperTest`) dan Remove Dead Code (opsi `notice` dihapus dari partial dan dua view pemanggilnya).
+
+**Validasi:** tidak ada perubahan perilaku; `composer coverage` 283 test hijau dengan line coverage 100%, PHPStan 0 error, PHPCS 0 error. Commit `12ea865`.

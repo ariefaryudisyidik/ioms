@@ -30,8 +30,8 @@ Mencakup alur inti dan edge case. Kolom "Area" mengacu ke Controller/Service asl
 | TS-24 | Sales Order | Cancel SO yang statusnya `Fulfilled` | Ditolak `InvalidStatusTransitionException` (SO yang sudah fulfilled tidak bisa dibatalkan) |
 | TS-25 | Stok / Low Stock | Jalankan `scripts/check-low-stock.php` saat ada produk dengan `SUM(quantity) < reorder_point` | Skrip melaporkan/mencatat produk tersebut (via `ProductStockRepositoryInterface::lowStockList`) |
 | TS-26 | Dashboard | Login sebagai masing-masing role (Admin/Sales/WarehouseStaff), buka dashboard | `DashboardService::summaryFor(role, userId)` menampilkan ringkasan relevan tanpa error, konten disesuaikan role |
-| TS-27 | Laporan | Ekspor CSV stock ledger dengan filter tanggal `date_from`/`date_to` | File CSV terunduh dengan header kolom sesuai `ReportService::stockLedgerCsv`, hanya baris dalam rentang tanggal |
-| TS-28 | Laporan | Ekspor CSV status order (`type=po` atau `type=so`) dengan `restrictToUserId` untuk role non-Admin | CSV hanya berisi order milik user tersebut |
+| TS-27 | Laporan | Ekspor CSV stock ledger dengan filter tanggal `date_from`/`date_to` | File CSV dengan kolom SKU, Product, Warehouse, Movement Type, Quantity, Reference, Reference Number, Performed By, Date & Time (nama dan nomor order, bukan ID), urut terbaru ke terlama, hanya baris dalam rentang tanggal |
+| TS-28 | Laporan | Ekspor CSV status order (`type=purchase` atau `type=sales`); user Sales membatasi ke order miliknya | CSV PO/SO memuat nama pihak terkait, gudang, status berspasi, total qty dan nilai; untuk Sales hanya order miliknya |
 | TS-29 | API | `GET /api/products/{sku}/availability` tanpa login (tanpa session valid) | HTTP 401 (`Auth::requireLoginApi`) |
 | TS-30 | API | `GET /api/products/{sku}/availability` dengan login valid tapi SKU tidak ditemukan | HTTP 404, body `{"error":"Not Found"}` |
 | TS-31 | API | `GET /api/products/{sku}/availability` dengan login valid dan SKU ada di beberapa gudang | HTTP 200, body berisi `sku`, `name`, `total`, dan array `warehouses` dengan quantity per gudang |
@@ -50,3 +50,33 @@ Mencakup alur inti dan edge case. Kolom "Area" mengacu ke Controller/Service asl
 | TS-44 | Upload | Gambar dengan tanda tangan PNG tetapi isi bukan gambar, tipe salah, terlalu besar | Ditolak; tidak ada produk tersimpan |
 | TS-45 | ERR-01 | Database gagal saat halaman dibuka (tabel tidak ada) | Halaman 500 generik tanpa detail; JSON 500 untuk API |
 | TS-46 | JOB-01 | `docker compose exec app php scripts/check-low-stock.php` | Ringkasan produk di bawah reorder point; kode keluar 1 bila database tidak terjangkau |
+| TS-47 | ARCH-02 (defense) | Jalankan `scripts/coverage.sh --testdox --filter Integration` (hanya test integration) terhadap MySQL nyata di Docker; hasil run 2026-10-06 untuk `GoodsIssueIntegrationTest` dan `TransactionRollbackIntegrationTest` | 2 test, 10 assertion lulus: goods issue pertama menghabiskan stok (stok 0, SO Fulfilled); goods issue kedua ditolak `InsufficientStockException`, SO kedua tetap Approved, stok tetap 0; kegagalan di tengah transaksi me-rollback semua tulisan sebelumnya |
+| TS-48 | UI-01 | Buka login, dashboard tiga role, daftar produk dan SO, detail SO (dengan dialog konfirmasi), form PO, dan Reports pada lebar 360px dan 1280px | Tidak ada elemen terpotong; tabel dashboard muat di 360px; form punya label; dialog konfirmasi fokus awal pada "Go back"; bukti di `docs/testing/screenshots/` |
+
+## Skenario defense ARCH-02 (oversell)
+
+Penjelasan 2 menit untuk technical defense (mekanisme dan alasan lengkap: ADR-002):
+
+1. **Masalah**: dua goods issue untuk produk dan gudang yang sama berjalan bersamaan; keduanya membaca stok 10, lalu keduanya mengurangi 10, sehingga stok menjadi -10 (oversell) atau satu update menimpa yang lain.
+2. **Mekanisme**: `SalesOrderService::fulfill()` membungkus semuanya dalam satu transaksi (`TransactionManagerInterface::run`), dan `MySqlProductStockRepository::lockForUpdate()` memakai `SELECT quantity ... FOR UPDATE` pada baris `product_stocks`. Permintaan kedua menunggu sampai yang pertama commit, lalu membaca stok setelah pengurangan.
+3. **Bukti**: `GoodsIssueIntegrationTest::testSecondGoodsIssueIsRejectedOnceStockIsExhausted` (hasil TS-47). Request kedua ditolak, SO kedua tetap Approved, stok tetap 0. Atomisitas: `TransactionRollbackIntegrationTest`.
+4. **Batas yang jujur**: test memakai dua `fulfill()` berurutan terhadap MySQL nyata, bukan thread paralel sungguhan (diizinkan brief §9 FAQ #8); jaminan konkurensi berasal dari row lock InnoDB.
+
+## Bukti screenshot (UI-01)
+
+Diambil 2026-10-06 dari aplikasi yang berjalan (Chrome headless, data seed). Berkas `*-mobile.png` memakai viewport 360px, `*-desktop.png` 1280px.
+
+| Halaman | Mobile | Desktop |
+|---|---|---|
+| Login | `screenshots/01-login-mobile.png` | `screenshots/01-login-desktop.png` |
+| Dashboard Admin | `screenshots/02-dashboard-admin-mobile.png` | `screenshots/02-dashboard-admin-desktop.png` |
+| Dashboard Sales | `screenshots/03-dashboard-sales-mobile.png` | `screenshots/03-dashboard-sales-desktop.png` |
+| Dashboard Warehouse | `screenshots/04-dashboard-warehouse-mobile.png` | `screenshots/04-dashboard-warehouse-desktop.png` |
+| Daftar produk | `screenshots/05-products-list-mobile.png` | `screenshots/05-products-list-desktop.png` |
+| Daftar Sales Order | `screenshots/06-sales-orders-list-mobile.png` | `screenshots/06-sales-orders-list-desktop.png` |
+| Detail Sales Order | `screenshots/07-sales-order-detail-mobile.png` | `screenshots/07-sales-order-detail-desktop.png` |
+| Dialog konfirmasi | `screenshots/08-confirm-dialog-mobile.png` | `screenshots/08-confirm-dialog-desktop.png` |
+| Form PO | `screenshots/09-purchase-order-form-mobile.png` | `screenshots/09-purchase-order-form-desktop.png` |
+| Reports | `screenshots/10-reports-mobile.png` | `screenshots/10-reports-desktop.png` |
+
+Temuan saat pengambilan: tabel Low Stock dan Recent Sales Orders di dashboard memotong kolom di 360px karena `min-width: 560px`; diperbaiki dengan varian `table-compact` (tanpa min-width) dan kolom Order Date disembunyikan di layar kecil. Tabel daftar produk dan order tetap bergeser horizontal di dalam kontainernya (`table-wrap`) karena memuat banyak kolom.

@@ -33,7 +33,7 @@ classDiagram
     %% ===== Repository Interfaces =====
     class UserRepositoryInterface { <<interface>> }
     class ProductRepositoryInterface { <<interface>> }
-    class ProductStockRepositoryInterface { <<interface>> +lockForUpdate(pdo,pid,wid) +increment() +decrement() +countLowStock() +lowStockList() }
+    class ProductStockRepositoryInterface { <<interface>> +lockForUpdate(pid,wid) +increment() +decrement() +countLowStock() +lowStockList() +totalInventoryValue() +totalRetailValue() }
     class CategoryRepositoryInterface { <<interface>> }
     class SupplierRepositoryInterface { <<interface>> }
     class CustomerRepositoryInterface { <<interface>> }
@@ -44,6 +44,7 @@ classDiagram
     class TransactionManagerInterface { <<interface>> +run(work) }
     class PdoTransactionManager
     class InMemoryTransactionManager { +commits +rollbacks }
+    class ReportRepositoryInterface { <<interface>> +stockLedgerRows(filters) +purchaseOrderRows(filters) +salesOrderRows(filters) }
     class LoginAttemptRepositoryInterface { <<interface>> +recordFailure() +countRecent() +countRecentForIp() +clear() +purgeOlderThan() }
 
     %% ===== Repository Implementations (MySQL) =====
@@ -58,6 +59,7 @@ classDiagram
     class MySqlSalesOrderRepository
     class MySqlStockLedgerRepository
     class MySqlLoginAttemptRepository
+    class MySqlReportRepository
     class InMemoryLoginAttemptRepository
     class AbstractMySqlRepository { <<abstract>> #fetchRows() #fetchRow() #execute() #insert() #buildWhere() #searchRows() #countRows() #dateOrder() }
 
@@ -87,7 +89,9 @@ classDiagram
     InMemoryTransactionManager ..|> TransactionManagerInterface
     MySqlLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
     InMemoryLoginAttemptRepository ..|> LoginAttemptRepositoryInterface
+    MySqlReportRepository ..|> ReportRepositoryInterface
     MySqlLoginAttemptRepository --|> AbstractMySqlRepository
+    MySqlReportRepository --|> AbstractMySqlRepository
     MySqlPurchaseOrderRepository --|> AbstractMySqlRepository
     MySqlSalesOrderRepository --|> AbstractMySqlRepository
     MySqlStockLedgerRepository --|> AbstractMySqlRepository
@@ -144,9 +148,11 @@ classDiagram
     SalesOrderService --> StockLedgerRepositoryInterface
     SalesOrderService --> TransactionManagerInterface
     StockLedgerService --> StockLedgerRepositoryInterface
-    ReportService --> StockLedgerRepositoryInterface
-    ReportService --> PurchaseOrderRepositoryInterface
-    ReportService --> SalesOrderRepositoryInterface
+    ReportService --> ReportRepositoryInterface
+    DashboardService --> ProductRepositoryInterface
+    DashboardService --> ProductStockRepositoryInterface
+    DashboardService --> SalesOrderRepositoryInterface
+    DashboardService --> PurchaseOrderRepositoryInterface
     LoginThrottle --> LoginAttemptRepositoryInterface
     PurchaseOrderService ..> OrderItemValidator
     PurchaseOrderService ..> DateRules
@@ -222,3 +228,7 @@ classDiagram
 12. **Penyesuaian dengan matriks peran brief (§1.2):** `ProductController` kini hanya Admin untuk menulis (Warehouse Staff hanya melihat produk dan stok), `CustomerController` hanya Admin untuk menulis, dan pencarian order (`search`, filter customer) menambah rule `like` di `AbstractMySqlRepository::buildWhere`. `ProductStockRepositoryInterface::totalInventoryValue()` dan `SalesOrderRepositoryInterface::countsByStatus(?createdBy)` dipakai `DashboardService` untuk nilai inventori Admin dan ringkasan order milik Sales.
 
 13. **Service tidak lagi bergantung pada `PDO` (ADR-005).** `SalesOrderService` dan `PurchaseOrderService` menerima `TransactionManagerInterface` (implementasi `PdoTransactionManager` untuk runtime dan `InMemoryTransactionManager` untuk unit test) dan membungkus operasi stok dalam `run()`. Parameter `PDO` juga dihapus dari metode repository (`lockForUpdate`, `record`, `updateStatus`, `updateItemReceived`) karena semua repository berbagi satu koneksi. `ArchitectureTest` menjaga agar kelas di `app/Service` tidak merujuk `PDO`, session, atau superglobal.
+
+14. **Laporan CSV memakai `ReportRepositoryInterface` (2026-10-06).** Export CSV sebelumnya menulis ID mentah (produk, gudang, supplier, user) karena `ReportService` bergantung pada tiga repository entitas. Sekarang satu interface khusus baca, `ReportRepositoryInterface` (`stockLedgerRows`, `purchaseOrderRows`, `salesOrderRows`), diimplementasikan oleh `MySqlReportRepository` dengan JOIN ke produk, gudang, user, supplier, customer, dan nomor PO/SO, plus total qty dan nilai dari item. `ReportService` hanya memformat baris menjadi CSV (label status, urutan kolom). `ReportServiceTest` menguji Service dengan mock interface, tanpa database.
+15. **Nilai retail dan margin di dashboard (2026-10-06).** `ProductStockRepositoryInterface::totalRetailValue()` (stok x harga jual produk aktif) ditambahkan di implementasi MySQL dan in-memory; `DashboardService` menghitung `potential_margin` sebagai selisihnya dengan `totalInventoryValue()`. Untuk Sales, `DashboardService` juga mengisi `my_recent_orders` lewat `SalesOrderRepositoryInterface::search()`; seluruh `DashboardService` bergantung pada interface repository.
+16. **Helper tampilan global (2026-10-06).** `rupiah()` (di `app/Core/View.php`, di samping `e()`) memformat nominal sebagai Rupiah tanpa desimal, dan `roleLabel()` (di `views/partials/partial.php`, sebelumnya `role_label`) menerjemahkan nilai role ke label. Keduanya fungsi global untuk template, bukan kelas, sehingga tidak muncul pada diagram.

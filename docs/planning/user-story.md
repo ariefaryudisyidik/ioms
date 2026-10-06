@@ -37,7 +37,7 @@ Format: **Sebagai** [role], **saya ingin** [aksi], **supaya** [tujuan].
 19. **US-19** Sebagai WarehouseStaff, saya ingin melihat riwayat pergerakan stok (stock ledger) per produk/gudang, supaya saya bisa menelusuri asal setiap perubahan stok (Receipt/Issue/Adjustment). (`StockLedgerService::search`, `StockLedgerRepositoryInterface`)
 20. **US-20** Sebagai Admin/WarehouseStaff, saya ingin melihat dashboard ringkasan (jumlah PO/SO per status, produk low stock), supaya saya cepat mengetahui kondisi operasional terkini. (`DashboardService::summaryFor`, `DashboardController`)
 21. **US-21** Sebagai Admin, saya ingin sistem memberi tahu produk yang stoknya di bawah reorder point (low stock), supaya saya bisa segera membuat PO baru. (`ProductStockRepositoryInterface::countLowStock`/`lowStockList`, `scripts/check-low-stock.php`)
-22. **US-22** Sebagai Admin, saya ingin mengekspor laporan stock ledger dan status order (PO/SO) ke CSV dengan filter tanggal, supaya data bisa diolah lebih lanjut di luar sistem. (`ReportService::stockLedgerCsv`/`orderStatusCsv`, `ReportController`)
+22. **US-22** Sebagai Admin, saya ingin mengekspor laporan stock ledger dan status order (PO/SO) ke CSV dengan filter tanggal, supaya data bisa diolah lebih lanjut di luar sistem. CSV memuat nama dan nomor order (bukan ID mentah), total qty dan nilai, dan Date & Time di kolom terakhir; laporan stok untuk Admin dan Warehouse Staff, PO hanya Admin, SO untuk Admin dan Sales (Sales hanya order miliknya), sesuai brief §1.2. (`ReportService::stockLedgerCsv`/`orderStatusCsv`, `ReportRepositoryInterface`, `ReportController`)
 
 ## API
 

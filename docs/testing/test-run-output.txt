@@ -1,4 +1,4 @@
-# Hasil test (Unit + Integration + E2E) — 2026-10-05 21:09 WIB
+# Hasil test (Unit + Integration + E2E) — 2026-10-06 13:38 WIB
 # Perintah: composer coverage   (scripts/coverage.sh --testdox)
 
 PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
@@ -6,13 +6,13 @@ PHPUnit 10.5.64 by Sebastian Bergmann and contributors.
 Runtime:       PHP 8.4.8 with Xdebug 3.4.2
 Configuration: /Users/Expiro/Project/ioms/phpunit.xml
 
-...............................................................  63 / 278 ( 22%)
-............................................................... 126 / 278 ( 45%)
-............................................................... 189 / 278 ( 67%)
-............................................................... 252 / 278 ( 90%)
-..........................                                      278 / 278 (100%)
+...............................................................  63 / 283 ( 22%)
+............................................................... 126 / 283 ( 44%)
+............................................................... 189 / 283 ( 66%)
+............................................................... 252 / 283 ( 89%)
+...............................                                 283 / 283 (100%)
 
-Time: 04:03.742, Memory: 27.00 MB
+Time: 04:20.313, Memory: 27.00 MB
 
 Architecture (Tests\Unit\Architecture)
  ✔ Services do not depend on pdo session or superglobals
@@ -43,6 +43,7 @@ Brief Requirements E2E (Tests\E2E\BriefRequirementsE2E)
  ✔ Product detail shows total stock and per warehouse breakdown
  ✔ Admin dashboard shows inventory value computed from stock
  ✔ Sales dashboard shows only their own orders per status
+ ✔ Sales dashboard shows an empty state when they have no orders
  ✔ Warehouse dashboard shows receipt and issue queues and low stock
  ✔ Master data is read only for sales and warehouse staff
  ✔ Purchase orders are created by admin or warehouse staff only
@@ -253,6 +254,10 @@ Purchase Order Receipt Validation (Tests\Unit\PurchaseOrderReceiptValidation)
  ✔ Receipt with nothing to receive is rejected
  ✔ Zero lines are ignored when another line receives something
 
+Report Service (Tests\Unit\ReportService)
+ ✔ Stock ledger csv shows names and order numbers instead of ids
+ ✔ Purchase status is spaced and sales export passes the owner filter
+
 Reports Api Dashboard E2E (Tests\E2E\ReportsApiDashboardE2E)
  ✔ Dashboard renders for every role
  ✔ Reports page and csv exports are available to logged in users
@@ -290,6 +295,10 @@ Router (Tests\Unit\Router)
  ✔ Patch and any register routes for their methods
  ✔ Missing route without custom handler responds with json 404
  ✔ Root route matches empty and slash paths
+
+Rupiah Helper (Tests\Unit\RupiahHelper)
+ ✔ Formats whole rupiah with dot thousands separator
+ ✔ Rounds to whole rupiah and keeps the sign of negative amounts
 
 Sales Order Creation (Tests\Unit\SalesOrderCreation)
  ✔ Number is generated from order year and id
@@ -368,7 +377,7 @@ Transaction Manager (Tests\Unit\TransactionManager)
 Transaction Rollback Integration (Tests\Integration\TransactionRollbackIntegration)
  ✔ Failure mid transaction rolls back all prior writes in the same fulfillment
 
-OK (278 tests, 1304 assertions)
+OK (283 tests, 1329 assertions)
 
 
 Coverage written to build/coverage/clover.xml (SonarQube) and build/coverage/html/index.html (browser)
