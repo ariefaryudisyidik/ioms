@@ -52,16 +52,16 @@ $mine = $summary['my_so_counts'] ?? [];
         </div>
     <?php else: ?>
         <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table table-compact">
                 <thead>
-                    <tr><th>SO Number</th><th>Customer</th><th>Order Date</th><th>Status</th></tr>
+                    <tr><th>SO Number</th><th>Customer</th><th class="hide-sm">Order Date</th><th>Status</th></tr>
                 </thead>
                 <tbody>
                     <?php foreach ($recent as $order): ?>
                         <tr>
                             <td><a href="/sales-orders/<?= (int) $order->id ?>"><?= e($order->soNumber) ?></a></td>
                             <td class="wrap"><?= e($order->customerName ?? '-') ?></td>
-                            <td><?= e($order->orderDate) ?></td>
+                            <td class="hide-sm"><?= e($order->orderDate) ?></td>
                             <td><span class="badge badge-<?= e(strtolower($order->status)) ?>"><?= e(trim((string) preg_replace('/(?<!^)(?=[A-Z])/', ' ', $order->status))) ?></span></td>
                         </tr>
                     <?php endforeach; ?>
@@ -83,7 +83,7 @@ $mine = $summary['my_so_counts'] ?? [];
         </div>
     <?php else: ?>
         <div class="table-wrap">
-            <table class="data-table">
+            <table class="data-table table-compact">
                 <thead>
                     <tr><th>SKU</th><th>Name</th><th>Total Stock</th><th>Reorder Point</th></tr>
                 </thead>

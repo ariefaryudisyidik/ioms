@@ -467,6 +467,15 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
 
 .data-table td.wrap, .data-table th.wrap { white-space: normal; }
 
+/* Small dashboard tables: fit a 360px screen instead of scrolling sideways. */
+table.data-table.table-compact { min-width: 0; }
+.table-compact th, .table-compact td { white-space: normal; }
+.table-compact td:first-child { white-space: nowrap; }
+@media (max-width: 600px) {
+  .hide-sm { display: none; }
+  .table-compact th, .table-compact td { padding: 8px 6px; }
+}
+
 .empty-state {
   text-align: center;
   padding: var(--space-6) var(--space-4);
