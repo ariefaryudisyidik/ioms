@@ -20,7 +20,7 @@ partial('order-list', [
         'label' => 'Customer',
         'options' => array_map(static fn ($customer) => [$customer->id, $customer->name], $customers),
     ],
-    'notice' => $role === 'Sales' ? 'Showing only sales orders you created.' : null,
+    'notice' => null,
     'emptyMessage' => 'Belum ada data sales order.',
     'headers' => ['SO Number', 'Customer', 'Order Date', 'Status', ''],
     'rows' => array_map(static fn ($o) => [
