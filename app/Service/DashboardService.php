@@ -34,11 +34,16 @@ final class DashboardService
         $soCounts = $this->salesOrders->countsByStatus();
         $poCounts = $this->purchaseOrders->countsByStatus();
 
+        $inventoryValue = $this->stocks->totalInventoryValue();
+        $retailValue = $this->stocks->totalRetailValue();
+
         $summary = [
             'total_products' => $totalProducts,
             'low_stock_count' => $lowStockCount,
             'low_stock_items' => $this->stocks->lowStockList(),
-            'inventory_value' => $this->stocks->totalInventoryValue(),
+            'inventory_value' => $inventoryValue,
+            'potential_revenue' => $retailValue,
+            'potential_margin' => $retailValue - $inventoryValue,
             'pending_approval_count' => $soCounts[SalesOrder::STATUS_PENDING_APPROVAL] ?? 0,
             'so_draft_count' => $soCounts[SalesOrder::STATUS_DRAFT] ?? 0,
             'so_approved_count' => $soCounts[SalesOrder::STATUS_APPROVED] ?? 0,
@@ -52,6 +57,7 @@ final class DashboardService
 
         if ($role === 'Sales') {
             $summary['my_so_counts'] = $this->salesOrders->countsByStatus($userId);
+            $summary['my_recent_orders'] = $this->salesOrders->search(['created_by' => $userId, 'limit' => 5]);
         }
 
         return $summary;

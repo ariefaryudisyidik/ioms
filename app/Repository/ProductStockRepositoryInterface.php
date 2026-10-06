@@ -45,6 +45,11 @@ interface ProductStockRepositoryInterface
     public function totalInventoryValue(): float;
 
     /**
+     * Value of all active products' stock at selling price (sum of quantity x selling_price).
+     */
+    public function totalRetailValue(): float;
+
+    /**
      * @return array<int,array{product_id:int,sku:string,name:string,total:int,reorder_point:int}>
      */
     public function lowStockList(): array;

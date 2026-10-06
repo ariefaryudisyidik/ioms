@@ -82,6 +82,8 @@ final class InMemoryRepositoriesTest extends TestCase
         $this->assertSame(1, $stocks->countLowStock());
         $this->assertSame(5 * 1.0, $stocks->totalInventoryValue(), 'purchase price 1 x total quantity 5');
         $this->assertSame(0.0, (new InMemoryProductStockRepository())->totalInventoryValue());
+        $this->assertSame(5 * 2.0, $stocks->totalRetailValue(), 'selling price 2 x total quantity 5');
+        $this->assertSame(0.0, (new InMemoryProductStockRepository())->totalRetailValue());
         $this->assertSame([], (new InMemoryProductStockRepository())->lowStockList());
     }
 
