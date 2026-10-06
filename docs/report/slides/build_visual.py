@@ -23,7 +23,7 @@ def browser(img, url, cls=''):
     return f'<div class="browser {cls}"><div class="bar"><i></i><i></i><i></i><span>{url}</span></div><img src="img/{img}.jpg"></div>'
 
 
-def foot(n, total=13):
+def foot(n, total=12):
     return f'<div class="foot"><span>IOMS · Final Project · 7 Oktober 2026</span><span>{n:02d} / {total}</span></div>'
 
 
@@ -199,14 +199,7 @@ $this-&gt;transactions-&gt;<span class="k">run</span>(<span class="k">function</
 <ul class="pts" style="color:#7c4a0a"><li>Rate limiting dan token untuk API</li><li>CI/CD</li></ul></div>
 <div class="card ok"><div class="badge-ic">{ic('route',24)}</div><h3>Prioritas</h3>
 <ol class="pts" style="color:#14532d"><li>Rate limiting API</li><li>MFA dan token API</li></ol></div></div>{foot(11)}</section>""")
-    # 12 AI
-    s.append(f"""<section class="slide"><div class="eyebrow">Transparansi</div><h2>Penggunaan AI</h2>
-<div class="row"><div class="grow"><ul class="steps">
-<li><span class="num">1</span><span>AI membantu menulis kode, test, dan dokumentasi.</span></li>
-<li><span class="num">2</span><span>Subagent paralel dipakai untuk refactor duplikasi; perilakunya saya <b>bandingkan sebelum dan sesudah</b>.</span></li>
-<li><span class="num">3</span><span>Hasilnya saya cek sendiri: build Docker dari clone bersih, test, SonarQube, dan smoke test tiap role.</span></li></ul></div>
-<div class="card soft" style="width:420px"><h3>Referensi</h3><p style="font-size:16px;color:#1e3a8a">Kode utama: <code>SalesOrderService::fulfill</code>, <code>Router</code>, <code>CrudController</code>. Keputusan desain: ADR 001–005. Rincian penggunaan AI: <code>ai-usage-log.md</code>.</p></div></div>{foot(12)}</section>""")
-    # 13 QA
+    # 12 QA
     s.append(f"""<section class="slide dark"><div style="position:absolute;right:70px;top:120px;width:470px;transform:rotate(2deg)">{browser('login','localhost:8080/login')}</div>
 <div style="margin-top:170px"><h1 style="font-size:96px">Terima kasih</h1>
 <div style="margin-top:34px;display:flex;gap:44px;font-size:14px;color:#9db7f0"><div>DISUSUN OLEH<br><b style="color:#fff;font-size:19px">Arief Aryudi Syidik</b></div><div>PROGRAM<br><b style="color:#fff;font-size:19px">PT Neuronworks Indonesia</b></div></div></div></section>""")
