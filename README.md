@@ -64,14 +64,31 @@ Seluruh akun demo memakai password: **`Password123!`**
 | WarehouseStaff | Rudi Hartono | rudi.warehouse@ioms.test |
 | WarehouseStaff | Maya Putri | maya.warehouse@ioms.test |
 
+## Perintah Composer
+
+Semua skrip bantu dijalankan lewat satu pintu, `composer <perintah>` (daftar dengan `composer list`):
+
+| Perintah | Fungsi |
+|---|---|
+| `composer test:unit` | Unit test saja (tanpa database) |
+| `composer test` | Seluruh suite PHPUnit (integration butuh MySQL) |
+| `composer coverage` | Unit + Integration + E2E dengan coverage, memakai MySQL sementara di Docker |
+| `composer stan` | Static analysis PHPStan level 5 |
+| `composer sonar` | Coverage lalu scan SonarQube (butuh `export SONAR_TOKEN=...`) |
+| `composer db:reset` | Reset database dev ke `schema.sql` + `seed.sql` (opsi: `-- --yes`, `-- --uploads`) |
+| `composer demo:api` | Demo API-01: JSON tanpa login (401), dengan login (200), SKU tidak ada (404) |
+| `composer low-stock` | Ringkasan produk di bawah reorder point (JOB-01, lewat `docker compose exec`) |
+
+Opsi untuk skrip diberikan setelah `--`, variabel lewat environment, mis. `SKU=SKU-0010 composer demo:api`.
+
 ## Reset Database Lokal
 
 Mengembalikan database dev ke data `database/schema.sql` + `database/seed.sql` (semua PO, SO, stok, dan user yang dibuat lewat aplikasi hilang):
 
 ```bash
-composer db:reset                 # atau: scripts/reset-db.sh
-scripts/reset-db.sh --yes         # tanpa konfirmasi
-scripts/reset-db.sh --uploads     # sekalian hapus gambar produk yang diunggah
+composer db:reset                 # meminta konfirmasi
+composer db:reset -- --yes        # tanpa konfirmasi
+composer db:reset -- --uploads    # sekalian hapus gambar produk yang diunggah
 ```
 
 Script menghapus volume `db_data` lalu menyalakan ulang stack, karena MySQL hanya memuat schema dan seed saat volumenya kosong. SonarQube tidak terpengaruh.
