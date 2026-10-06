@@ -47,6 +47,7 @@ final class ReportsApiDashboardE2ETest extends E2ETestCase
 
         $found = $client->get('/api/products/SKU-0001/availability');
         $this->assertSame(200, $found->status);
+        $this->assertStringContainsString('application/json', $found->contentType);
         $data = $found->json();
         $this->assertSame('SKU-0001', $data['sku']);
         $this->assertSame(56, $data['total']);
@@ -54,6 +55,7 @@ final class ReportsApiDashboardE2ETest extends E2ETestCase
 
         $missing = $client->get('/api/products/NOPE/availability');
         $this->assertSame(404, $missing->status);
+        $this->assertStringContainsString('application/json', $missing->contentType);
         $this->assertSame('Not Found', $missing->json()['error']);
     }
 
