@@ -10,6 +10,11 @@ namespace Tests\E2E;
  */
 final class BriefRequirementsE2ETest extends E2ETestCase
 {
+    private function rupiah(mixed $amount): string
+    {
+        return 'Rp ' . number_format(round((float) $amount), 0, ',', '.');
+    }
+
     private function card(string $html, string $label): ?string
     {
         $pattern = '#<div class="card-label">(?:<svg.*?</svg>\s*)?<span>' . preg_quote(htmlspecialchars($label), '#') . '</span></div><div class="card-value">([^<]*)</div>#s';
@@ -90,12 +95,22 @@ final class BriefRequirementsE2ETest extends E2ETestCase
     {
         $admin = $this->loginAs(self::ADMIN);
         $sql = 'SELECT SUM(ps.quantity * p.purchase_price) FROM product_stocks ps JOIN products p ON p.id = ps.product_id WHERE p.is_active = 1';
-        $expected = number_format((float) $this->value($sql), 2);
+        $expected = $this->rupiah($this->value($sql));
+        $retailSql = str_replace('p.purchase_price', 'p.selling_price', $sql);
+        $retail = (float) $this->value($retailSql);
 
-        $this->assertSame($expected, $this->card($admin->get('/dashboard')->body, 'Inventory Value'));
+        $body = $admin->get('/dashboard')->body;
+        $this->assertSame($expected, $this->card($body, 'Inventory Value'));
+        $this->assertSame($this->rupiah($retail), $this->card($body, 'Potential Revenue'));
+        $this->assertSame($this->rupiah($retail - (float) $this->value($sql)), $this->card($body, 'Potential Margin'));
+        $awaiting = $this->value("SELECT COUNT(*) FROM purchase_orders WHERE status IN ('Ordered','PartiallyReceived')");
+        $this->assertSame((string) $awaiting, $this->card($body, 'PO Awaiting Receipt'));
 
         $this->db()->exec('UPDATE product_stocks SET quantity = 0');
-        $this->assertSame('0.00', $this->card($admin->get('/dashboard')->body, 'Inventory Value'), 'the value is aggregated, not static');
+        $body = $admin->get('/dashboard')->body;
+        $this->assertSame('Rp 0', $this->card($body, 'Inventory Value'), 'the value is aggregated, not static');
+        $this->assertSame('Rp 0', $this->card($body, 'Potential Revenue'));
+        $this->assertSame('Rp 0', $this->card($body, 'Potential Margin'));
         $this->assertSame('PendingApproval', $this->value('SELECT status FROM sales_orders WHERE id = 1'));
         $this->assertSame('3', $this->card($admin->get('/dashboard')->body, 'SO Pending Approval'));
     }
@@ -104,14 +119,25 @@ final class BriefRequirementsE2ETest extends E2ETestCase
     {
         $body = $this->loginAs(self::SALES)->get('/dashboard')->body; // Sari owns SOs 1,3,5,7,9,11
 
-        $this->assertSame('1', $this->card($body, 'My orders: Draft'));
-        $this->assertSame('2', $this->card($body, 'My orders: PendingApproval'));
-        $this->assertSame('1', $this->card($body, 'My orders: Approved'));
-        $this->assertSame('1', $this->card($body, 'My orders: Fulfilled'));
-        $this->assertSame('1', $this->card($body, 'My orders: Cancelled'));
+        $this->assertSame('1', $this->card($body, 'Draft'));
+        $this->assertSame('2', $this->card($body, 'Pending Approval'));
+        $this->assertSame('1', $this->card($body, 'Approved'));
+        $this->assertSame('1', $this->card($body, 'Fulfilled'));
+        $this->assertSame('1', $this->card($body, 'Cancelled'));
+        $this->assertStringContainsString('Recent Sales Orders', $body);
+        $this->assertStringNotContainsString('Low Stock Items', $body);
 
         $this->db()->exec("UPDATE sales_orders SET status = 'Draft' WHERE id = 11");
-        $this->assertSame('2', $this->card($this->loginAs(self::SALES)->get('/dashboard')->body, 'My orders: Draft'));
+        $this->assertSame('2', $this->card($this->loginAs(self::SALES)->get('/dashboard')->body, 'Draft'));
+    }
+
+    public function testSalesDashboardShowsAnEmptyStateWhenTheyHaveNoOrders(): void
+    {
+        $this->db()->exec('UPDATE sales_orders SET created_by = 3 WHERE created_by = 2');
+        $body = $this->loginAs(self::SALES)->get('/dashboard')->body;
+
+        $this->assertStringContainsString('Belum ada Sales Order', $body);
+        $this->assertSame('0', $this->card($body, 'Draft'));
     }
 
     public function testWarehouseDashboardShowsReceiptAndIssueQueuesAndLowStock(): void

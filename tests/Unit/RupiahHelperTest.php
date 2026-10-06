@@ -8,6 +8,11 @@ use PHPUnit\Framework\TestCase;
 
 final class RupiahHelperTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        require_once __DIR__ . '/../../app/Core/View.php';
+    }
+
     public function testFormatsWholeRupiahWithDotThousandsSeparator(): void
     {
         $this->assertSame('Rp 636.128.000', rupiah(636128000.0));
