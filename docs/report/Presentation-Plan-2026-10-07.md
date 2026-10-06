@@ -9,7 +9,7 @@ Dokumen ini menggantikan skrip lama (`Demo-Script.pdf`, `IOMS-Presentation.pdf`,
 **H-1 (Selasa):**
 - [ ] `git push origin master`; buka repo di jendela incognito, pastikan terakhir ter-push dan bisa diakses.
 - [ ] Clone ke folder baru, `cp .env.example .env`, `docker compose up --build`, login: pastikan README benar-benar jalan.
-- [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml up -d`, buka `http://localhost:9001` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
+- [ ] Nyalakan SonarQube: `docker compose -f docker-compose.sonar.yml up -d`, buka `http://localhost:9000` (password admin sudah kamu ganti), pastikan proyek `ioms` menunjukkan **Passed, 0 isu, coverage 100%, duplikasi 0%**.
 - [ ] `composer coverage` sekali lagi; buka `build/coverage/html/index.html` (laporan coverage per file).
 - [ ] Screenshot cadangan: dashboard SonarQube (Overall Code), laporan coverage HTML, output `composer coverage` (278 tests, 1304 assertions), `docker compose ps`, demo PO→SO.
 - [ ] Latihan dengan timer. Target selesai di 9:30.

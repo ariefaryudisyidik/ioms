@@ -403,7 +403,7 @@ def main():
     d.para('Repository, README, ADR, class diagram, laporan SonarQube, dan laporan coverage siap ditelusuri '
            'langsung dari kode.', MX, 350, 860, style(20, MUTED, leading=29))
     for i, (lbl, val) in enumerate([('Akun demo', 'admin@ioms.test · Password123!'),
-                                    ('Aplikasi', 'localhost:8080'), ('SonarQube', 'localhost:9001')]):
+                                    ('Aplikasi', 'localhost:8080'), ('SonarQube', 'localhost:9000')]):
         x = MX + [0, 470, 720][i]
         c.setFillColor(MUTED)
         c.setFont('Sans', 13)
