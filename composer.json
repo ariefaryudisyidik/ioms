@@ -25,12 +25,15 @@
     "scripts": {
         "test": "phpunit",
         "test:unit": "phpunit --testsuite Unit",
-        "coverage": "bash scripts/coverage.sh",
+        "coverage": [
+            "Composer\\Config::disableProcessTimeout",
+            "bash scripts/coverage.sh"
+        ],
         "db:reset": "bash scripts/reset-db.sh",
         "demo:api": "bash scripts/demo-api.sh",
         "low-stock": "docker compose exec app php scripts/check-low-stock.php",
         "sonar": [
-            "@putenv COMPOSER_PROCESS_TIMEOUT=0",
+            "Composer\\Config::disableProcessTimeout",
             "[ -n \"$SONAR_TOKEN\" ] || { echo 'SONAR_TOKEN belum di-export (buat di SonarQube: My Account > Security).'; exit 1; }",
             "@coverage",
             "docker compose -f docker-compose.sonar.yml run --rm scanner sonar-scanner -Dsonar.qualitygate.wait=true"
