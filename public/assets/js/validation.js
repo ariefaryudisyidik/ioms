@@ -37,58 +37,43 @@
   }
 
   /**
-   * Validates a form generically based on data attributes:
-   *   data-required, data-type="number|date|email", data-min="0", data-max="10"
-   * Returns true if valid.
+   * Returns the error message for a single field based on its data attributes
+   * (data-required, data-type="number|date|email", data-min, data-max), or null.
    */
+  function fieldError(field) {
+    var value = (field.value || '').trim();
+
+    if (field.hasAttribute('data-required') && value === '') {
+      return 'This field is required.';
+    }
+    if (value === '') return null;
+
+    var type = field.getAttribute('data-type');
+    if (type === 'number') {
+      var num = Number(value);
+      if (isNaN(num)) return 'Must be a number.';
+      var min = field.getAttribute('data-min');
+      if (min !== null && num < Number(min)) return 'Must be at least ' + min + '.';
+      var max = field.getAttribute('data-max');
+      if (max !== null && num > Number(max)) return 'Must be at most ' + max + '.';
+    } else if (type === 'date') {
+      if (!isValidDate(value)) return 'Enter a valid date (YYYY-MM-DD).';
+    } else if (type === 'email') {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address.';
+    }
+    return null;
+  }
+
+  /** Validates a form generically. Returns true if valid. */
   function validateForm(form) {
     clearAllErrors(form);
     var valid = true;
-    var fields = form.querySelectorAll('[data-required], [data-type]');
 
-    fields.forEach(function (field) {
-      var value = (field.value || '').trim();
-
-      if (field.hasAttribute('data-required') && value === '') {
-        showError(field, 'This field is required.');
+    form.querySelectorAll('[data-required], [data-type]').forEach(function (field) {
+      var message = fieldError(field);
+      if (message) {
+        showError(field, message);
         valid = false;
-        return;
-      }
-
-      if (value === '') return;
-
-      var type = field.getAttribute('data-type');
-      if (type === 'number') {
-        var num = Number(value);
-        if (isNaN(num)) {
-          showError(field, 'Must be a number.');
-          valid = false;
-          return;
-        }
-        var min = field.getAttribute('data-min');
-        if (min !== null && num < Number(min)) {
-          showError(field, 'Must be at least ' + min + '.');
-          valid = false;
-          return;
-        }
-        var max = field.getAttribute('data-max');
-        if (max !== null && num > Number(max)) {
-          showError(field, 'Must be at most ' + max + '.');
-          valid = false;
-          return;
-        }
-      } else if (type === 'date') {
-        if (!isValidDate(value)) {
-          showError(field, 'Enter a valid date (YYYY-MM-DD).');
-          valid = false;
-          return;
-        }
-      } else if (type === 'email') {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          showError(field, 'Enter a valid email address.');
-          valid = false;
-          return;
-        }
       }
     });
 
@@ -106,8 +91,22 @@
     return valid;
   }
 
+  // Re-check a field as soon as it changes: the error disappears once it is valid.
+  function revalidateField(event) {
+    var field = event.target;
+    if (!field.matches || !field.matches('[data-required], [data-type]')) return;
+    var wrapper = field.closest('.field') || field.parentElement;
+    if (!wrapper || !wrapper.classList.contains('has-error')) return;
+    wrapper.querySelectorAll('.field-error').forEach(function (el) { el.remove(); });
+    wrapper.classList.remove('has-error');
+    var message = fieldError(field);
+    if (message) showError(field, message);
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('form[data-validate]').forEach(function (form) {
+      form.addEventListener('input', revalidateField);
+      form.addEventListener('change', revalidateField);
       form.addEventListener('submit', function (event) {
         if (!validateForm(form)) {
           event.preventDefault();

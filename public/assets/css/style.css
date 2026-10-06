@@ -575,7 +575,7 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
   display: grid;
   grid-template-columns: 2fr 1fr auto;
   gap: var(--space-2);
-  align-items: end;
+  align-items: start;
   border-bottom: 1px dashed var(--color-border);
   padding-bottom: var(--space-3);
   margin-bottom: var(--space-3);
@@ -583,6 +583,13 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
 
 .item-row .field { margin-bottom: 0; }
 .item-row .field label { margin-bottom: 0; }
+/* Blank label-height spacer so the action button lines up with the inputs, even when a field shows an error. */
+.item-row .field-action::before {
+  content: '\00a0';
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
 .item-row input,
 .item-row select,
 .item-row .btn { height: 42px; box-sizing: border-box; }
@@ -590,6 +597,7 @@ table.data-table { width: 100%; border-collapse: collapse; min-width: 560px; }
 
 @media (max-width: 700px) {
   .item-row { grid-template-columns: 1fr; }
+  .item-row .field-action::before { display: none; }
 }
 
 .text-muted { color: var(--color-text-muted); }

@@ -22,7 +22,7 @@
         <input type="number" name="items[<?= e($index) ?>][<?= e($qtyName) ?>]" class="js-qty-input" min="1" step="1" data-required data-type="number" data-min="1" required>
     </label>
     </div>
-    <div class="field">
+    <div class="field field-action">
         <button type="button" class="btn btn-danger btn-sm js-remove-item-row"><?= icon('trash-2') ?>Remove</button>
     </div>
     <div class="availability-box" style="grid-column:1/-1;"></div>
